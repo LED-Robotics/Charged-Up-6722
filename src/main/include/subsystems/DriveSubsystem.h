@@ -8,17 +8,20 @@
 #include <frc/Encoder.h>
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/geometry/Pose2d.h>
-#include <frc/kinematics/DifferentialDriveOdometry.h>
+#include <frc/kinematics/SwerveDriveOdometry.h>
 #include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/SubsystemBase.h>
 #include <units/voltage.h>
 #include "ctre/Phoenix.h"
 #include "AHRS.h"
+#include <frc/kinematics/ChassisSpeeds.h>
+
 
 #include "Constants.h"
 
 using namespace frc;
+using namespace frc2;
 
 class DriveSubsystem : public frc2::SubsystemBase {
  public:
@@ -147,7 +150,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
    *
    * @return The current wheel speeds.
    */
-  frc::DifferentialDriveWheelSpeeds GetWheelSpeeds();
+  frc::ChassisSpeeds GetWheelSpeeds();
 
   /**
    * Resets the odometry to the specified pose.
@@ -161,28 +164,33 @@ class DriveSubsystem : public frc2::SubsystemBase {
   // declared private and exposed only through public methods.
 
   // The motor controllers
-  // WPI_VictorSPX m_left1;
-  // WPI_VictorSPX m_left2;
-  // WPI_VictorSPX m_right1;
-  // WPI_VictorSPX m_right2;
+  // WPI_VictorSPX backLeft;
+  // WPI_VictorSPX frontLeft;
+  // WPI_VictorSPX backRight;
+  // WPI_VictorSPX frontRight;
 
-  WPI_TalonFX m_left1;
-  WPI_TalonFX m_left2;
-  WPI_TalonFX m_right1;
-  WPI_TalonFX m_right2;
+  WPI_TalonFX backLeft;
+  WPI_TalonFX frontLeft;
+  WPI_TalonFX backRight;
+  WPI_TalonFX frontRight;
+
+  WPI_TalonFX backLeftTheta;
+  WPI_TalonFX frontLeftTheta;
+  WPI_TalonFX backRightTheta;
+  WPI_TalonFX frontRightTheta;
 
   // The motors on the left side of the drive
-  frc::MotorControllerGroup m_leftMotors{m_left1, m_left2};
+  frc::MotorControllerGroup leftMotors{backLeft, frontLeft};
 
   // The motors on the right side of the drive
-  frc::MotorControllerGroup m_rightMotors{m_right1, m_right2};
+  frc::MotorControllerGroup rightMotors{backRight, frontRight};
 
   // The robot's drive
-  frc::DifferentialDrive m_drive{m_leftMotors, m_rightMotors};
+  frc::DifferentialDrive drive{leftMotors, rightMotors};
 
   // The gyro sensor
-  AHRS m_gyro;
+  AHRS gyro;
 
   // Odometry class for tracking robot pose
-  frc::DifferentialDriveOdometry m_odometry;
+  frc::SwerveDriveOdometry<4> odometry;
 };

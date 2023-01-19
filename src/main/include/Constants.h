@@ -2,8 +2,8 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/kinematics/DifferentialDriveKinematics.h>
-#include <frc/trajectory/constraint/DifferentialDriveKinematicsConstraint.h>
+#include <frc/kinematics/SwerveDriveKinematics.h>
+#include <frc/trajectory/constraint/SwerveDriveKinematicsConstraint.h>
 #include <units/acceleration.h>
 #include <units/angle.h>
 #include <units/length.h>
@@ -32,8 +32,12 @@ constexpr int kRightMotor2Port = 3;
 constexpr bool kLeftEncoderReversed = false;
 constexpr bool kRightEncoderReversed = true;
 
-constexpr auto kTrackwidth = 0.69_m;
-extern const frc::DifferentialDriveKinematics kDriveKinematics;
+constexpr frc::Translation2d backLeftCord{-.381_m, .381_m};
+constexpr frc::Translation2d frontLeftCord{.381_m, .381_m};
+constexpr frc::Translation2d backRightCord{-.381_m, -.381_m};
+constexpr frc::Translation2d frontRightCord{.381_m, -.381_m};
+extern const frc::SwerveDriveKinematics kDriveKinematics;
+
 
 constexpr int kEncoderCPR = 2048;
 constexpr double kWheelDiameterInches = 0.1524;

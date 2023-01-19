@@ -6,5 +6,6 @@
 
 using namespace DriveConstants;
 
-const frc::DifferentialDriveKinematics DriveConstants::kDriveKinematics(
-    kTrackwidth);
+const frc::SwerveDriveKinematics DriveConstants::kDriveKinematics(
+    backLeftCord, backRightCord, frontLeftCord, frontRightCord
+);
