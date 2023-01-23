@@ -22,7 +22,7 @@ DriveSubsystem::DriveSubsystem()
       frontRightTheta{kFrontRightThetaPort},
 
       gyro{SPI::Port::kMXP},
-      odometry{kDriveKinematics, {units::degree_t{gyro.GetAngle()}}},
+      odometry{kDriveKinematics, {units::degree_t{gyro.GetAngle()}}, {GetPosition(&backLeft), GetPosition(&frontLeft), GetPosition(&backRight), GetPosition(&frontRight)}, frc::Pose2d{0_m, 0_m, 0_deg}},
   // We need to invert one side of the drivetrain so that positive voltages
   // result in both sides moving forward. Depending on how your robot's
   // gearbox is constructed, you might have to invert the left side instead.

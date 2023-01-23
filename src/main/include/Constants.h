@@ -11,6 +11,11 @@
 #include <units/velocity.h>
 #include <units/voltage.h>
 #include <numbers>
+#include <frc/Encoder.h>
+#include <frc/controller/ArmFeedforward.h>
+#include <frc/motorcontrol/PWMSparkMax.h>
+#include <frc2/command/ProfiledPIDSubsystem.h>
+#include <units/angle.h>
 
 #pragma once
 
@@ -24,18 +29,22 @@
  */
 
 namespace DriveConstants {
-constexpr int kLeftMotor1Port = 0;
-constexpr int kLeftMotor2Port = 1;
-constexpr int kRightMotor1Port = 2;
-constexpr int kRightMotor2Port = 3;
+constexpr int kBackLeftPort = 0;
+constexpr int kFrontLeftPort = 1;
+constexpr int kBackRightPort = 2;
+constexpr int kFrontRightPort = 3;
+constexpr int kBackLeftThetaPort = 4;
+constexpr int kFrontLeftThetaPort = 5;
+constexpr int kBackRightThetaPort = 6;
+constexpr int kFrontRightThetaPort = 7;
 
 constexpr bool kLeftEncoderReversed = false;
 constexpr bool kRightEncoderReversed = true;
 
-constexpr frc::Translation2d backLeftCord{-.381_m, .381_m};
-constexpr frc::Translation2d frontLeftCord{.381_m, .381_m};
-constexpr frc::Translation2d backRightCord{-.381_m, -.381_m};
-constexpr frc::Translation2d frontRightCord{.381_m, -.381_m};
+frc::Translation2d backLeftCord{-.381_m, .381_m};
+frc::Translation2d frontLeftCord{.381_m, .381_m};
+frc::Translation2d backRightCord{-.381_m, -.381_m};
+frc::Translation2d frontRightCord{.381_m, -.381_m};
 extern const frc::SwerveDriveKinematics kDriveKinematics;
 
 

@@ -17,7 +17,6 @@
 #include "AHRS.h"
 #include <frc/kinematics/ChassisSpeeds.h>
 
-
 #include "Constants.h"
 
 using namespace frc;
