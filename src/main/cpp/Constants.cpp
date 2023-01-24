@@ -4,8 +4,7 @@
 
 #include "Constants.h"
 
-using namespace DriveConstants;
-
-const frc::SwerveDriveKinematics DriveConstants::kDriveKinematics(
-    backLeftCord, backRightCord, frontLeftCord, frontRightCord
-);
+namespace AutoConstants {
+    const frc::TrapezoidProfile<units::radians>::Constraints
+        kThetaControllerConstraints{kAngularSpeed, kMaxAngularAcceleration};
+}

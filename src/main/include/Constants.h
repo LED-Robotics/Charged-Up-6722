@@ -2,10 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-#include <frc/kinematics/SwerveDriveKinematics.h>
-#include <frc/trajectory/constraint/SwerveDriveKinematicsConstraint.h>
+#include <frc/trajectory/TrapezoidProfile.h>
 #include <units/acceleration.h>
 #include <units/angle.h>
+#include <units/angular_acceleration.h>
+#include <units/angular_velocity.h>
 #include <units/length.h>
 #include <units/time.h>
 #include <units/velocity.h>
@@ -29,43 +30,41 @@
  */
 
 namespace DriveConstants {
-constexpr int kBackLeftPort = 0;
-constexpr int kFrontLeftPort = 1;
-constexpr int kBackRightPort = 2;
-constexpr int kFrontRightPort = 3;
-constexpr int kBackLeftThetaPort = 4;
-constexpr int kFrontLeftThetaPort = 5;
-constexpr int kBackRightThetaPort = 6;
-constexpr int kFrontRightThetaPort = 7;
+    //Wheel motors
+    constexpr int kBackLeftPort = 0;
+    constexpr int kFrontLeftPort = 1;
+    constexpr int kBackRightPort = 2;
+    constexpr int kFrontRightPort = 3;
+    //Degree of wheel motors
+    constexpr int kBackLeftThetaPort = 4;
+    constexpr int kFrontLeftThetaPort = 5;
+    constexpr int kBackRightThetaPort = 6;
+    constexpr int kFrontRightThetaPort = 7;
 
-constexpr bool kLeftEncoderReversed = false;
-constexpr bool kRightEncoderReversed = true;
+    constexpr bool kLeftEncoderReversed = false;
+    constexpr bool kRightEncoderReversed = true;
 
-frc::Translation2d backLeftCord{-.381_m, .381_m};
-frc::Translation2d frontLeftCord{.381_m, .381_m};
-frc::Translation2d backRightCord{-.381_m, -.381_m};
-frc::Translation2d frontRightCord{.381_m, -.381_m};
-extern const frc::SwerveDriveKinematics kDriveKinematics;
+    constexpr auto kTrackwidth = .69_m;
 
+    constexpr int kEncoderResolution = 2048;
+    constexpr double kWheelRadius = .0508;
+    constexpr double kDriveRatio = 1 / 7.13;
+    constexpr double kTurnRatio = 1 / 15.43;
+    constexpr double kDriveEncoderDistancePerPulse = (2 * std::numbers::pi * kWheelRadius / kEncoderResolution) * kDriveRatio;
+    constexpr double kTurnEncoderDistancePerPulse = (2 * std::numbers::pi / kEncoderResolution) * kTurnRatio;
 
-constexpr int kEncoderCPR = 2048;
-constexpr double kWheelDiameterInches = 0.1524;
-constexpr double kEncoderDistancePerPulse =
-    // Assumes the encoders are directly mounted on the wheel shafts
-    (kWheelDiameterInches * std::numbers::pi) /
-    static_cast<double>(kEncoderCPR) / 10.75;
+    // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
+    // These characterization values MUST be determined either experimentally or
+    // theoretically for *your* robot's drive. The Robot Characterization
+    // Toolsuite provides a convenient tool for obtaining these values for your
+    // robot.
 
-// These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
-// These characterization values MUST be determined either experimentally or
-// theoretically for *your* robot's drive. The Robot Characterization
-// Toolsuite provides a convenient tool for obtaining these values for your
-// robot.
-constexpr auto ks = 0.60367_V;
-constexpr auto kv = 2.3911 * 1_V * 1_s / 1_m;
-constexpr auto ka = 0.27482 * 1_V * 1_s * 1_s / 1_m;
+    constexpr auto ks = 0.60367_V;
+    constexpr auto kv = 2.3911 * 1_V * 1_s / 1_m;
+    constexpr auto ka = 0.27482 * 1_V * 1_s * 1_s / 1_m;
 
-// Example value only - as above, this must be tuned for your drive!
-constexpr double kPDriveVel = 3.1116;
+    // Example value only - as above, this must be tuned for your drive!
+    constexpr double kPDriveVel = 3.1116;
 }  // namespace DriveConstants
 
 namespace FlywheelConstants {
@@ -127,14 +126,18 @@ namespace LimelightConstants {
 }
 
 namespace AutoConstants {
-constexpr auto kMaxSpeed = 0.25_mps;
-constexpr auto kMaxAcceleration = 0.1_mps_sq;
+        constexpr auto kMaxSpeed = 3_mps;
+        constexpr auto kMaxAcceleration = 3_mps_sq;
+        constexpr auto kAngularSpeed = 180_deg_per_s;
+        constexpr auto kMaxAngularAcceleration = 180_deg_per_s_sq;
 
-// Reasonable baseline values for a RAMSETE follower in units of meters and
-// seconds
-constexpr auto kRamseteB = 2.0 * 1_rad * 1_rad / (1_m * 1_m);
-constexpr auto kRamseteZeta = 0.7 / 1_rad;
-}  // namespace AutoConstants
+        constexpr double kPXController = .5;
+        constexpr double kPYController = .5;
+        constexpr double kPThetaController = .5;
+
+        extern const frc::TrapezoidProfile<units::radians>::Constraints
+            kThetaControllerConstraints;
+} //namespace AutoConstants
 
 namespace OIConstants {
 constexpr int kDriverControllerPort = 0;
