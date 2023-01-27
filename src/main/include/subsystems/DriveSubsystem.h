@@ -61,6 +61,11 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   void SetModuleStates(wpi::array<frc::SwerveModuleState, 4> desiredStates);
 
+  void SetDrivePower(double power);
+
+  void SetTurnPower(double power);
+
+
   /**
    * Returns the heading of the robot.
    *
@@ -94,10 +99,10 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   void ResetOdometry(frc::Pose2d pose);
 
-  frc::Translation2d backLeftLocation{0.381_m, 0.381_m};
-  frc::Translation2d frontLeftLocation{0.381_m, 0.381_m};
-  frc::Translation2d backRightLocation{0.381_m, 0.381_m};
-  frc::Translation2d frontRightLocation{0.381_m, 0.381_m};
+  frc::Translation2d backLeftLocation{-0.449072_m, -0.449072_m};
+  frc::Translation2d frontLeftLocation{-0.449072_m, 0.449072_m};
+  frc::Translation2d backRightLocation{0.449072_m, -0.449072_m};
+  frc::Translation2d frontRightLocation{0.449072_m, 0.449072_m};
   frc::SwerveDriveKinematics<4> kDriveKinematics{backLeftLocation, frontLeftLocation, backRightLocation, frontRightLocation};
 
  private:

@@ -5,6 +5,7 @@
 #include "subsystems/DriveSubsystem.h"
 
 #include <iostream>
+#include <cmath>
 #include <frc/geometry/Rotation2d.h>
 
 using namespace DriveConstants;
@@ -33,7 +34,10 @@ DriveSubsystem::DriveSubsystem()
 
       //Odometry
       odometry{kDriveKinematics, {gyro.GetRotation2d()}, {s_backLeft.GetPosition(), s_frontLeft.GetPosition(), s_backRight.GetPosition(),
-      s_frontRight.GetPosition()}, frc::Pose2d{}} {}
+      s_frontRight.GetPosition()}, frc::Pose2d{}} {
+        ResetEncoders();
+        ResetOdometry(frc::Pose2d{});
+      }
 
 void DriveSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here.
@@ -42,8 +46,10 @@ void DriveSubsystem::Periodic() {
   //                   units::meter_t(this->GetLeftEncoderDistance()),
   //                   units::meter_t(this->GetRightEncoderDistance()));
   // Pose2d current = m_odometry.GetPose();
-  // std::cout << "Coordinates: (" << (double)current.X() << ", " << (double)current.Y() << ")\n";
-  // std::cout << "Rotation: " << (double)current.Rotation().Degrees() << '\n';
+  std::cout << "Back Left: " << (double)s_backLeft.GetPosition().angle.Degrees() << '\n';
+  std::cout << "Front Left: " << (double)s_frontLeft.GetPosition().angle.Degrees() << '\n';
+  std::cout << "Back Right: " << (double)s_backRight.GetPosition().angle.Degrees() << '\n';
+  std::cout << "Front Right: " << (double)s_frontRight.GetPosition().angle.Degrees() << '\n';
 
   odometry.Update(gyro.GetRotation2d(),
                   {s_backLeft.GetPosition(), s_frontLeft.GetPosition(),
@@ -68,6 +74,11 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
   s_frontRight.SetDesiredState(br);
   s_backLeft.SetDesiredState(bl);
   s_backRight.SetDesiredState(br);
+
+  s_backLeft.SetDrivePower((abs((double)xSpeed) + abs((double)ySpeed)));
+  s_frontLeft.SetDrivePower((abs((double)xSpeed) + abs((double)ySpeed)));
+  s_backRight.SetDrivePower((abs((double)xSpeed) + abs((double)ySpeed)));
+  s_frontRight.SetDrivePower((abs((double)xSpeed) + abs((double)ySpeed)));
 }
 
 void DriveSubsystem::SetModuleStates(
@@ -78,6 +89,20 @@ void DriveSubsystem::SetModuleStates(
     s_frontRight.SetDesiredState(desiredStates[1]);
     s_backLeft.SetDesiredState(desiredStates[2]);
     s_backRight.SetDesiredState(desiredStates[3]);
+}
+
+void DriveSubsystem::SetDrivePower(double power) {
+  s_frontLeft.SetDrivePower(power);
+  s_frontRight.SetDrivePower(power);
+  s_backLeft.SetDrivePower(power);
+  s_backRight.SetDrivePower(power);
+}
+
+void DriveSubsystem::SetTurnPower(double power) {
+  s_frontLeft.SetTurnPower(power);
+  s_frontRight.SetTurnPower(power);
+  s_backLeft.SetTurnPower(power);
+  s_backRight.SetTurnPower(power);
 }
 
 // void DriveSubsystem::Periodic() {

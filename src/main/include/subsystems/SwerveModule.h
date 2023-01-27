@@ -50,6 +50,8 @@ class SwerveModule {
         frc::SwerveModuleState GetState() const;
         frc::SwerveModulePosition GetPosition() const;
         void SetDesiredState(const frc::SwerveModuleState& state);
+        void SetDrivePower(double power);
+        void SetTurnPower(double power);
         void ResetEncoders();
 
     private:
@@ -63,15 +65,14 @@ class SwerveModule {
         WPI_TalonFX *driveMotor;
         WPI_TalonFX *turnMotor;
 
-        frc2::PIDController drivePIDController{1.0, 0, 0};
+        frc2::PIDController drivePIDController{DriveConstants::kPDriveVel, 0, 0};
+        // frc2::PIDController drivePIDController{1.0, 0, 0};
         frc::ProfiledPIDController<units::degrees> turningPIDController{
-            1.0,
+            DriveConstants::kPTurnVel,
             0.0,
             0.0,
             {kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration}};
 
-        frc::SimpleMotorFeedforward<units::meters> driveFeedforward{1_V,
-                                                                        3_V / 1_mps};
-        frc::SimpleMotorFeedforward<units::degrees> turnFeedforward{
-            1_V, 0.5_V / 57.2958_deg_per_s};
+        frc::SimpleMotorFeedforward<units::meters> driveFeedforward{DriveConstants::driveKs, DriveConstants::driveKv, DriveConstants::driveKa};
+        frc::SimpleMotorFeedforward<units::degrees> turnFeedforward{DriveConstants::turnKs, DriveConstants::turnKv, DriveConstants::turnKa};
 };

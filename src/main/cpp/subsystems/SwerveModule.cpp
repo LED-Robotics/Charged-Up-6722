@@ -35,7 +35,7 @@ units::meter_t SwerveModule::GetDriveEncoderDistance() const {
 }
 
 units::degree_t SwerveModule::GetTurnEncoderAngle() const {
-    return units::degree_t{turnMotor->GetSelectedSensorPosition() * DriveConstants::kTurnEncoderDistancePerPulse};
+    return units::degree_t{turnMotor->GetSelectedSensorPosition() * DriveConstants::kTurnEncoderDegreesPerPulse};
 }
 
 units::meters_per_second_t SwerveModule::GetDriveEncoderRate() const {
@@ -53,11 +53,11 @@ frc::SwerveModulePosition SwerveModule::GetPosition() const {
 }
 
 void SwerveModule::SetDesiredState(
-    const frc::SwerveModuleState& refrenceState) {
+    const frc::SwerveModuleState& referenceState) {
     // Optimize the reference state to avoid spinning further than 90 degrees
 
     const auto state = frc::SwerveModuleState::Optimize(
-        refrenceState, GetTurnEncoderAngle());
+        referenceState, GetTurnEncoderAngle());
     
     // Calculate the drive output from the drive PID controller.
     const auto driveOutput = drivePIDController.Calculate(
@@ -73,8 +73,17 @@ void SwerveModule::SetDesiredState(
         turningPIDController.GetSetpoint().velocity);
 
     // Set the motor outputs.
-    driveMotor->SetVoltage(units::volt_t{driveOutput} + driveFeedforwardState);
-    turnMotor->SetVoltage(units::volt_t{turnOutput} + turnFeedforwardState);
+    // driveMotor->SetVoltage(units::volt_t{driveOutput} + driveFeedforwardState);
+    // turnMotor->SetVoltage(units::volt_t{turnOutput} + turnFeedforwardState);
+    turnMotor->Set(TalonFXControlMode::Position, (double)state.angle.Degrees() / DriveConstants::kTurnEncoderDegreesPerPulse);
+}
+
+void SwerveModule::SetDrivePower(double power) {
+    driveMotor->Set(power);
+}
+
+void SwerveModule::SetTurnPower(double power) {
+    turnMotor->Set(power);
 }
 
 void SwerveModule::ResetEncoders() {

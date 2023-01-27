@@ -48,10 +48,10 @@ namespace DriveConstants {
 
     constexpr int kEncoderResolution = 2048;
     constexpr double kWheelRadius = .0508;
-    constexpr double kDriveRatio = 1 / 7.13;
-    constexpr double kTurnRatio = 1 / 15.43;
+    constexpr double kDriveRatio = 1 / 6.55;
+    constexpr double kTurnRatio = 1 / 10.29;
     constexpr double kDriveEncoderDistancePerPulse = (2 * std::numbers::pi * kWheelRadius / kEncoderResolution) * kDriveRatio;
-    constexpr double kTurnEncoderDistancePerPulse = (2 * std::numbers::pi / kEncoderResolution) * kTurnRatio;
+    constexpr double kTurnEncoderDegreesPerPulse = (360.0 / (double)kEncoderResolution) * kTurnRatio;
 
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
     // These characterization values MUST be determined either experimentally or
@@ -59,12 +59,18 @@ namespace DriveConstants {
     // Toolsuite provides a convenient tool for obtaining these values for your
     // robot.
 
-    constexpr auto ks = 0.60367_V;
-    constexpr auto kv = 2.3911 * 1_V * 1_s / 1_m;
-    constexpr auto ka = 0.27482 * 1_V * 1_s * 1_s / 1_m;
+    constexpr auto driveKs = 0.2256_V;
+    constexpr auto driveKv = 2.2285 * 1_V * 1_s / 1_m;
+    constexpr auto driveKa = 0.19337 * 1_V * 1_s * 1_s / 1_m;
+
+    constexpr auto turnKs = 0.257951_V;
+    constexpr auto turnKv = 0.0020769 * 1_V * 1_s / 1_deg;
+    constexpr auto turnKa = 6.1723E-05 * 1_V * 1_s * 1_s / 1_deg;
 
     // Example value only - as above, this must be tuned for your drive!
-    constexpr double kPDriveVel = 3.1116;
+    constexpr double kPDriveVel = 1.0;
+    constexpr double kPTurnVel = 0.001;
+    // constexpr double kPTurnVel = 2.1916E-06;
 }  // namespace DriveConstants
 
 namespace FlywheelConstants {

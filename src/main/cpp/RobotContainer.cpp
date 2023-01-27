@@ -30,70 +30,76 @@ RobotContainer::RobotContainer() {
       [this] {
             m_drive.Drive(
             units::meters_per_second_t{controller.GetLeftY()},
-            units::meters_per_second_t{controller.GetLeftX()},
-            units::degrees_per_second_t{controller.GetRightX()}, true);
+            units::meters_per_second_t{controller.GetLeftX() * -1.0},
+            units::degrees_per_second_t{controller.GetRightX()}, false);
+            // double angle = controller.GetPOV();
+            // if(angle != -1) {
+            //     frc::SwerveModuleState state{0_mps, {units::degree_t{angle}}};
+            //     m_drive.SetModuleStates({state, state, state, state});
+            // }
+            // m_drive.SetTurnPower(controller.GetRightX());
       },
       {&m_drive}));
 
-    flywheel.SetDefaultCommand(frc2::RunCommand(
-      [this] {
-          if(controller.GetAButtonPressed()) flywheel.SetFlywheelState(!flywheel.GetFlywheelState());
-          if(controller.GetYButtonPressed()) flywheel.SetMotorPower(flywheel.GetMotorPower() + 0.01);
-          if(controller.GetBButtonPressed()) flywheel.SetMotorPower(flywheel.GetMotorPower() - 0.01);
-      },
-      {&flywheel}));
+    // flywheel.SetDefaultCommand(frc2::RunCommand(
+    //   [this] {
+    //       if(controller.GetAButtonPressed()) flywheel.SetFlywheelState(!flywheel.GetFlywheelState());
+    //       if(controller.GetYButtonPressed()) flywheel.SetMotorPower(flywheel.GetMotorPower() + 0.01);
+    //       if(controller.GetBButtonPressed()) flywheel.SetMotorPower(flywheel.GetMotorPower() - 0.01);
+    //   },
+    //   {&flywheel}));
     
-    intake.SetDefaultCommand(frc2::RunCommand(
-      [this] {
-            intake.SetPower(controller2.GetRightTriggerAxis() - controller2.GetLeftTriggerAxis());
-            if(controller.GetXButton()) {
-                intake.On();
-            } else {
-                if(intake.GetPower() > IntakeConstants::kIntakeDeadzone) {
-                    intake.UsePowerMode();
-                } else intake.Off();
-            }
-      },
-      {&intake}));
+    // intake.SetDefaultCommand(frc2::RunCommand(
+    //   [this] {
+    //         intake.SetPower(controller2.GetRightTriggerAxis() - controller2.GetLeftTriggerAxis());
+    //         if(controller.GetXButton()) {
+    //             intake.On();
+    //         } else {
+    //             if(intake.GetPower() > IntakeConstants::kIntakeDeadzone) {
+    //                 intake.UsePowerMode();
+    //             } else intake.Off();
+    //         }
+    //   },
+    //   {&intake}));
 
-    elevator.SetDefaultCommand(frc2::RunCommand(
-      [this] {
-            int pov = controller.GetPOV();
-            if(pov != 0 && pov != 180) pov = controller2.GetPOV();
-            if(pov == 0) {
-                elevator.On();
-                elevator.SetPower(ElevatorConstants::kDefaultPower);
-            } else if(pov == 180) {
-                elevator.On();
-                elevator.SetPower(-ElevatorConstants::kDefaultPower);
-            } else {
-                elevator.Off();
-            }
-      },
-      {&elevator}));
+    // elevator.SetDefaultCommand(frc2::RunCommand(
+    //   [this] {
+    //         int pov = controller.GetPOV();
+    //         if(pov != 0 && pov != 180) pov = controller2.GetPOV();
+    //         if(pov == 0) {
+    //             elevator.On();
+    //             elevator.SetPower(ElevatorConstants::kDefaultPower);
+    //         } else if(pov == 180) {
+    //             elevator.On();
+    //             elevator.SetPower(-ElevatorConstants::kDefaultPower);
+    //         } else {
+    //             elevator.Off();
+    //         }
+    //   },
+    //   {&elevator}));
 
-    turret.SetDefaultCommand(frc2::RunCommand(
-      [this] {
-            int pov = controller.GetPOV();
-            if(pov != 90 && pov != 270) pov = controller2.GetPOV();
-            if(pov == 90) {
-                turret.SetState(TurretConstants::kPowerMode);
-                turret.SetPower(TurretConstants::kDefaultPower);
-            } else if(pov == 270) {
-                turret.SetState(TurretConstants::kPowerMode);
-                turret.SetPower(-TurretConstants::kDefaultPower);
-            } else {
-                turret.SetState(TurretConstants::kOff);
-            }
-      },
-      {&turret}));
+    // turret.SetDefaultCommand(frc2::RunCommand(
+    //   [this] {
+    //         int pov = controller.GetPOV();
+    //         if(pov != 90 && pov != 270) pov = controller2.GetPOV();
+    //         if(pov == 90) {
+    //             turret.SetState(TurretConstants::kPowerMode);
+    //             turret.SetPower(TurretConstants::kDefaultPower);
+    //         } else if(pov == 270) {
+    //             turret.SetState(TurretConstants::kPowerMode);
+    //             turret.SetPower(-TurretConstants::kDefaultPower);
+    //         } else {
+    //             turret.SetState(TurretConstants::kOff);
+    //         }
+    //   },
+    //   {&turret}));
 
-      lift.SetDefaultCommand(frc2::RunCommand(
-      [this] {
-          lift.SetState(LiftConstants::kPowerMode);
-          lift.SetPower(abs(controller.GetRightY()) > 0.1 ? controller.GetRightY() : 0);
-      },
-      {&lift}));
+    //   lift.SetDefaultCommand(frc2::RunCommand(
+    //   [this] {
+    //       lift.SetState(LiftConstants::kPowerMode);
+    //       lift.SetPower(abs(controller.GetRightY()) > 0.1 ? controller.GetRightY() : 0);
+    //   },
+    //   {&lift}));
 }
 
 void RobotContainer::ResetOdometry() {
