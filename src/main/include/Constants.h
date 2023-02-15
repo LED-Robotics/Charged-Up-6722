@@ -50,7 +50,7 @@ namespace DriveConstants {
     constexpr double kWheelRadius = .0508;
     constexpr double kDriveRatio = 1 / 6.55;
     constexpr double kTurnRatio = 1 / 10.29;
-    constexpr double kDriveEncoderDistancePerPulse = (2 * std::numbers::pi * kWheelRadius / kEncoderResolution) * kDriveRatio;
+    constexpr double kDriveEncoderDistancePerPulse = (2 * std::numbers::pi * kWheelRadius / (double)kEncoderResolution) * kDriveRatio;
     constexpr double kTurnEncoderDegreesPerPulse = (360.0 / (double)kEncoderResolution) * kTurnRatio;
 
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!

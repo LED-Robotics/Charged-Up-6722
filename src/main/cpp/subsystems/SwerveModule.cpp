@@ -56,25 +56,29 @@ void SwerveModule::SetDesiredState(
     const frc::SwerveModuleState& referenceState) {
     // Optimize the reference state to avoid spinning further than 90 degrees
 
-    const auto state = frc::SwerveModuleState::Optimize(
-        referenceState, GetTurnEncoderAngle());
+    const auto state = frc::SwerveModuleState::Optimize(referenceState, GetTurnEncoderAngle());
     
     // Calculate the drive output from the drive PID controller.
-    const auto driveOutput = drivePIDController.Calculate(
-        driveMotor->GetSelectedSensorVelocity(), state.speed.value());
+    // const auto driveOutput = drivePIDController.Calculate(
+    //     driveMotor->GetSelectedSensorVelocity(), state.speed.value());
     
-    const auto driveFeedforwardState = driveFeedforward.Calculate(state.speed);
+    // const auto driveFeedforwardState = driveFeedforward.Calculate(state.speed);
 
     // Calculate the turning motor output from the turning PID controller.
-    const auto turnOutput = turningPIDController.Calculate(
-        GetTurnEncoderAngle(), state.angle.Degrees());
+    // const auto turnOutput = turningPIDController.Calculate(
+    //     GetTurnEncoderAngle(), state.angle.Degrees());
 
-    const auto turnFeedforwardState = turnFeedforward.Calculate(
-        turningPIDController.GetSetpoint().velocity);
+    // const auto turnFeedforwardState = turnFeedforward.Calculate(
+    //     turningPIDController.GetSetpoint().velocity);
 
     // Set the motor outputs.
     // driveMotor->SetVoltage(units::volt_t{driveOutput} + driveFeedforwardState);
     // turnMotor->SetVoltage(units::volt_t{turnOutput} + turnFeedforwardState);
+    driveMotor->Set(TalonFXControlMode::Velocity, ((double)state.speed / 10.0) / DriveConstants::kDriveEncoderDistancePerPulse);
+
+    // driveMotor->Set(TalonFXControlMode::Velocity, ((double)state.speed / 10.0) / DriveConstants::kDriveEncoderDistancePerPulse,
+    // ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, 0.3);
+    
     turnMotor->Set(TalonFXControlMode::Position, (double)state.angle.Degrees() / DriveConstants::kTurnEncoderDegreesPerPulse);
 }
 

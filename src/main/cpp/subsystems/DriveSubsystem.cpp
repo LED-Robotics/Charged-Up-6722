@@ -33,8 +33,9 @@ DriveSubsystem::DriveSubsystem()
       gyro{SPI::Port::kMXP},
 
       //Odometry
-      odometry{kDriveKinematics, {gyro.GetRotation2d()}, {s_backLeft.GetPosition(), s_frontLeft.GetPosition(), s_backRight.GetPosition(),
-      s_frontRight.GetPosition()}, frc::Pose2d{}} {
+      odometry{kDriveKinematics, {gyro.GetRotation2d()}, {s_frontLeft.GetPosition(), s_frontRight.GetPosition(), s_backLeft.GetPosition(),
+      s_backRight.GetPosition()}, frc::Pose2d{}} {
+
         ResetEncoders();
         ResetOdometry(frc::Pose2d{});
       }
@@ -46,14 +47,14 @@ void DriveSubsystem::Periodic() {
   //                   units::meter_t(this->GetLeftEncoderDistance()),
   //                   units::meter_t(this->GetRightEncoderDistance()));
   // Pose2d current = m_odometry.GetPose();
-  std::cout << "Back Left: " << (double)s_backLeft.GetPosition().angle.Degrees() << '\n';
-  std::cout << "Front Left: " << (double)s_frontLeft.GetPosition().angle.Degrees() << '\n';
-  std::cout << "Back Right: " << (double)s_backRight.GetPosition().angle.Degrees() << '\n';
-  std::cout << "Front Right: " << (double)s_frontRight.GetPosition().angle.Degrees() << '\n';
+  // std::cout << "Back Left: " << (double)s_backLeft.GetPosition().angle.Degrees() << '\n';
+  // std::cout << "Front Left: " << (double)s_frontLeft.GetPosition().angle.Degrees() << '\n';
+  // std::cout << "Back Right: " << (double)s_backRight.GetPosition().angle.Degrees() << '\n';
+  // std::cout << "Front Right: " << (double)s_frontRight.GetPosition().angle.Degrees() << '\n';
 
   odometry.Update(gyro.GetRotation2d(),
-                  {s_backLeft.GetPosition(), s_frontLeft.GetPosition(),
-                  s_backRight.GetPosition(), s_frontRight.GetPosition()});
+                  {s_frontLeft.GetPosition(), s_frontRight.GetPosition(),
+                  s_backLeft.GetPosition(), s_backRight.GetPosition()});
 }
 
 void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
@@ -70,15 +71,10 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
   //Florida, France, Bland, Brazil
   auto [fl, fr, bl, br] = states;
 
-  s_frontLeft.SetDesiredState(fl);
-  s_frontRight.SetDesiredState(br);
   s_backLeft.SetDesiredState(bl);
+  s_frontLeft.SetDesiredState(fl);
   s_backRight.SetDesiredState(br);
-
-  s_backLeft.SetDrivePower((abs((double)xSpeed) + abs((double)ySpeed)));
-  s_frontLeft.SetDrivePower((abs((double)xSpeed) + abs((double)ySpeed)));
-  s_backRight.SetDrivePower((abs((double)xSpeed) + abs((double)ySpeed)));
-  s_frontRight.SetDrivePower((abs((double)xSpeed) + abs((double)ySpeed)));
+  s_frontRight.SetDesiredState(fr);
 }
 
 void DriveSubsystem::SetModuleStates(
@@ -151,7 +147,7 @@ frc::Pose2d DriveSubsystem::GetPose() {
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
   odometry.ResetPosition(
     GetHeading(),
-    {s_backLeft.GetPosition(), s_frontLeft.GetPosition(),
-    s_backRight.GetPosition(), s_frontRight.GetPosition()},
+    {s_frontLeft.GetPosition(), s_frontRight.GetPosition(),
+    s_backLeft.GetPosition(), s_backRight.GetPosition()},
     pose);
 }

@@ -29,14 +29,26 @@ RobotContainer::RobotContainer() {
     m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
             m_drive.Drive(
-            units::meters_per_second_t{controller.GetLeftY()},
-            units::meters_per_second_t{controller.GetLeftX() * -1.0},
-            units::degrees_per_second_t{controller.GetRightX()}, false);
+            units::meters_per_second_t{controller.GetLeftY() * 4.0},
+            units::meters_per_second_t{controller.GetLeftX() * -4.0},
+            units::degrees_per_second_t{controller.GetRightX() * 150}, false);
+            // D-Pad Turn Control
             // double angle = controller.GetPOV();
             // if(angle != -1) {
             //     frc::SwerveModuleState state{0_mps, {units::degree_t{angle}}};
             //     m_drive.SetModuleStates({state, state, state, state});
             // }
+            // double axis = controller.GetLeftY();
+            // auto speed = 1.5_mps;
+            // if(abs(axis) > 0.3) {
+            //   frc::SwerveModuleState state{axis > 0.0 ? speed : -speed, {units::degree_t{0}}};
+            //   m_drive.SetModuleStates({state, state, state, state});
+            // } else {
+            //   frc::SwerveModuleState state{0_mps, {units::degree_t{0}}};
+            //   m_drive.SetModuleStates({state, state, state, state});
+            // }
+            // m_drive.SetDrivePower(controller.GetLeftY());
+            // Manual turn control
             // m_drive.SetTurnPower(controller.GetRightX());
       },
       {&m_drive}));

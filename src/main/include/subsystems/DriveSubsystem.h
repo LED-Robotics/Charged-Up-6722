@@ -98,12 +98,21 @@ class DriveSubsystem : public frc2::SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   void ResetOdometry(frc::Pose2d pose);
+  // frc::Translation2d frontRightLocation{-0.449072_m, -0.449072_m};
+  // frc::Translation2d frontLeftLocation{-0.449072_m, 0.449072_m};
+  // frc::Translation2d backRightLocation{0.449072_m, -0.449072_m};
+  // frc::Translation2d backLeftLocation{0.449072_m, 0.449072_m};
 
-  frc::Translation2d backLeftLocation{-0.449072_m, -0.449072_m};
-  frc::Translation2d frontLeftLocation{-0.449072_m, 0.449072_m};
+  // frc::Translation2d backLeftLocation{0.449072_m, 0.449072_m};
+  // frc::Translation2d backRightLocation{-0.449072_m, 0.449072_m};
+  // frc::Translation2d frontLeftLocation{0.449072_m, -0.449072_m};
+  // frc::Translation2d frontRightLocation{-0.449072_m, -0.449072_m};
+
+  frc::Translation2d frontRightLocation{-0.449072_m, -0.449072_m};
   frc::Translation2d backRightLocation{0.449072_m, -0.449072_m};
-  frc::Translation2d frontRightLocation{0.449072_m, 0.449072_m};
-  frc::SwerveDriveKinematics<4> kDriveKinematics{backLeftLocation, frontLeftLocation, backRightLocation, frontRightLocation};
+  frc::Translation2d frontLeftLocation{-0.449072_m, 0.449072_m};
+  frc::Translation2d backLeftLocation{0.449072_m, 0.449072_m};
+  frc::SwerveDriveKinematics<4> kDriveKinematics{frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation};
 
  private:
   // Components (e.g. motor controllers and sensors) should generally be
