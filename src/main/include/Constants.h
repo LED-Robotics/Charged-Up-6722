@@ -41,6 +41,18 @@ namespace DriveConstants {
     constexpr int kBackRightThetaPort = 6;
     constexpr int kFrontRightThetaPort = 7;
 
+    constexpr int kBackLeftTalonPort = 8;
+    constexpr int kFrontLeftTalonPort = 9;
+    constexpr int kBackRightTalonPort = 10;
+    constexpr int kFrontRightTalonPort = 11;
+
+    constexpr int kBLeftMagPos = 2496;
+    constexpr int kFLeftMagPos = 3582;
+    constexpr int kBRightMagPos = 2836;
+    constexpr int kFRightMagPos = 1061;
+
+    constexpr int kZeroDeadzone = 5;
+
     constexpr bool kLeftEncoderReversed = false;
     constexpr bool kRightEncoderReversed = true;
 

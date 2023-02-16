@@ -23,6 +23,12 @@ DriveSubsystem::DriveSubsystem()
       backRightTheta{kBackRightThetaPort},
       frontRightTheta{kFrontRightThetaPort},
 
+      //Mag encoder motor controllers
+      backLeftTalon{kBackLeftTalonPort},
+      frontLeftTalon{kFrontLeftTalonPort},
+      backRightTalon{kBackRightTalonPort},
+      frontRightTalon{kFrontRightTalonPort},
+
       //Swerve group motors
       s_backLeft{&backLeft, &backLeftTheta},
       s_frontLeft{&frontLeft, &frontLeftTheta},
@@ -41,16 +47,20 @@ DriveSubsystem::DriveSubsystem()
       }
 
 void DriveSubsystem::Periodic() {
+  // auto blPos = backLeftTalon.GetSensorCollection();
+  // auto flPos = frontLeftTalon.GetSensorCollection();
+  // auto brPos = backRightTalon.GetSensorCollection();
+  // auto frPos = frontRightTalon.GetSensorCollection();
   // Implementation of subsystem periodic method goes here.
 
   // m_odometry.Update(GetRotation2d(),
   //                   units::meter_t(this->GetLeftEncoderDistance()),
   //                   units::meter_t(this->GetRightEncoderDistance()));
   // Pose2d current = m_odometry.GetPose();
-  // std::cout << "Back Left: " << (double)s_backLeft.GetPosition().angle.Degrees() << '\n';
-  // std::cout << "Front Left: " << (double)s_frontLeft.GetPosition().angle.Degrees() << '\n';
-  // std::cout << "Back Right: " << (double)s_backRight.GetPosition().angle.Degrees() << '\n';
-  // std::cout << "Front Right: " << (double)s_frontRight.GetPosition().angle.Degrees() << '\n';
+  // std::cout << "Back Left: " << blPos.GetPulseWidthPosition() << '\n';
+  // std::cout << "Front Left: " << flPos.GetPulseWidthPosition() << '\n';
+  // std::cout << "Back Right: " << brPos.GetPulseWidthPosition() << '\n';
+  // std::cout << "Front Right: " << frPos.GetPulseWidthPosition() << '\n';
 
   odometry.Update(gyro.GetRotation2d(),
                   {s_frontLeft.GetPosition(), s_frontRight.GetPosition(),
@@ -99,6 +109,26 @@ void DriveSubsystem::SetTurnPower(double power) {
   s_frontRight.SetTurnPower(power);
   s_backLeft.SetTurnPower(power);
   s_backRight.SetTurnPower(power);
+}
+
+bool DriveSubsystem::ZeroSwervePosition() {
+  WPI_TalonFX *turnMotors[4] = {&backLeftTheta, &frontLeftTheta, &backRightTheta, &frontRightTheta};
+  WPI_TalonSRX *talons[4] = {&backLeftTalon, &frontLeftTalon, &backRightTalon, &frontRightTalon};
+  int poses[4] = {kBLeftMagPos, kFLeftMagPos, kBRightMagPos, kFRightMagPos};
+  int zeroed = 0;
+  for(int i = 0; i < 4; i++) {
+    auto sensor = talons[i]->GetSensorCollection();
+    int pos = sensor.GetPulseWidthPosition();
+    double power = 0.2 + 0.4 * ((abs(pos - poses[i]) / 4096));
+    if(pos > poses[i] - kZeroDeadzone || pos < poses[i] + kZeroDeadzone) {
+      turnMotors[i]->Set(0);
+      zeroed++;
+    } else {
+      turnMotors[i]->Set(power);
+    }
+  }
+  if(zeroed == 4) return true;
+  else return false;
 }
 
 // void DriveSubsystem::Periodic() {

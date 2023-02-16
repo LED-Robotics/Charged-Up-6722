@@ -65,6 +65,8 @@ class DriveSubsystem : public frc2::SubsystemBase {
 
   void SetTurnPower(double power);
 
+  bool ZeroSwervePosition();
+
 
   /**
    * Returns the heading of the robot.
@@ -129,6 +131,12 @@ class DriveSubsystem : public frc2::SubsystemBase {
   WPI_TalonFX frontLeftTheta;
   WPI_TalonFX backRightTheta;
   WPI_TalonFX frontRightTheta;
+
+  //Mag encoder motor controllers
+  WPI_TalonSRX backLeftTalon;
+  WPI_TalonSRX frontLeftTalon;
+  WPI_TalonSRX backRightTalon;
+  WPI_TalonSRX frontRightTalon;
 
   //Swerve motor groups
   SwerveModule s_backLeft;
