@@ -28,10 +28,16 @@ RobotContainer::RobotContainer() {
   // Set up default drive command
     m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
-            m_drive.Drive(
-            units::meters_per_second_t{controller.GetLeftY() * 4.0},
-            units::meters_per_second_t{controller.GetLeftX() * -4.0},
-            units::degrees_per_second_t{controller.GetRightX() * 150}, false);
+            if(controller.GetAButton()) {
+              if(m_drive.ZeroSwervePosition()) {
+                m_drive.ResetEncoders();
+              }
+            } else {
+              m_drive.Drive(
+                units::meters_per_second_t{controller.GetLeftY() * 4.0},
+                units::meters_per_second_t{controller.GetLeftX() * -4.0},
+                units::degrees_per_second_t{controller.GetRightX() * 150}, false);
+            }
             // D-Pad Turn Control
             // double angle = controller.GetPOV();
             // if(angle != -1) {
@@ -175,4 +181,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       std::move(swerveControllerCommand),
       frc2::InstantCommand(
           [this]() { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); }, {}));
+}
+
+frc2::Command* RobotContainer::GetZeroCommand() {
 }

@@ -119,8 +119,13 @@ bool DriveSubsystem::ZeroSwervePosition() {
   for(int i = 0; i < 4; i++) {
     auto sensor = talons[i]->GetSensorCollection();
     int pos = sensor.GetPulseWidthPosition();
-    double power = 0.2 + 0.4 * ((abs(pos - poses[i]) / 4096));
-    if(pos > poses[i] - kZeroDeadzone || pos < poses[i] + kZeroDeadzone) {
+    double error = abs(((double)pos * kTurnRatio) - (double)poses[i]);
+    double correction = 1.0 * (error / 4096);
+    double power = 0.1 + correction;
+    if(pos < poses[i]) power *= -1;
+    std::cout << "Motor" << i + 1 << "Sensor: " << pos << '\n';
+    std::cout << "Motor" << i + 1 << "Power: " << power << '\n';
+    if((double)pos * kTurnRatio > (double)poses[i] - (double)kZeroDeadzone && (double)pos * kTurnRatio < (double)poses[i] + (double)kZeroDeadzone) {
       turnMotors[i]->Set(0);
       zeroed++;
     } else {

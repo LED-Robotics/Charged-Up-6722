@@ -51,7 +51,7 @@ namespace DriveConstants {
     constexpr int kBRightMagPos = 2836;
     constexpr int kFRightMagPos = 1061;
 
-    constexpr int kZeroDeadzone = 5;
+    constexpr int kZeroDeadzone = 100;
 
     constexpr bool kLeftEncoderReversed = false;
     constexpr bool kRightEncoderReversed = true;
