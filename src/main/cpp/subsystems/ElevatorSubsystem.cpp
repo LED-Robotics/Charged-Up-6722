@@ -12,18 +12,25 @@ using namespace ElevatorConstants;
 using namespace frc;
 
 ElevatorSubsystem::ElevatorSubsystem()
-    : bottom{kMotor1Port},
-    top{kMotor2Port} {
+    : leftStopSensor{kLeftStopPort},
+    rightStopSensor{kRightStopPort},
+    left{kLeftMotorPort},
+    right{kRightMotorPort} {
 }
 
 void ElevatorSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here
   if(state == kOff) {
-    bottom.Set(0.0);
-    top.Set(0.0);
-  } else if(state == kOn) {
-    bottom.Set(power);
-    top.Set(power);
+    left.Set(0.0);
+    right.Set(0.0);
+  } else if(state == kPowerMode) {
+    left.Set(leftStopSensor.Get() ? 0.0 : power);
+    right.Set(rightStopSensor.Get() ? 0.0 : power);
+  } else if(state == kPositionMode) {
+    if(leftStopSensor.Get()) left.Set(0.0);
+    else left.Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, position);
+    if(rightStopSensor.Get()) right.Set(0.0);
+    else right.Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, position);
   }
 }
 
@@ -32,13 +39,29 @@ void ElevatorSubsystem::Off() {
 }
 
 void ElevatorSubsystem::On() {
-  state = kOn;
+  state = kPowerMode;
 }
 
 void ElevatorSubsystem::SetPower(double newPower) {
   power = newPower;
 }
 
+void ElevatorSubsystem::SetState(int newState) {
+  state = newState;
+}
+
 int ElevatorSubsystem::GetState() {
   return state;
+}
+
+void ElevatorSubsystem::SetTargetPosition(double newPosition) {
+  position = newPosition;
+}
+
+double ElevatorSubsystem::GetLeftPosition() {
+  return left.GetSelectedSensorPosition(0);
+}
+
+double ElevatorSubsystem::GetRightPosition() {
+  return left.GetSelectedSensorPosition(0);
 }

@@ -85,55 +85,35 @@ namespace DriveConstants {
     // constexpr double kPTurnVel = 2.1916E-06;
 }  // namespace DriveConstants
 
-namespace FlywheelConstants {
-    constexpr int kMotor1Port = 8;
+namespace ElevatorConstants {
+    constexpr int kLeftMotorPort = 12;
+    constexpr int kRightMotorPort = 13;
+    constexpr int kLeftStopPort = 0;
+    constexpr int kRightStopPort = 1;
     constexpr int kOff = 0;
     constexpr int kPowerMode = 1;
-    constexpr int kRpmMode = 2;
+    constexpr int kPositionMode = 2;
     constexpr double kDefaultPower = 1.0;
+}
 
-    constexpr double bangBangThreshold = 4.0;
+namespace ArmConstants {
+    constexpr int kLeftMotorPort = 14;
+    constexpr int kRightMotorPort = 15;
+    constexpr int kOff = 0;
+    constexpr int kPowerMode = 1;
+    constexpr int kPositionMode = 2;
+    constexpr double kDefaultPower = 1.0;
 }
 
 namespace IntakeConstants {
-    constexpr int kMotorPort = 12;
+    constexpr int kIntakePort = 16;
+    constexpr int kWristPort = 17;
     constexpr int kOff = 0;
     constexpr int kFullMode = 1;
     constexpr int kPowerMode = 2;
     constexpr double kFullPower = 1.0;
+    constexpr double kCurrentLimit = 0.5;
     constexpr double kIntakeDeadzone = 0.1;
-}
-
-namespace ElevatorConstants {
-    constexpr int kMotor1Port = 11;
-    constexpr int kMotor2Port = 10;
-    constexpr int kOff = 0;
-    constexpr int kOn = 1;
-    constexpr double kDefaultPower = 1.0;
-}
-
-namespace TurretConstants {
-    constexpr int kMotorPort = 9;
-    constexpr int kEncoderAPort = 4;
-    constexpr int kEncoderBPort = 5;
-    constexpr bool kEncoderReversed = true;
-    constexpr int kMaxLeft = -2920;
-    constexpr int kMaxRight = 3000;
-    constexpr double kP = 1.0;
-    constexpr double kI = 0.0;
-    constexpr int kOff = 0;
-    constexpr int kPowerMode = 1;
-    constexpr int kPositionMode = 2;
-    constexpr double kDefaultPower = 0.6;
-}
-
-namespace LiftConstants {
-    constexpr int kMotorPort = 6;
-    constexpr int kOff = 0;
-    constexpr int kForward = 1;
-    constexpr int kReverse = 2;
-    constexpr int kPowerMode = 3;
-    constexpr double kDefaultPower = 1.0;
 }
 
 namespace LimelightConstants {

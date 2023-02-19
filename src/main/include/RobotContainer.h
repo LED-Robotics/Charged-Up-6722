@@ -16,11 +16,9 @@
 
 #include "Constants.h"
 #include "subsystems/DriveSubsystem.h"
-#include "subsystems/FlywheelSubsystem.h"
 #include "subsystems/IntakeSubsystem.h"
 #include "subsystems/ElevatorSubsystem.h"
-#include "subsystems/TurretSubsystem.h"
-#include "subsystems/LiftSubsystem.h"
+#include "subsystems/ArmSubsystem.h"
 #include "subsystems/LimelightSubsystem.h"
 
 /**
@@ -51,15 +49,11 @@ class RobotContainer {
   // The robot's subsystems
   DriveSubsystem m_drive;
   
-  // FlywheelSubsystem flywheel;
+  IntakeSubsystem intake;
 
-  // IntakeSubsystem intake;
-
-  // ElevatorSubsystem elevator;
+  ElevatorSubsystem elevator;
   
-  // TurretSubsystem turret;
-
-  // LiftSubsystem lift;
+  ArmSubsystem arm;
 
   // LimelightSubsystem limelight;
 

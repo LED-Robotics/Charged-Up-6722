@@ -15,6 +15,7 @@
 #include <units/voltage.h>
 #include <frc/controller/BangBangController.h>
 #include "ctre/Phoenix.h"
+#include <rev/CANSparkMax.h>
 
 #include "Constants.h"
 
@@ -65,15 +66,40 @@ class IntakeSubsystem : public frc2::SubsystemBase {
    */  
   int GetState();
 
+  /**
+   * Sets the position of the Intake wrist.
+   */
+  void SetPosition(double newPosition);
+
+  /**
+   * Returns the target position of the intake's Wrist.
+   *
+   * @return The target Intake wrist position
+   */
+  double GetTargetPosition();
+
+  /**
+   * Returns the current position of the intake's Wrist.
+   *
+   * @return The current Intake wrist position
+   */
+  double GetCurrentPosition();
+
+  /**
+   * Resets the Intake wrist encoder.
+   */
+  void ResetWristEncoder();
+
     
  private:
   int state = IntakeConstants::kOff;
   double power = 0.0;
+  double position = 0.0;
 
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 
   // The motor controllers
-  WPI_VictorSPX motor;
-  // WPI_TalonSRX motor;
+  rev::CANSparkMax intakeMotor;
+  WPI_TalonFX wristMotor;
 };

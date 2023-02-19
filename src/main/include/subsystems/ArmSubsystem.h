@@ -14,78 +14,79 @@
 #include <frc2/command/SubsystemBase.h>
 #include <units/voltage.h>
 #include <frc/controller/BangBangController.h>
+#include <frc/DigitalInput.h>
 #include "ctre/Phoenix.h"
 
 #include "Constants.h"
 
 using namespace frc;
 
-class FlywheelSubsystem : public frc2::SubsystemBase {
+class ArmSubsystem : public frc2::SubsystemBase {
  public:
-  FlywheelSubsystem();
+  ArmSubsystem();
 
   /**
    * Will be called periodically whenever the CommandScheduler runs.
    */
   void Periodic() override;
-
+  
   /**
-   * Resets the drive encoders to currently read a position of 0.
-   */
-  void ResetEncoders();
-
-  /**
-   * Sets the flywheel's state to kOff.
+   * Turns the Arm state to kOff.
    */
   void Off();
-
+  
   /**
-   * Sets the RPM target to use while in kRpmMode.
-   * @param rpm The RPM target to use.
+   * Turns the Arm state to kPowerMode.
    */
-  void SetMotorRPM(double rpm);
+  void On();
 
   /**
-   * Gets the distance of the left encoder.
+   * Sets the power for the Arm to use when in kPowerMode.
    *
-   * @return the flywheel's RPM
+   * @param power the power for the Arm to use
    */
-  double GetRPM();
+  void SetPower(double newPower);
 
   /**
-   * Set the power to use while in kPowerMode.
-   */
-  void SetMotorPower(double percent);
-
-  /**
-   * Returns the flywheel's power setting for kPowerMode.
+   * Returns the current state of the Arm.
    *
-   * @return The power setting of the flywheel
+   * @return The current state of the Arm
    */
-  double GetMotorPower();
+  int GetState();
 
   /**
-   * Sets the current state of the flywheel.
+   * Sets the current state of the Arm.
    */
-  void SetFlywheelState(int newState);
+  void SetState(int newState);
 
   /**
-   * Returns the current state of the flywheel.
-   *
-   * @return The current state of the flywheel
+   * Returns the current position of the left Arm's Falon500.
    */
-  int GetFlywheelState();
+  void SetTargetPosition(double newPosition);
+
+  /**
+   * Returns the current position of the left Arm's Falon500.
+   */
+  double GetLeftPosition();
+
+  /**
+   * Returns the current position of the right Arm's Falon500.
+   */
+  double GetRightPosition();
+  
     
  private:
-  int state = FlywheelConstants::kOff;
-  double power = FlywheelConstants::kDefaultPower;
-  double rpm = 0.0;
+//  while the state is kOn the Arm will run at the current power setting
+  int state = ArmConstants::kOff;
+  double power = ArmConstants::kDefaultPower;
+  double position = 0.0;
 
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 
   // The motor controllers
-  WPI_TalonFX motor1;
-
-  // frc::BangBangController rpmController{FlywheelConstants::bangBangThreshold};
+  // WPI_TalonSRX left;
+  WPI_TalonFX left;
+  // WPI_TalonSRX right;
+  WPI_TalonFX right;
 };

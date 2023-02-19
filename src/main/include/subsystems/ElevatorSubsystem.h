@@ -14,6 +14,7 @@
 #include <frc2/command/SubsystemBase.h>
 #include <units/voltage.h>
 #include <frc/controller/BangBangController.h>
+#include <frc/DigitalInput.h>
 #include "ctre/Phoenix.h"
 
 #include "Constants.h"
@@ -35,14 +36,14 @@ class ElevatorSubsystem : public frc2::SubsystemBase {
   void Off();
   
   /**
-   * Turns the elevator state to kOn.
+   * Turns the elevator state to kPowerMode.
    */
   void On();
 
   /**
-   * Sets the elevator to run at the given power.
+   * Sets the power for the elevator to use when in kPowerMode.
    *
-   * @param power the power to run the elevator at
+   * @param power the power for the elevator to use
    */
   void SetPower(double newPower);
 
@@ -52,18 +53,44 @@ class ElevatorSubsystem : public frc2::SubsystemBase {
    * @return The current state of the elevator
    */
   int GetState();
+
+  /**
+   * Sets the current state of the elevator.
+   */
+  void SetState(int newState);
+
+  /**
+   * Returns the current position of the left elevator's Falon500.
+   */
+  void SetTargetPosition(double newPosition);
+
+  /**
+   * Returns the current position of the left elevator's Falon500.
+   */
+  double GetLeftPosition();
+
+  /**
+   * Returns the current position of the right elevator's Falon500.
+   */
+  double GetRightPosition();
+  
     
  private:
 //  while the state is kOn the elevator will run at the current power setting
   int state = ElevatorConstants::kOff;
   double power = ElevatorConstants::kDefaultPower;
+  double position = 0.0;
 
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 
+  // limit switches at the bottom elevator position
+  DigitalInput leftStopSensor;
+  DigitalInput rightStopSensor;
+
   // The motor controllers
-  // WPI_TalonSRX bottom;
-  WPI_VictorSPX bottom;
-  // WPI_TalonSRX top;
-  WPI_VictorSPX top;
+  // WPI_TalonSRX left;
+  WPI_TalonFX left;
+  // WPI_TalonSRX right;
+  WPI_TalonFX right;
 };
