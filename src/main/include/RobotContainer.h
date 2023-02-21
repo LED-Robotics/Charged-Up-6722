@@ -47,13 +47,13 @@ class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   // The robot's subsystems
-  DriveSubsystem m_drive;
+  // DriveSubsystem m_drive;
   
-  IntakeSubsystem intake;
+  // IntakeSubsystem intake;
 
   ElevatorSubsystem elevator;
   
-  ArmSubsystem arm;
+  // ArmSubsystem arm;
 
   // LimelightSubsystem limelight;
 

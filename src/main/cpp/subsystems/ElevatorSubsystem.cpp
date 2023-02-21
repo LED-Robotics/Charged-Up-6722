@@ -16,6 +16,7 @@ ElevatorSubsystem::ElevatorSubsystem()
     rightStopSensor{kRightStopPort},
     left{kLeftMotorPort},
     right{kRightMotorPort} {
+      left.SetInverted(true);
 }
 
 void ElevatorSubsystem::Periodic() {
@@ -27,10 +28,13 @@ void ElevatorSubsystem::Periodic() {
     left.Set(leftStopSensor.Get() ? 0.0 : power);
     right.Set(rightStopSensor.Get() ? 0.0 : power);
   } else if(state == kPositionMode) {
-    if(leftStopSensor.Get()) left.Set(0.0);
-    else left.Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, position);
-    if(rightStopSensor.Get()) right.Set(0.0);
-    else right.Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, position);
+    std::cout << "Position mode: " << position << '\n';
+    // if(leftStopSensor.Get()) left.Set(0.0);
+    // else left.Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, position);
+    left.Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, position);
+    // if(rightStopSensor.Get()) right.Set(0.0);
+    // else right.Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, position);
+    right.Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, position);
   }
 }
 

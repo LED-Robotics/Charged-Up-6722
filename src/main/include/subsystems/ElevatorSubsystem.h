@@ -77,7 +77,7 @@ class ElevatorSubsystem : public frc2::SubsystemBase {
     
  private:
 //  while the state is kOn the elevator will run at the current power setting
-  int state = ElevatorConstants::kOff;
+  int state = ElevatorConstants::kPositionMode;
   double power = ElevatorConstants::kDefaultPower;
   double position = 0.0;
 

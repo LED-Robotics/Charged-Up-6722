@@ -26,6 +26,7 @@ RobotContainer::RobotContainer() {
   ConfigureButtonBindings();
 
   // Set up default drive command
+  /*
     m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
             if(controller.GetAButton()) {
@@ -58,14 +59,7 @@ RobotContainer::RobotContainer() {
             // m_drive.SetTurnPower(controller.GetRightX());
       },
       {&m_drive}));
-
-    // flywheel.SetDefaultCommand(frc2::RunCommand(
-    //   [this] {
-    //       if(controller.GetAButtonPressed()) flywheel.SetFlywheelState(!flywheel.GetFlywheelState());
-    //       if(controller.GetYButtonPressed()) flywheel.SetMotorPower(flywheel.GetMotorPower() + 0.01);
-    //       if(controller.GetBButtonPressed()) flywheel.SetMotorPower(flywheel.GetMotorPower() - 0.01);
-    //   },
-    //   {&flywheel}));
+      */
     
     // intake.SetDefaultCommand(frc2::RunCommand(
     //   [this] {
@@ -80,21 +74,16 @@ RobotContainer::RobotContainer() {
     //   },
     //   {&intake}));
 
-    // elevator.SetDefaultCommand(frc2::RunCommand(
-    //   [this] {
-    //         int pov = controller.GetPOV();
-    //         if(pov != 0 && pov != 180) pov = controller2.GetPOV();
-    //         if(pov == 0) {
-    //             elevator.On();
-    //             elevator.SetPower(ElevatorConstants::kDefaultPower);
-    //         } else if(pov == 180) {
-    //             elevator.On();
-    //             elevator.SetPower(-ElevatorConstants::kDefaultPower);
-    //         } else {
-    //             elevator.Off();
-    //         }
-    //   },
-    //   {&elevator}));
+    elevator.SetDefaultCommand(frc2::RunCommand(
+      [this] {
+            elevator.SetTargetPosition((controller.GetRightY() * -10000) + 2000);
+            int state = elevator.GetState();
+            if(controller.GetAButtonPressed()) {
+              if(state == ElevatorConstants::kPositionMode) elevator.SetState(ElevatorConstants::kOff);
+              else if(state == ElevatorConstants::kOff) elevator.SetState(ElevatorConstants::kPositionMode);
+            }
+      },
+      {&elevator}));
 
     // turret.SetDefaultCommand(frc2::RunCommand(
     //   [this] {
@@ -120,9 +109,9 @@ RobotContainer::RobotContainer() {
     //   {&lift}));
 }
 
-void RobotContainer::ResetOdometry() {
-        m_drive.ResetOdometry({});
-}
+// void RobotContainer::ResetOdometry() {
+//         m_drive.ResetOdometry({});
+// }
 
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
@@ -135,7 +124,7 @@ void RobotContainer::ConfigureButtonBindings() {
 //   frc2::JoystickButton(&controller, 1)
 //       .WhenPressed(&toggleFlywheel);
 }
-
+/*
 frc2::Command* RobotContainer::GetAutonomousCommand() {
   // Set up config for trajectory
   frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
@@ -182,6 +171,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       frc2::InstantCommand(
           [this]() { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); }, {}));
 }
+*/
 
 frc2::Command* RobotContainer::GetZeroCommand() {
 }
