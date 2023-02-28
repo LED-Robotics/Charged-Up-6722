@@ -81,10 +81,12 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
   //Florida, France, Bland, Brazil
   auto [fl, fr, bl, br] = states;
 
-  s_backLeft.SetDesiredState(bl);
-  s_frontLeft.SetDesiredState(fl);
-  s_backRight.SetDesiredState(br);
-  s_frontRight.SetDesiredState(fr);
+  SetModuleStates(states);
+
+  // s_backLeft.SetDesiredState(bl);
+  // s_frontLeft.SetDesiredState(fl);
+  // s_backRight.SetDesiredState(br);
+  // s_frontRight.SetDesiredState(fr);
 }
 
 void DriveSubsystem::SetModuleStates(
@@ -161,6 +163,13 @@ void DriveSubsystem::ResetEncoders() {
   s_backLeft.ResetEncoders();
   s_frontRight.ResetEncoders();
   s_backRight.ResetEncoders();
+}
+
+void DriveSubsystem::SetInverted(bool inverted) {
+  backLeft.SetInverted(inverted);
+  frontLeft.SetInverted(inverted);
+  backRight.SetInverted(inverted);
+  frontRight.SetInverted(inverted);
 }
 
 units::degree_t DriveSubsystem::GetHeading() const {

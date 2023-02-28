@@ -56,6 +56,8 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   void ResetEncoders();
 
+  void SetInverted(bool inverted);
+
   /**
    * Sets the drive MotorControllers to a power from -1 to 1.
    */

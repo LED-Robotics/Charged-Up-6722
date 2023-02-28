@@ -25,8 +25,8 @@ RobotContainer::RobotContainer() {
   // Configure the button bindings
   ConfigureButtonBindings();
 
+/*
   // Set up default drive command
-  /*
     m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
             if(controller.GetAButton()) {
@@ -76,7 +76,7 @@ RobotContainer::RobotContainer() {
 
     elevator.SetDefaultCommand(frc2::RunCommand(
       [this] {
-            elevator.SetTargetPosition((controller.GetRightY() * -10000) + 2000);
+            elevator.SetTargetPosition((controller.GetRightY() * -85000) + 100);
             int state = elevator.GetState();
             if(controller.GetAButtonPressed()) {
               if(state == ElevatorConstants::kPositionMode) elevator.SetState(ElevatorConstants::kOff);
@@ -109,9 +109,9 @@ RobotContainer::RobotContainer() {
     //   {&lift}));
 }
 
-// void RobotContainer::ResetOdometry() {
-//         m_drive.ResetOdometry({});
-// }
+void RobotContainer::ResetOdometry() {
+        // m_drive.ResetOdometry({});
+}
 
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
@@ -124,9 +124,10 @@ void RobotContainer::ConfigureButtonBindings() {
 //   frc2::JoystickButton(&controller, 1)
 //       .WhenPressed(&toggleFlywheel);
 }
-/*
+
 frc2::Command* RobotContainer::GetAutonomousCommand() {
   // Set up config for trajectory
+  /*
   frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
                                AutoConstants::kMaxAcceleration);
   // Add kinematics to ensure max speed is actually obeyed
@@ -134,12 +135,13 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
 
   // An example trajectory to follow.  All units in meters.
   auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
+    /*
       // Start at the origin facing the +X direction
-      frc::Pose2d{0_m, 0_m, 0_deg},
-      // Pass through these two interior waypoints, making an 's' curve path
-      {frc::Translation2d{1_m, 1_m}, frc::Translation2d{2_m, -1_m}},
+      {frc::Pose2d{0.0_m, 0.0_m, 0.0_deg}, frc::Pose2d{1.0_m, 1.0_m, 0_deg}, 
+      frc::Pose2d{-1.0_m, 2.0_m, 0_deg},
       // End 3 meters straight ahead of where we started, facing forward
-      frc::Pose2d{3_m, 0_m, 0_deg},
+      frc::Pose2d{0.0_m, 3.0_m, 0_deg},
+      },
       // Pass the config
       config);
 
@@ -166,12 +168,18 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   m_drive.ResetOdometry(exampleTrajectory.InitialPose());
 
   // no auto
+  // return std::move(swerveControllerCommand);
   return new frc2::SequentialCommandGroup(
+      frc2::InstantCommand(
+          [this]() { 
+            m_drive.SetInverted(true);
+           }, {}),
       std::move(swerveControllerCommand),
       frc2::InstantCommand(
-          [this]() { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false); }, {}));
+          [this]() { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false);
+          m_drive.SetInverted(false); }, {}));
+  */
 }
-*/
 
 frc2::Command* RobotContainer::GetZeroCommand() {
 }

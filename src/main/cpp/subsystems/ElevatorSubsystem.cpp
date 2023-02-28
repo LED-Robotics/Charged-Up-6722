@@ -16,7 +16,9 @@ ElevatorSubsystem::ElevatorSubsystem()
     rightStopSensor{kRightStopPort},
     left{kLeftMotorPort},
     right{kRightMotorPort} {
-      left.SetInverted(true);
+      right.SetInverted(true);
+      left.SetSelectedSensorPosition(0);
+      right.SetSelectedSensorPosition(0);
 }
 
 void ElevatorSubsystem::Periodic() {
@@ -28,14 +30,24 @@ void ElevatorSubsystem::Periodic() {
     left.Set(leftStopSensor.Get() ? 0.0 : power);
     right.Set(rightStopSensor.Get() ? 0.0 : power);
   } else if(state == kPositionMode) {
-    std::cout << "Position mode: " << position << '\n';
-    // if(leftStopSensor.Get()) left.Set(0.0);
-    // else left.Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, position);
-    left.Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, position);
-    // if(rightStopSensor.Get()) right.Set(0.0);
-    // else right.Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, position);
-    right.Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, position);
-  }
+        // std::cout << "Position mode: " << position << '\n';
+      std::cout << "Left Current Position: " << GetLeftPosition() << '\n';
+      std::cout << "Right Current Position: " << GetRightPosition() << '\n';
+      // if(leftStopSensor.Get()) left.Set(0.0);
+      // else left.Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, position);
+      double leftPos = GetLeftPosition();
+      double rightPos = GetRightPosition();
+      if(leftPos - rightPos > kElevatorDeadzone) {
+        left.Set(ctre::phoenix::motorcontrol::ControlMode::Position, rightPos);
+      } else {
+        left.Set(ctre::phoenix::motorcontrol::ControlMode::Position, position);
+      }
+      if(rightPos - leftPos > kElevatorDeadzone) {
+        left.Set(ctre::phoenix::motorcontrol::ControlMode::Position, leftPos);
+      } else {
+        right.Set(ctre::phoenix::motorcontrol::ControlMode::Position, position);
+      }
+    }
 }
 
 void ElevatorSubsystem::Off() {
@@ -60,6 +72,7 @@ int ElevatorSubsystem::GetState() {
 
 void ElevatorSubsystem::SetTargetPosition(double newPosition) {
   position = newPosition;
+  if(position < 0) position = 0;
 }
 
 double ElevatorSubsystem::GetLeftPosition() {

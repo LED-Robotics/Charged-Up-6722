@@ -94,6 +94,7 @@ namespace ElevatorConstants {
     constexpr int kPowerMode = 1;
     constexpr int kPositionMode = 2;
     constexpr double kDefaultPower = 1.0;
+    constexpr double kElevatorDeadzone = 500;
 }
 
 namespace ArmConstants {
