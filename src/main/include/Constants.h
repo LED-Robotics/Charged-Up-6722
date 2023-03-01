@@ -104,6 +104,10 @@ namespace ArmConstants {
     constexpr int kPowerMode = 1;
     constexpr int kPositionMode = 2;
     constexpr double kDefaultPower = 1.0;
+    constexpr int kArmDegreeMin = 0;   // encoder counts at the arm's minimum usable position
+    constexpr int kMinAngleCounts = -200;   // encoder counts at the arm's minimum usable position
+    constexpr int kMaxAngleCounts = 4000;   // encoder counts at the arm's max usable position
+    constexpr double kArmDegreeMax = 200; // degrees the arm is capable of moving 
 }
 
 namespace IntakeConstants {

@@ -79,7 +79,7 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
   kDriveKinematics.DesaturateWheelSpeeds(&states, AutoConstants::kMaxSpeed);
 
   //Florida, France, Bland, Brazil
-  auto [fl, fr, bl, br] = states;
+  // auto [fl, fr, bl, br] = states;
 
   SetModuleStates(states);
 

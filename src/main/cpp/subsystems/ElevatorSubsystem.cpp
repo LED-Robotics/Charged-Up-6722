@@ -30,7 +30,7 @@ void ElevatorSubsystem::Periodic() {
     left.Set(leftStopSensor.Get() ? 0.0 : power);
     right.Set(rightStopSensor.Get() ? 0.0 : power);
   } else if(state == kPositionMode) {
-        // std::cout << "Position mode: " << position << '\n';
+        std::cout << "Position mode: " << position << '\n';
       std::cout << "Left Current Position: " << GetLeftPosition() << '\n';
       std::cout << "Right Current Position: " << GetRightPosition() << '\n';
       // if(leftStopSensor.Get()) left.Set(0.0);

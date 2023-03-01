@@ -27,9 +27,10 @@ void ArmSubsystem::Periodic() {
   } else if(state == kPositionMode) {
     // feed forwards should be a changing constant that increases as the arm moves further. It should be a static amount of power to overcome gravity.
     double leftFeedForward = 0.0; // GetLeftPosition() / 5000   <-- tune this number after verifying the motion magic works in any capacity
-    left.Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, leftFeedForward);
+    // leftFeedForward = sin(currentAngle) * kF;
+    left.Set(ctre::phoenix::motorcontrol::ControlMode::Position, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, leftFeedForward);
     double rightFeedForward = 0.0; // GetRightPosition() / 5000   <-- tune this number after verifying the motion magic works in any capacity
-    right.Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, rightFeedForward);
+    right.Set(ctre::phoenix::motorcontrol::ControlMode::Position, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, rightFeedForward);
   }
 }
 

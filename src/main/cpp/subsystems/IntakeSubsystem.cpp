@@ -31,7 +31,7 @@ void IntakeSubsystem::Periodic() {
   // Wrist position control
   // feed forward should be a changing constant that increases as the wrist moves further. It should be a static amount of power to overcome gravity.
   double feedForward = 0.0; // GetCurrentPosition() / 5000   <-- tune this number after verifying the motion magic works in any capacity
-  wristMotor.Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, feedForward);
+  wristMotor.Set(ctre::phoenix::motorcontrol::ControlMode::Position, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, feedForward);
 }
 
 void IntakeSubsystem::Off() {

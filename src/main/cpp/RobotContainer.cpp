@@ -25,7 +25,6 @@ RobotContainer::RobotContainer() {
   // Configure the button bindings
   ConfigureButtonBindings();
 
-/*
   // Set up default drive command
     m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
@@ -59,7 +58,6 @@ RobotContainer::RobotContainer() {
             // m_drive.SetTurnPower(controller.GetRightX());
       },
       {&m_drive}));
-      */
     
     // intake.SetDefaultCommand(frc2::RunCommand(
     //   [this] {
@@ -76,7 +74,7 @@ RobotContainer::RobotContainer() {
 
     elevator.SetDefaultCommand(frc2::RunCommand(
       [this] {
-            elevator.SetTargetPosition((controller.GetRightY() * -85000) + 100);
+            elevator.SetTargetPosition(controller.GetLeftTriggerAxis() * -85000);
             int state = elevator.GetState();
             if(controller.GetAButtonPressed()) {
               if(state == ElevatorConstants::kPositionMode) elevator.SetState(ElevatorConstants::kOff);
@@ -84,6 +82,17 @@ RobotContainer::RobotContainer() {
             }
       },
       {&elevator}));
+
+      arm.SetDefaultCommand(frc2::RunCommand(
+      [this] {
+            arm.SetTargetPosition(controller.GetRightTriggerAxis() * -500);
+            int state = arm.GetState();
+            if(controller.GetAButtonPressed()) {
+              if(state == ArmConstants::kPositionMode) arm.SetState(ArmConstants::kOff);
+              else if(state == ArmConstants::kOff) arm.SetState(ArmConstants::kPositionMode);
+            }
+      },
+      {&arm}));
 
     // turret.SetDefaultCommand(frc2::RunCommand(
     //   [this] {
