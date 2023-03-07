@@ -11,6 +11,10 @@
 
 void Robot::RobotInit() {
   m_container.ResetOdometry();
+  SmartDashboard::PutNumber("armPos", 6435);
+  SmartDashboard::PutNumber("armPower", 0.0);
+  SmartDashboard::PutNumber("wristPos", 4000);
+  SmartDashboard::PutNumber("wristPower", 0.0);
 }
 
 /**

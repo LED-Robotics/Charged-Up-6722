@@ -30,20 +30,20 @@ void ElevatorSubsystem::Periodic() {
     left.Set(leftStopSensor.Get() ? 0.0 : power);
     right.Set(rightStopSensor.Get() ? 0.0 : power);
   } else if(state == kPositionMode) {
-        std::cout << "Position mode: " << position << '\n';
-      std::cout << "Left Current Position: " << GetLeftPosition() << '\n';
-      std::cout << "Right Current Position: " << GetRightPosition() << '\n';
+      // std::cout << "Position mode: " << position << '\n';
+      // std::cout << "Left Current Position: " << GetLeftPosition() << '\n';
+      // std::cout << "Right Current Position: " << GetRightPosition() << '\n';
       // if(leftStopSensor.Get()) left.Set(0.0);
       // else left.Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, position);
       double leftPos = GetLeftPosition();
       double rightPos = GetRightPosition();
       if(leftPos - rightPos > kElevatorDeadzone) {
-        left.Set(ctre::phoenix::motorcontrol::ControlMode::Position, rightPos);
+        left.Set(ctre::phoenix::motorcontrol::ControlMode::Position, rightPos >= 0.0 ? rightPos : 0.0);
       } else {
         left.Set(ctre::phoenix::motorcontrol::ControlMode::Position, position);
       }
       if(rightPos - leftPos > kElevatorDeadzone) {
-        left.Set(ctre::phoenix::motorcontrol::ControlMode::Position, leftPos);
+        left.Set(ctre::phoenix::motorcontrol::ControlMode::Position, leftPos >= 0.0 ? leftPos : 0.0);
       } else {
         right.Set(ctre::phoenix::motorcontrol::ControlMode::Position, position);
       }

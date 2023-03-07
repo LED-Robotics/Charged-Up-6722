@@ -108,6 +108,8 @@ namespace ArmConstants {
     constexpr int kMinAngleCounts = -200;   // encoder counts at the arm's minimum usable position
     constexpr int kMaxAngleCounts = 4000;   // encoder counts at the arm's max usable position
     constexpr double kArmDegreeMax = 200; // degrees the arm is capable of moving 
+    constexpr int kCountsPerDegree = 545;
+    constexpr double kMaxFeedForward = 0.06;
 }
 
 namespace IntakeConstants {
@@ -117,8 +119,10 @@ namespace IntakeConstants {
     constexpr int kFullMode = 1;
     constexpr int kPowerMode = 2;
     constexpr double kFullPower = 1.0;
-    constexpr double kCurrentLimit = 0.5;
+    constexpr double kCurrentLimit = 15.0;
     constexpr double kIntakeDeadzone = 0.1;
+    constexpr int kCountsPerDegree = 149;
+    constexpr double kMaxFeedForward = -0.07;
 }
 
 namespace LimelightConstants {

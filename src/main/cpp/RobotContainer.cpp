@@ -9,6 +9,7 @@
 #include <iostream>
 #include <frc/controller/PIDController.h>
 #include <frc/shuffleboard/Shuffleboard.h>
+#include <frc/SmartDashboard/SmartDashboard.h>
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc/trajectory/constraint/DifferentialDriveVoltageConstraint.h>
@@ -59,38 +60,50 @@ RobotContainer::RobotContainer() {
       },
       {&m_drive}));
     
-    // intake.SetDefaultCommand(frc2::RunCommand(
+    intake.SetDefaultCommand(frc2::RunCommand(
+      [this] {
+          // intake.SetState(IntakeConstants::kPowerMode);
+          // if(controller.GetXButton()) intake.SetPower(1.0);
+          // else if(controller.GetYButton()) intake.SetPower(-1.0);
+          // else intake.SetPower(0.0);
+          intake.SetPosition(4000 + (controller.GetRightTriggerAxis() * 16600));
+
+          // intake.SetState(ArmConstants::kPowerMode);
+          // double wristPower = SmartDashboard::GetNumber("wristPower", 0.0);
+          // intake.SetWristPower(wristPower);
+      },
+      {&intake}));
+
+    // elevator.SetDefaultCommand(frc2::RunCommand(
     //   [this] {
-    //         intake.SetPower(controller2.GetRightTriggerAxis() - controller2.GetLeftTriggerAxis());
-    //         if(controller.GetXButton()) {
-    //             intake.On();
-    //         } else {
-    //             if(intake.GetPower() > IntakeConstants::kIntakeDeadzone) {
-    //                 intake.UsePowerMode();
-    //             } else intake.Off();
+    //         elevator.SetTargetPosition(controller.GetLeftTriggerAxis() * 30000);
+    //         int state = elevator.GetState();
+    //         if(controller.GetAButtonPressed()) {
+    //           if(state == ElevatorConstants::kPositionMode) elevator.SetState(ElevatorConstants::kOff);
+    //           else if(state == ElevatorConstants::kOff) elevator.SetState(ElevatorConstants::kPositionMode);
     //         }
     //   },
-    //   {&intake}));
-
-    elevator.SetDefaultCommand(frc2::RunCommand(
-      [this] {
-            elevator.SetTargetPosition(controller.GetLeftTriggerAxis() * -85000);
-            int state = elevator.GetState();
-            if(controller.GetAButtonPressed()) {
-              if(state == ElevatorConstants::kPositionMode) elevator.SetState(ElevatorConstants::kOff);
-              else if(state == ElevatorConstants::kOff) elevator.SetState(ElevatorConstants::kPositionMode);
-            }
-      },
-      {&elevator}));
+    //   {&elevator}));
 
       arm.SetDefaultCommand(frc2::RunCommand(
       [this] {
-            arm.SetTargetPosition(controller.GetRightTriggerAxis() * -500);
-            int state = arm.GetState();
-            if(controller.GetAButtonPressed()) {
-              if(state == ArmConstants::kPositionMode) arm.SetState(ArmConstants::kOff);
-              else if(state == ArmConstants::kOff) arm.SetState(ArmConstants::kPositionMode);
-            }
+            // arm.SetTargetPosition(controller.GetRightTriggerAxis() * 80000);
+            // int state = arm.GetState();
+            // if(controller.GetBButtonPressed()) {
+            //   if(state == ArmConstants::kPositionMode) arm.SetState(ArmConstants::kOff);
+            //   else if(state == ArmConstants::kOff) arm.SetState(ArmConstants::kPositionMode);
+            // }
+
+            // arm.SetState(ArmConstants::kPositionMode);
+            // double armPos = SmartDashboard::GetNumber("armPos", 6435);
+            // arm.SetTargetPosition(armPos);
+
+            arm.SetState(ArmConstants::kPositionMode);
+            arm.SetTargetPosition(6435 + (controller.GetLeftTriggerAxis() * 80000));
+
+            // arm.SetState(ArmConstants::kPowerMode);
+            // double armPower = SmartDashboard::GetNumber("armPower", 0.0);
+            // arm.SetPower(armPower);
       },
       {&arm}));
 

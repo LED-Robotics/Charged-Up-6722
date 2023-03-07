@@ -16,6 +16,7 @@
 #include <frc/controller/BangBangController.h>
 #include "ctre/Phoenix.h"
 #include <rev/CANSparkMax.h>
+#include <iostream>
 
 #include "Constants.h"
 
@@ -50,7 +51,8 @@ class IntakeSubsystem : public frc2::SubsystemBase {
   /**
    * Sets the power to use while in kPowerMode.
    */
-  void SetPower(double power);
+  void SetPower(double newPower);
+  void SetWristPower(double newPower);
 
   /**
    * Returns the current power setting of the intake.
@@ -65,6 +67,11 @@ class IntakeSubsystem : public frc2::SubsystemBase {
    * @return The current state of the intake
    */  
   int GetState();
+
+  /**
+   * Sets the current state of the intake.
+   */  
+  void SetState(int newState);
 
   /**
    * Sets the position of the Intake wrist.
@@ -94,6 +101,7 @@ class IntakeSubsystem : public frc2::SubsystemBase {
  private:
   int state = IntakeConstants::kOff;
   double power = 0.0;
+  double wristPower = 0.0;
   double position = 0.0;
 
   // Components (e.g. motor controllers and sensors) should generally be

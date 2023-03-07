@@ -14,24 +14,28 @@ IntakeSubsystem::IntakeSubsystem()
     : intakeMotor{kIntakePort, rev::CANSparkMaxLowLevel::MotorType::kBrushless},
     wristMotor{kWristPort} {
       intakeMotor.SetInverted(true);
+      wristMotor.SetSelectedSensorPosition(0);
 }
 
 void IntakeSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here
-
+  // std::cout << "Wrist Current Position: " << GetCurrentPosition() << '\n';
+  // std::cout << "Intake Output Current: " << intakeMotor.GetOutputCurrent() << '\n';
   // Intake power control
   if(state == kOff) {
     intakeMotor.Set(0.0);
-  } else if(state == kFullMode) {
-    if(intakeMotor.GetOutputCurrent() < kCurrentLimit) intakeMotor.Set(kFullPower);
   } else if(state == kPowerMode) {
-    if(intakeMotor.GetOutputCurrent() < kCurrentLimit) intakeMotor.Set(power);
+    // if(intakeMotor.GetOutputCurrent() < kCurrentLimit && power > 0.0) intakeMotor.Set(power);
+    intakeMotor.Set(power);
+    // else intakeMotor.Set(0.0);
   }
-
+  std::cout << "Wrist Position Target: " << position << '\n';
   // Wrist position control
   // feed forward should be a changing constant that increases as the wrist moves further. It should be a static amount of power to overcome gravity.
-  double feedForward = 0.0; // GetCurrentPosition() / 5000   <-- tune this number after verifying the motion magic works in any capacity
+  // double feedForward = 0.0; // GetCurrentPosition() / 5000   <-- tune this number after verifying the motion magic works in any capacity
+  double feedForward = sin((GetCurrentPosition() / kCountsPerDegree) * (M_PI/180)) * kMaxFeedForward;
   wristMotor.Set(ctre::phoenix::motorcontrol::ControlMode::Position, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, feedForward);
+  // wristMotor.Set(wristPower);
 }
 
 void IntakeSubsystem::Off() {
@@ -48,7 +52,12 @@ void IntakeSubsystem::UsePowerMode() {
 
 void IntakeSubsystem::SetPower(double newPower) {
   power = newPower;
-  if(power < kIntakeDeadzone) power = 0.0;
+  // if(power < kIntakeDeadzone) power = 0.0;
+}
+
+void IntakeSubsystem::SetWristPower(double newPower) {
+  wristPower = newPower;
+  // if(power < kIntakeDeadzone) power = 0.0;
 }
 
 double IntakeSubsystem::GetPower() {
@@ -57,6 +66,10 @@ double IntakeSubsystem::GetPower() {
 
 int IntakeSubsystem::GetState() {
   return state;
+}
+
+void IntakeSubsystem::SetState(int newState) {
+  state = newState;
 }
 
 void IntakeSubsystem::SetPosition(double newPosition) {
@@ -68,7 +81,7 @@ double IntakeSubsystem::GetTargetPosition() {
 }
 
 double IntakeSubsystem::GetCurrentPosition() {
-  return wristMotor.SetSelectedSensorPosition(0);
+  return wristMotor.GetSelectedSensorPosition();
 }
 
 void IntakeSubsystem::ResetWristEncoder() {
