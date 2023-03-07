@@ -34,39 +34,47 @@ RobotContainer::RobotContainer() {
                 m_drive.ResetEncoders();
               }
             } else {
+              double x = controller.GetLeftX();
+              double y = controller.GetLeftY();
+
+              // zero out axes if they fall within deadzone
+              if (x > -DriveConstants::kDriveDeadzone && x < DriveConstants::kDriveDeadzone)
+                  x = 0.0;
+              if (y > -DriveConstants::kDriveDeadzone && y < DriveConstants::kDriveDeadzone)
+                  y = 0.0;
+
+              // put speeds through a polynomial to smooth out joystick input
+              // check the curve out here: https://www.desmos.com/calculator/65tpwhxyai the range between 0.0 to 1.0 is used for the motors
+              // change driveCurveExtent to modify curve strength
+              float xSpeed = DriveConstants::kDriveCurveExtent * pow(x, 3) + (1 - DriveConstants::kDriveCurveExtent) * x;
+              float ySpeed = DriveConstants::kDriveCurveExtent * pow(y, 3) + (1 - DriveConstants::kDriveCurveExtent) * y;
               m_drive.Drive(
-                units::meters_per_second_t{controller.GetLeftY() * 4.0},
-                units::meters_per_second_t{controller.GetLeftX() * -4.0},
+                units::meters_per_second_t{ySpeed * 4.0},
+                units::meters_per_second_t{xSpeed * -4.0},
                 units::degrees_per_second_t{controller.GetRightX() * 150}, false);
             }
-            // D-Pad Turn Control
-            // double angle = controller.GetPOV();
-            // if(angle != -1) {
-            //     frc::SwerveModuleState state{0_mps, {units::degree_t{angle}}};
-            //     m_drive.SetModuleStates({state, state, state, state});
-            // }
-            // double axis = controller.GetLeftY();
-            // auto speed = 1.5_mps;
-            // if(abs(axis) > 0.3) {
-            //   frc::SwerveModuleState state{axis > 0.0 ? speed : -speed, {units::degree_t{0}}};
-            //   m_drive.SetModuleStates({state, state, state, state});
-            // } else {
-            //   frc::SwerveModuleState state{0_mps, {units::degree_t{0}}};
-            //   m_drive.SetModuleStates({state, state, state, state});
-            // }
-            // m_drive.SetDrivePower(controller.GetLeftY());
-            // Manual turn control
-            // m_drive.SetTurnPower(controller.GetRightX());
       },
       {&m_drive}));
     
     intake.SetDefaultCommand(frc2::RunCommand(
       [this] {
-          // intake.SetState(IntakeConstants::kPowerMode);
-          // if(controller.GetXButton()) intake.SetPower(1.0);
-          // else if(controller.GetYButton()) intake.SetPower(-1.0);
-          // else intake.SetPower(0.0);
-          intake.SetPosition(4000 + (controller.GetRightTriggerAxis() * 16600));
+          intake.SetState(IntakeConstants::kPowerMode);
+          if(controller.GetXButton()) intake.SetPower(1.0);
+          else if(controller.GetYButton()) intake.SetPower(-1.0);
+          else intake.SetPower(0.0);
+          // intake.SetPosition(4000 + (controller.GetRightTriggerAxis() * 16600));
+          int pov = controller.GetPOV();
+          switch(pov) {
+            case 180:
+              intake.SetPosition(IntakeConstants::kFloorPickupPosition);
+              break;
+            case 90:
+              intake.SetPosition(IntakeConstants::kMidDropoffPosition);
+              break;
+            case 270:
+              intake.SetPosition(4000);
+              break;
+          }
 
           // intake.SetState(ArmConstants::kPowerMode);
           // double wristPower = SmartDashboard::GetNumber("wristPower", 0.0);
@@ -98,8 +106,21 @@ RobotContainer::RobotContainer() {
             // double armPos = SmartDashboard::GetNumber("armPos", 6435);
             // arm.SetTargetPosition(armPos);
 
+            // arm.SetState(ArmConstants::kOff);
             arm.SetState(ArmConstants::kPositionMode);
-            arm.SetTargetPosition(6435 + (controller.GetLeftTriggerAxis() * 80000));
+            int pov = controller.GetPOV();
+            switch(pov) {
+              case 180:
+                arm.SetTargetPosition(ArmConstants::kFloorPickupPosition);
+                break;
+              case 90:
+                arm.SetTargetPosition(ArmConstants::kMidDropoffPosition);
+                break;
+              case 270: 
+                arm.SetTargetPosition(6435);
+                break;
+            }
+            // arm.SetTargetPosition(6435 + (controller.GetLeftTriggerAxis() * 80000));
 
             // arm.SetState(ArmConstants::kPowerMode);
             // double armPower = SmartDashboard::GetNumber("armPower", 0.0);

@@ -102,7 +102,7 @@ class IntakeSubsystem : public frc2::SubsystemBase {
   int state = IntakeConstants::kOff;
   double power = 0.0;
   double wristPower = 0.0;
-  double position = 0.0;
+  double position = 4000;
 
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
