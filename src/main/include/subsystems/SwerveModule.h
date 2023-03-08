@@ -47,6 +47,7 @@ class SwerveModule {
          * @return the encoder distance
          */
         units::meters_per_second_t GetDriveEncoderRate() const;
+        // frc::SwerveModuleState& GetTarget() const;
         frc::SwerveModuleState GetState() const;
         frc::SwerveModulePosition GetPosition() const;
         void SetDesiredState(const frc::SwerveModuleState& state);
@@ -56,7 +57,7 @@ class SwerveModule {
 
     private:
   
-
+        // const frc::SwerveModuleState *last;
         static constexpr auto kModuleMaxAngularVelocity =
             std::numbers::pi * 57.2958_deg_per_s;  // radians per second
         static constexpr auto kModuleMaxAngularAcceleration =

@@ -1,0 +1,53 @@
+Forward:
+﻿﻿﻿﻿﻿﻿ X Target: 0 ﻿
+﻿﻿﻿﻿﻿﻿ Y Target: 0.405526 ﻿
+﻿﻿﻿﻿﻿﻿ Angle Target: 0 ﻿
+﻿﻿﻿﻿﻿﻿ FL Speed: 0.405526 FL Angle: 90 ﻿
+﻿﻿﻿﻿﻿﻿ FR Speed: 0.405526 FR Angle: 90 ﻿
+﻿﻿﻿﻿﻿﻿ BL Speed: 0.405526 BL Angle: 90 ﻿
+﻿﻿﻿﻿﻿﻿ BR Speed: 0.405526 BR Angle: 90 ﻿
+
+Backwards:
+﻿﻿﻿﻿﻿﻿ X Target: 0 ﻿
+﻿﻿﻿﻿﻿﻿ Y Target: -0.356853 ﻿
+﻿﻿﻿﻿﻿﻿ Angle Target: 0 ﻿
+﻿﻿﻿﻿﻿﻿ FL Speed: 0.356853 FL Angle: -90 ﻿
+﻿﻿﻿﻿﻿﻿ FR Speed: 0.356853 FR Angle: -90 ﻿
+﻿﻿﻿﻿﻿﻿ BL Speed: 0.356853 BL Angle: -90 ﻿
+﻿﻿﻿﻿﻿﻿ BR Speed: 0.356853 BR Angle: -90 
+Left: 
+﻿﻿﻿﻿﻿﻿ X Target: -1.11774 ﻿
+﻿﻿﻿﻿﻿﻿ Y Target: -0 ﻿
+﻿﻿﻿﻿﻿﻿ Angle Target: 0 ﻿
+﻿﻿﻿﻿﻿﻿ FL Speed: 1.11774 FL Angle: -180 ﻿
+﻿﻿﻿﻿﻿﻿ FR Speed: 1.11774 FR Angle: 180 ﻿
+﻿﻿﻿﻿﻿﻿ BL Speed: 1.11774 BL Angle: -180 ﻿
+﻿﻿﻿﻿﻿﻿ BR Speed: 1.11774 BR Angle: 180 
+Right: 
+﻿﻿﻿﻿﻿﻿ X Target: 0.39145 ﻿
+﻿﻿﻿﻿﻿﻿ Y Target: -0 ﻿
+﻿﻿﻿﻿﻿﻿ Angle Target: 0 ﻿
+﻿﻿﻿﻿﻿﻿ FL Speed: 0.39145 FL Angle: 0 ﻿
+﻿﻿﻿﻿﻿﻿ FR Speed: 0.39145 FR Angle: 0 ﻿
+﻿﻿﻿﻿﻿﻿ BL Speed: 0.39145 BL Angle: 0 ﻿
+﻿﻿﻿﻿﻿﻿ BR Speed: 0.39145 BR Angle: 0 ﻿
+
+Left Turn:
+﻿﻿﻿﻿﻿﻿ X Target: 0 ﻿
+﻿﻿﻿﻿﻿﻿ Y Target: -0 ﻿
+﻿﻿﻿﻿﻿﻿ Angle Target: -82.0312 ﻿
+﻿﻿﻿﻿﻿﻿ FL Speed: 0.909259 FL Angle: 45 ﻿
+﻿﻿﻿﻿﻿﻿ FR Speed: 0.909259 FR Angle: -45 ﻿
+﻿﻿﻿﻿﻿﻿ BL Speed: 0.909259 BL Angle: 135 ﻿
+﻿﻿﻿﻿﻿﻿ BR Speed: 0.909259 BR Angle: -135 ﻿
+
+Right Turn:
+ X Target: 0 ﻿
+﻿﻿﻿﻿﻿﻿ Y Target: -0 ﻿
+﻿﻿﻿﻿﻿﻿ Angle Target: 150 ﻿
+﻿﻿﻿﻿﻿﻿ FL Speed: 1.66265 FL Angle: -135 ﻿
+﻿﻿﻿﻿﻿﻿ FR Speed: 1.66265 FR Angle: 135 ﻿
+﻿﻿﻿﻿﻿﻿ BL Speed: 1.66265 BL Angle: -45 ﻿
+﻿﻿﻿﻿﻿﻿ BR Speed: 1.66265 BR Angle: 45 ﻿
+
+

@@ -48,9 +48,13 @@ RobotContainer::RobotContainer() {
               // change driveCurveExtent to modify curve strength
               float xSpeed = DriveConstants::kDriveCurveExtent * pow(x, 3) + (1 - DriveConstants::kDriveCurveExtent) * x;
               float ySpeed = DriveConstants::kDriveCurveExtent * pow(y, 3) + (1 - DriveConstants::kDriveCurveExtent) * y;
+              // m_drive.Drive(
+              //   units::meters_per_second_t{ySpeed * 4.0},
+              //   units::meters_per_second_t{xSpeed * -4.0},
+              //   units::degrees_per_second_t{controller.GetRightX() * 150}, false);
               m_drive.Drive(
-                units::meters_per_second_t{ySpeed * 4.0},
-                units::meters_per_second_t{xSpeed * -4.0},
+                units::meters_per_second_t{xSpeed * 4.0},
+                units::meters_per_second_t{ySpeed * -4.0},
                 units::degrees_per_second_t{controller.GetRightX() * 150}, false);
             }
       },
@@ -61,7 +65,7 @@ RobotContainer::RobotContainer() {
           intake.SetState(IntakeConstants::kPowerMode);
           if(controller.GetXButton()) intake.SetPower(1.0);
           else if(controller.GetYButton()) intake.SetPower(-1.0);
-          else intake.SetPower(0.0);
+          if(controller.GetRightBumper()) intake.SetPower(0.1);
           // intake.SetPosition(4000 + (controller.GetRightTriggerAxis() * 16600));
           int pov = controller.GetPOV();
           switch(pov) {
@@ -170,7 +174,7 @@ void RobotContainer::ConfigureButtonBindings() {
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
   // Set up config for trajectory
-  /*
+  
   frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
                                AutoConstants::kMaxAcceleration);
   // Add kinematics to ensure max speed is actually obeyed
@@ -178,7 +182,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
 
   // An example trajectory to follow.  All units in meters.
   auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
-    /*
+    
       // Start at the origin facing the +X direction
       {frc::Pose2d{0.0_m, 0.0_m, 0.0_deg}, frc::Pose2d{1.0_m, 1.0_m, 0_deg}, 
       frc::Pose2d{-1.0_m, 2.0_m, 0_deg},
@@ -221,7 +225,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       frc2::InstantCommand(
           [this]() { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false);
           m_drive.SetInverted(false); }, {}));
-  */
+  
 }
 
 frc2::Command* RobotContainer::GetZeroCommand() {

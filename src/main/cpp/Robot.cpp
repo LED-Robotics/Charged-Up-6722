@@ -15,6 +15,7 @@ void Robot::RobotInit() {
   SmartDashboard::PutNumber("armPower", 0.0);
   SmartDashboard::PutNumber("wristPos", 4000);
   SmartDashboard::PutNumber("wristPower", 0.0);
+  SmartDashboard::PutNumber("homingP", 0.00001);
 }
 
 /**

@@ -108,6 +108,6 @@ class IntakeSubsystem : public frc2::SubsystemBase {
   // declared private and exposed only through public methods.
 
   // The motor controllers
-  rev::CANSparkMax intakeMotor;
+  WPI_TalonFX intakeMotor;
   WPI_TalonFX wristMotor;
 };

@@ -11,7 +11,7 @@ using namespace IntakeConstants;
 using namespace frc;
 
 IntakeSubsystem::IntakeSubsystem()
-    : intakeMotor{kIntakePort, rev::CANSparkMaxLowLevel::MotorType::kBrushless},
+    : intakeMotor{kIntakePort},
     wristMotor{kWristPort} {
       intakeMotor.SetInverted(true);
       wristMotor.SetSelectedSensorPosition(0);
@@ -19,7 +19,7 @@ IntakeSubsystem::IntakeSubsystem()
 
 void IntakeSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here
-  std::cout << "Wrist Current Position: " << GetCurrentPosition() << '\n';
+  // std::cout << "Wrist Current Position: " << GetCurrentPosition() << '\n';
   // std::cout << "Intake Output Current: " << intakeMotor.GetOutputCurrent() << '\n';
   // Intake power control
   if(state == kOff) {

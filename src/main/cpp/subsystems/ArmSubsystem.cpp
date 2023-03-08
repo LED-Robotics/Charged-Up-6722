@@ -21,8 +21,8 @@ ArmSubsystem::ArmSubsystem()
 
 void ArmSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here
-  std::cout << "Left Arm Current Position: " << GetLeftPosition() << '\n';
-  std::cout << "Right Arm Current Position: " << GetRightPosition() << '\n';
+  // std::cout << "Left Arm Current Position: " << GetLeftPosition() << '\n';
+  // std::cout << "Right Arm Current Position: " << GetRightPosition() << '\n';
   // std::cout << "Left Velocity: " << left.GetSelectedSensorVelocity() << '\n';
   if(state == kOff) {
     left.Set(0.0);

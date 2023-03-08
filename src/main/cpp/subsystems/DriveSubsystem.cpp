@@ -7,6 +7,7 @@
 #include <iostream>
 #include <cmath>
 #include <frc/geometry/Rotation2d.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 using namespace DriveConstants;
 using namespace frc;
@@ -47,17 +48,18 @@ DriveSubsystem::DriveSubsystem()
       }
 
 void DriveSubsystem::Periodic() {
-  // auto blPos = backLeftTalon.GetSensorCollection();
-  // auto flPos = frontLeftTalon.GetSensorCollection();
-  // auto brPos = backRightTalon.GetSensorCollection();
-  // auto frPos = frontRightTalon.GetSensorCollection();
+  auto blPos = backLeftTalon.GetSensorCollection();
+  auto flPos = frontLeftTalon.GetSensorCollection();
+  auto brPos = backRightTalon.GetSensorCollection();
+  auto frPos = frontRightTalon.GetSensorCollection();
   // Implementation of subsystem periodic method goes here.
 
   // m_odometry.Update(GetRotation2d(),
   //                   units::meter_t(this->GetLeftEncoderDistance()),
   //                   units::meter_t(this->GetRightEncoderDistance()));
   // Pose2d current = m_odometry.GetPose();
-  // std::cout << "Back Left: " << blPos.GetPulseWidthPosition() << '\n';
+  // std::cout << "Back Left Absolute: " << blPos.GetPulseWidthPosition() << '\n';
+  // std::cout << "Back Left Relative: " << backLeftTheta.GetSelectedSensorPosition() * kTurnRatio << '\n';
   // std::cout << "Front Left: " << flPos.GetPulseWidthPosition() << '\n';
   // std::cout << "Back Right: " << brPos.GetPulseWidthPosition() << '\n';
   // std::cout << "Front Right: " << frPos.GetPulseWidthPosition() << '\n';
@@ -80,7 +82,9 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
 
   //Florida, France, Bland, Brazil
   // auto [fl, fr, bl, br] = states;
-
+  std::cout << "X Target: " << (double)xSpeed << '\n';
+  std::cout << "Y Target: " << (double)ySpeed << '\n';
+  std::cout << "Angle Target: " << (double)rot << '\n';
   SetModuleStates(states);
 
   // s_backLeft.SetDesiredState(bl);
@@ -93,9 +97,13 @@ void DriveSubsystem::SetModuleStates(
   wpi::array<frc::SwerveModuleState, 4> desiredStates) {
     kDriveKinematics.DesaturateWheelSpeeds(&desiredStates,
                                           AutoConstants::kMaxSpeed);
+    std::cout << "FL Speed: " << (double)desiredStates[0].speed << " FL Angle: " << (double)desiredStates[0].angle.Degrees() << '\n';
     s_frontLeft.SetDesiredState(desiredStates[0]);
+    std::cout << "FR Speed: " << (double)desiredStates[1].speed << " FR Angle: " << (double)desiredStates[1].angle.Degrees() << '\n';
     s_frontRight.SetDesiredState(desiredStates[1]);
+    std::cout << "BL Speed: " << (double)desiredStates[2].speed << " BL Angle: " << (double)desiredStates[2].angle.Degrees() << '\n';
     s_backLeft.SetDesiredState(desiredStates[2]);
+    std::cout << "BR Speed: " << (double)desiredStates[3].speed << " BR Angle: " << (double)desiredStates[3].angle.Degrees() << '\n';
     s_backRight.SetDesiredState(desiredStates[3]);
 }
 
@@ -120,10 +128,11 @@ bool DriveSubsystem::ZeroSwervePosition() {
   int zeroed = 0;
   for(int i = 0; i < 4; i++) {
     auto sensor = talons[i]->GetSensorCollection();
-    int pos = sensor.GetPulseWidthPosition();
-    double error = abs(((double)pos * kTurnRatio) - (double)poses[i]);
-    double correction = 1.0 * (error / 4096);
-    double power = 0.1 + correction;
+    int pos = sensor.GetPulseWidthPosition() / 2;
+    double error = ((double)poses[i]) - ((double)pos * kTurnRatio) / 1024;
+    double kP = SmartDashboard::GetNumber("homingP", 0.00001);
+    double power = 0.05 + (error * kP);
+
     if(pos < poses[i]) power *= -1;
     std::cout << "Motor" << i + 1 << "Sensor: " << pos << '\n';
     std::cout << "Motor" << i + 1 << "Power: " << power << '\n';
