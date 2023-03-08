@@ -7,6 +7,7 @@
 #include <frc/geometry/Rotation2d.h>
 #include <iostream>
 #include <frc/kinematics/DifferentialDriveWheelSpeeds.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 using namespace ArmConstants;
 using namespace frc;
@@ -21,9 +22,6 @@ ArmSubsystem::ArmSubsystem()
 
 void ArmSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here
-  // std::cout << "Left Arm Current Position: " << GetLeftPosition() << '\n';
-  // std::cout << "Right Arm Current Position: " << GetRightPosition() << '\n';
-  // std::cout << "Left Velocity: " << left.GetSelectedSensorVelocity() << '\n';
   if(state == kOff) {
     left.Set(0.0);
     right.Set(0.0);
@@ -33,14 +31,14 @@ void ArmSubsystem::Periodic() {
   } else if(state == kPositionMode) {
     // std::cout << "Arm Position mode: " << position << '\n';
     // feed forwards should be a changing constant that increases as the arm moves further. It should be a static amount of power to overcome gravity.
-    // double leftFeedForward = 0.0; // GetLeftPosition() / 5000   <-- tune this number after verifying the motion magic works in any capacity
-    double leftFeedForward = sin((GetLeftPosition() / kCountsPerDegree) * (M_PI/180)) * kMaxFeedForward;
-    // std::cout << "Left Feed Forward: " << leftFeedForward << '\n';
-    // leftFeedForward = sin(currentAngle) * kF;
-
+    
+    double leftAngle = (GetLeftPosition() / kCountsPerDegree) * (M_PI/180);
+    double rightAngle = (GetRightPosition() / kCountsPerDegree) * (M_PI/180);
+    double leftFeedForward = sin(leftAngle) * kMaxFeedForward;
+    double rightFeedForward = sin(rightAngle) * kMaxFeedForward;
+    SmartDashboard::PutNumber("armAngle", (leftAngle + rightAngle) / 2);  // print to Shuffleboard
     left.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, leftFeedForward);
     // double rightFeedForward = 0.0; // GetRightPosition() / 5000   <-- tune this number after verifying the motion magic works in any capacity
-    double rightFeedForward = sin((GetRightPosition() / kCountsPerDegree) * (M_PI/180)) * kMaxFeedForward;
     right.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, rightFeedForward);
   }
 }
@@ -75,4 +73,10 @@ double ArmSubsystem::GetLeftPosition() {
 
 double ArmSubsystem::GetRightPosition() {
   return left.GetSelectedSensorPosition(0);
+}
+
+double ArmSubsystem::GetAngle() {
+  double left = sin((GetLeftPosition() / kCountsPerDegree) * (M_PI/180));
+  double right = sin((GetRightPosition() / kCountsPerDegree) * (M_PI/180));
+  return (left + right) / 2;
 }

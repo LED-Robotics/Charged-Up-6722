@@ -81,7 +81,7 @@ namespace DriveConstants {
 
     constexpr double kDriveDeadzone = 0.05;
     constexpr double kDriveCurveExtent = 0.5;
-
+    constexpr auto kDriveTranslationLimit = 3_mps_sq;
     // Example value only - as above, this must be tuned for your drive!
     constexpr double kPDriveVel = 1.0;
     constexpr double kPTurnVel = 0.001;
@@ -129,6 +129,7 @@ namespace IntakeConstants {
     constexpr double kIntakeDeadzone = 0.1;
     constexpr int kCountsPerDegree = 149;
     constexpr double kMaxFeedForward = -0.07;
+    constexpr double kStartAngle = -30.0;
     // constexpr int kFloorPickupPosition = 20600;
     constexpr int kFloorPickupPosition = 28400;
     constexpr int kMidDropoffPosition = 44000;

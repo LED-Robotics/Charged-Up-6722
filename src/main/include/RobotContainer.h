@@ -48,11 +48,13 @@ class RobotContainer {
   // The robot's subsystems
   DriveSubsystem m_drive;
   
-  IntakeSubsystem intake;
-
   ElevatorSubsystem elevator;
   
   ArmSubsystem arm;
+
+  IntakeSubsystem intake{&arm};
+
+  
 
   // LimelightSubsystem limelight;
 

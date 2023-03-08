@@ -6,21 +6,21 @@
 
 #include <frc/geometry/Rotation2d.h>
 #include <frc/kinematics/DifferentialDriveWheelSpeeds.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 using namespace IntakeConstants;
 using namespace frc;
 
-IntakeSubsystem::IntakeSubsystem()
+IntakeSubsystem::IntakeSubsystem(ArmSubsystem *reference)
     : intakeMotor{kIntakePort},
     wristMotor{kWristPort} {
+      arm = reference;
       intakeMotor.SetInverted(true);
       wristMotor.SetSelectedSensorPosition(0);
 }
 
 void IntakeSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here
-  // std::cout << "Wrist Current Position: " << GetCurrentPosition() << '\n';
-  // std::cout << "Intake Output Current: " << intakeMotor.GetOutputCurrent() << '\n';
   // Intake power control
   if(state == kOff) {
     intakeMotor.Set(0.0);
@@ -29,13 +29,15 @@ void IntakeSubsystem::Periodic() {
     intakeMotor.Set(power);
     // else intakeMotor.Set(0.0);
   }
-  // std::cout << "Wrist Position Target: " << position << '\n';
+
   // Wrist position control
+  double armAngle = arm->GetAngle();
+  std::cout << "Arm Angle: " << armAngle << '\n';
   // feed forward should be a changing constant that increases as the wrist moves further. It should be a static amount of power to overcome gravity.
-  double feedForward = 0.0; // GetCurrentPosition() / 5000   <-- tune this number after verifying the motion magic works in any capacity
-  // double feedForward = sin((GetCurrentPosition() / kCountsPerDegree) * (M_PI/180)) * kMaxFeedForward;
+  double wristAngle = (kStartAngle - armAngle + (GetCurrentPosition() / kCountsPerDegree)) * (M_PI/180);
+  double feedForward = sin(wristAngle) * kMaxFeedForward;
+  SmartDashboard::PutNumber("wristAngle", wristAngle);  // print to Shuffleboard
   wristMotor.Set(ctre::phoenix::motorcontrol::ControlMode::Position, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, feedForward);
-  // wristMotor.Set(wristPower);
 }
 
 void IntakeSubsystem::Off() {

@@ -17,6 +17,7 @@
 #include "ctre/Phoenix.h"
 #include <rev/CANSparkMax.h>
 #include <iostream>
+#include "ArmSubsystem.h"
 
 #include "Constants.h"
 
@@ -24,7 +25,7 @@ using namespace frc;
 
 class IntakeSubsystem : public frc2::SubsystemBase {
  public:
-  IntakeSubsystem();
+  IntakeSubsystem(ArmSubsystem *reference);
 
   /**
    * Will be called periodically whenever the CommandScheduler runs.
@@ -99,6 +100,7 @@ class IntakeSubsystem : public frc2::SubsystemBase {
 
     
  private:
+  ArmSubsystem *arm;
   int state = IntakeConstants::kOff;
   double power = 0.0;
   double wristPower = 0.0;

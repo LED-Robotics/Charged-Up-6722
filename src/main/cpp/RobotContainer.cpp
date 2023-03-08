@@ -14,6 +14,7 @@
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc/trajectory/constraint/DifferentialDriveVoltageConstraint.h>
 #include <frc2/command/InstantCommand.h>
+#include <frc2/command/FunctionalCommand.h>
 #include <frc2/command/SwerveControllerCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/button/JoystickButton.h>
@@ -29,10 +30,10 @@ RobotContainer::RobotContainer() {
   // Set up default drive command
     m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
-            if(controller.GetAButton()) {
-              if(m_drive.ZeroSwervePosition()) {
-                m_drive.ResetEncoders();
-              }
+            if(controller.GetAButtonPressed()) {
+              // if(m_drive.ZeroSwervePosition()) {
+              //   m_drive.ResetEncoders();
+              // }
             } else {
               double x = controller.GetLeftX();
               double y = controller.GetLeftY();
@@ -48,14 +49,14 @@ RobotContainer::RobotContainer() {
               // change driveCurveExtent to modify curve strength
               float xSpeed = DriveConstants::kDriveCurveExtent * pow(x, 3) + (1 - DriveConstants::kDriveCurveExtent) * x;
               float ySpeed = DriveConstants::kDriveCurveExtent * pow(y, 3) + (1 - DriveConstants::kDriveCurveExtent) * y;
-              m_drive.Drive(
-                units::meters_per_second_t{ySpeed * 4.0},
-                units::meters_per_second_t{xSpeed * -4.0},
-                units::degrees_per_second_t{controller.GetRightX() * 150}, false);
               // m_drive.Drive(
-              //   units::meters_per_second_t{xSpeed * 4.0},
-              //   units::meters_per_second_t{ySpeed * -4.0},
+              //   units::meters_per_second_t{ySpeed * 4.0},
+              //   units::meters_per_second_t{xSpeed * -4.0},
               //   units::degrees_per_second_t{controller.GetRightX() * 150}, false);
+              m_drive.Drive(
+                units::meters_per_second_t{xSpeed * 4.0},
+                units::meters_per_second_t{ySpeed * -4.0},
+                units::degrees_per_second_t{controller.GetRightX() * 150}, false);
             }
       },
       {&m_drive}));
@@ -131,29 +132,6 @@ RobotContainer::RobotContainer() {
             // arm.SetPower(armPower);
       },
       {&arm}));
-
-    // turret.SetDefaultCommand(frc2::RunCommand(
-    //   [this] {
-    //         int pov = controller.GetPOV();
-    //         if(pov != 90 && pov != 270) pov = controller2.GetPOV();
-    //         if(pov == 90) {
-    //             turret.SetState(TurretConstants::kPowerMode);
-    //             turret.SetPower(TurretConstants::kDefaultPower);
-    //         } else if(pov == 270) {
-    //             turret.SetState(TurretConstants::kPowerMode);
-    //             turret.SetPower(-TurretConstants::kDefaultPower);
-    //         } else {
-    //             turret.SetState(TurretConstants::kOff);
-    //         }
-    //   },
-    //   {&turret}));
-
-    //   lift.SetDefaultCommand(frc2::RunCommand(
-    //   [this] {
-    //       lift.SetState(LiftConstants::kPowerMode);
-    //       lift.SetPower(abs(controller.GetRightY()) > 0.1 ? controller.GetRightY() : 0);
-    //   },
-    //   {&lift}));
 }
 
 void RobotContainer::ResetOdometry() {
@@ -219,12 +197,14 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   return new frc2::SequentialCommandGroup(
       frc2::InstantCommand(
           [this]() { 
-            m_drive.SetInverted(true);
+            m_drive.SetLimiting(false);
            }, {}),
       std::move(swerveControllerCommand),
       frc2::InstantCommand(
-          [this]() { m_drive.Drive(0_mps, 0_mps, 0_rad_per_s, false);
-          m_drive.SetInverted(false); }, {}));
+          [this]() { m_drive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
+            m_drive.SetLimiting(true);
+          // m_drive.SetInverted(false); 
+          }, {}));
   
 }
 

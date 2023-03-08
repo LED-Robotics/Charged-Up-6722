@@ -73,6 +73,11 @@ class ArmSubsystem : public frc2::SubsystemBase {
    * Returns the current position of the right Arm's Falon500.
    */
   double GetRightPosition();
+
+  /**
+   * Returns the current estimated angle of the arm Subsystem.
+   */
+  double GetAngle();
   
     
  private:

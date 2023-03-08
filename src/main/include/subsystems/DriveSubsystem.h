@@ -16,6 +16,7 @@
 #include <frc/motorcontrol/MotorControllerGroup.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/SubsystemBase.h>
+#include <frc/filter/SlewRateLimiter.h>
 #include <units/voltage.h>
 #include "ctre/Phoenix.h"
 #include "AHRS.h"
@@ -102,6 +103,20 @@ class DriveSubsystem : public frc2::SubsystemBase {
    * @param pose The pose to which to set the odometry.
    */
   void ResetOdometry(frc::Pose2d pose);
+
+  /**
+   * Resets the rate limiter.
+   */
+  void ResetRateLimiter();
+
+  /**
+   * Enable or disable acceleration limiting.
+   *
+   * @param state Whether or not limiting is enabled.
+   */
+   void SetLimiting(bool state);
+
+
   // frc::Translation2d frontRightLocation{-0.449072_m, -0.449072_m};
   // frc::Translation2d frontLeftLocation{-0.449072_m, 0.449072_m};
   // frc::Translation2d backRightLocation{0.449072_m, -0.449072_m};
@@ -112,17 +127,20 @@ class DriveSubsystem : public frc2::SubsystemBase {
   // frc::Translation2d frontLeftLocation{0.449072_m, -0.449072_m};
   // frc::Translation2d frontRightLocation{-0.449072_m, -0.449072_m};
 
-  frc::Translation2d frontRightLocation{-0.449072_m, -0.449072_m};
-  frc::Translation2d backRightLocation{0.449072_m, -0.449072_m};
-  frc::Translation2d frontLeftLocation{-0.449072_m, 0.449072_m};
-  frc::Translation2d backLeftLocation{0.449072_m, 0.449072_m};
-  // frc::Translation2d frontRightLocation{0.449072_m, 0.449072_m};
+  // frc::Translation2d frontRightLocation{-0.449072_m, -0.449072_m};
   // frc::Translation2d backRightLocation{0.449072_m, -0.449072_m};
   // frc::Translation2d frontLeftLocation{-0.449072_m, 0.449072_m};
-  // frc::Translation2d backLeftLocation{-0.449072_m, -0.449072_m};
+  // frc::Translation2d backLeftLocation{0.449072_m, 0.449072_m};
+
+  //Florida, France, Bland, Brazil
+  frc::Translation2d backLeftLocation{-0.449072_m, 0.449072_m};
+  frc::Translation2d frontLeftLocation{0.449072_m, 0.449072_m};
+  frc::Translation2d backRightLocation{-0.449072_m, -0.449072_m};
+  frc::Translation2d frontRightLocation{0.449072_m, -0.449072_m};
   frc::SwerveDriveKinematics<4> kDriveKinematics{frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation};
 
  private:
+ bool enableLimiting = true;
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 
@@ -156,4 +174,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
 
   // Odometry class for tracking robot pose
   frc::SwerveDriveOdometry<4> odometry;
+
+  SlewRateLimiter<units::meters_per_second> xLimiter;
+  SlewRateLimiter<units::meters_per_second> yLimiter;
 };
