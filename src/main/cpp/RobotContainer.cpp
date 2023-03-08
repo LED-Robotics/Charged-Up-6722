@@ -48,14 +48,14 @@ RobotContainer::RobotContainer() {
               // change driveCurveExtent to modify curve strength
               float xSpeed = DriveConstants::kDriveCurveExtent * pow(x, 3) + (1 - DriveConstants::kDriveCurveExtent) * x;
               float ySpeed = DriveConstants::kDriveCurveExtent * pow(y, 3) + (1 - DriveConstants::kDriveCurveExtent) * y;
-              // m_drive.Drive(
-              //   units::meters_per_second_t{ySpeed * 4.0},
-              //   units::meters_per_second_t{xSpeed * -4.0},
-              //   units::degrees_per_second_t{controller.GetRightX() * 150}, false);
               m_drive.Drive(
-                units::meters_per_second_t{xSpeed * 4.0},
-                units::meters_per_second_t{ySpeed * -4.0},
+                units::meters_per_second_t{ySpeed * 4.0},
+                units::meters_per_second_t{xSpeed * -4.0},
                 units::degrees_per_second_t{controller.GetRightX() * 150}, false);
+              // m_drive.Drive(
+              //   units::meters_per_second_t{xSpeed * 4.0},
+              //   units::meters_per_second_t{ySpeed * -4.0},
+              //   units::degrees_per_second_t{controller.GetRightX() * 150}, false);
             }
       },
       {&m_drive}));
