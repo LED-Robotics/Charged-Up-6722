@@ -89,3 +89,11 @@ double IntakeSubsystem::GetCurrentPosition() {
 void IntakeSubsystem::ResetWristEncoder() {
   wristMotor.SetSelectedSensorPosition(0);
 }
+
+void IntakeSubsystem::SetBrakeMode(bool state) {
+  ctre::phoenix::motorcontrol::NeutralMode mode;
+  if(state) mode = ctre::phoenix::motorcontrol::NeutralMode::Brake;
+  else mode = ctre::phoenix::motorcontrol::NeutralMode::Coast;
+  intakeMotor.SetNeutralMode(mode);
+  wristMotor.SetNeutralMode(mode);
+}

@@ -46,10 +46,10 @@ namespace DriveConstants {
     constexpr int kBackRightTalonPort = 10;
     constexpr int kFrontRightTalonPort = 11;
 
-    constexpr int kBLeftMagPos = 7215;
-    constexpr int kFLeftMagPos = -3303;
-    constexpr int kBRightMagPos = 5620;
-    constexpr int kFRightMagPos = 455;
+    constexpr int kBLeftMagPos = 3120;
+    constexpr int kFLeftMagPos = 788;
+    constexpr int kBRightMagPos = 2058;
+    constexpr int kFRightMagPos = 4544;
 
     constexpr int kZeroDeadzone = 100;
 
@@ -98,6 +98,10 @@ namespace ElevatorConstants {
     constexpr int kPositionMode = 2;
     constexpr double kDefaultPower = 1.0;
     constexpr double kElevatorDeadzone = 500;
+    constexpr int kStartPosition = 10;
+    constexpr int kFloorPickupPosition = 10;
+    constexpr int kMidDropoffPosition = 10;
+    constexpr int kHighDropoffPosition = 70000;
 }
 
 namespace ArmConstants {
@@ -114,8 +118,10 @@ namespace ArmConstants {
     constexpr int kCountsPerDegree = 545;
     constexpr double kMaxFeedForward = 0.06;
     // constexpr int kFloorPickupPosition = 2080; original
+    constexpr int kStartPosition = 6435;
     constexpr int kFloorPickupPosition = 13360;
     constexpr int kMidDropoffPosition = 74500;
+    constexpr int kHighDropoffPosition = 74500;
 }
 
 namespace IntakeConstants {
@@ -130,9 +136,11 @@ namespace IntakeConstants {
     constexpr int kCountsPerDegree = 149;
     constexpr double kMaxFeedForward = -0.07;
     constexpr double kStartAngle = -30.0;
+    constexpr int kStartPosition = 4000;
     // constexpr int kFloorPickupPosition = 20600;
     constexpr int kFloorPickupPosition = 28400;
-    constexpr int kMidDropoffPosition = 44000;
+    constexpr int kMidDropoffPosition = 36000;
+    constexpr int kHighDropoffPosition = 36000;
 }
 
 namespace LimelightConstants {

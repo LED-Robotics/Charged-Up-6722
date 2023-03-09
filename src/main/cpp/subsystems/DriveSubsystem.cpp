@@ -46,6 +46,7 @@ DriveSubsystem::DriveSubsystem()
       xLimiter{kDriveTranslationLimit},
       yLimiter{kDriveTranslationLimit} {
         ZeroSwervePosition();
+        backRightTheta.SetSelectedSensorPosition(0);
         // ResetEncoders();
         ResetOdometry(frc::Pose2d{});
       }
@@ -57,7 +58,7 @@ void DriveSubsystem::Periodic() {
   // auto frPos = frontRightTalon.GetSensorCollection();
   // Implementation of subsystem periodic method goes here.
   // std::cout << "Back Left Absolute: " << blPos.GetPulseWidthPosition() << '\n';
-  // std::cout << "Back Left Relative: " << backLeftTheta.GetSelectedSensorPosition() * kTurnRatio << '\n';
+  // std::cout << "Back Left Relative: " << backLeftTheta.GetSelectedSensorPosition() << '\n';
   // std::cout << "Front Left: " << flPos.GetPulseWidthPosition() << '\n';
   // std::cout << "Back Right: " << brPos.GetPulseWidthPosition() << '\n';
   // std::cout << "Front Right: " << frPos.GetPulseWidthPosition() << '\n';
@@ -143,13 +144,16 @@ void DriveSubsystem::SetTurnPower(double power) {
 // }
 
 bool DriveSubsystem::ZeroSwervePosition() {
-  WPI_TalonFX *turnMotors[4] = {&backLeftTheta, &frontLeftTheta, &backRightTheta, &frontRightTheta};
-  WPI_TalonSRX *talons[4] = {&backLeftTalon, &frontLeftTalon, &backRightTalon, &frontRightTalon};
-  int poses[4] = {kBLeftMagPos, kFLeftMagPos, kBRightMagPos, kFRightMagPos};
-  for(int i = 0; i < 4; i++) {
+  WPI_TalonFX *turnMotors[4] = {&backLeftTheta, &frontLeftTheta, &frontRightTheta};
+  // WPI_TalonFX *turnMotors[4] = {&backLeftTheta, &frontLeftTheta, &backRightTheta, &frontRightTheta};
+  WPI_TalonSRX *talons[4] = {&backLeftTalon, &frontLeftTalon, &frontRightTalon};
+  // WPI_TalonSRX *talons[4] = {&backLeftTalon, &frontLeftTalon, &backRightTalon, &frontRightTalon};
+  double poses[4] = {kBLeftMagPos, kFLeftMagPos, kFRightMagPos};
+  // double poses[4] = {kBLeftMagPos, kFLeftMagPos, kBRightMagPos, kFRightMagPos};
+  for(int i = 0; i < 3; i++) {
     auto sensor = talons[i]->GetSensorCollection();
-    int pos = sensor.GetPulseWidthPosition() / 2;
-    turnMotors[i]->SetSelectedSensorPosition(turnMotors[i]->GetSelectedSensorPosition() - pos);
+    double pos = sensor.GetPulseWidthPosition() / 2;
+    turnMotors[i]->SetSelectedSensorPosition(((poses[i] / 2) / kTurnRatio) - (pos / kTurnRatio));
   }
   return true;
 }
@@ -194,4 +198,18 @@ void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
 
 void DriveSubsystem::SetLimiting(bool state) {
   enableLimiting = state;
+}
+
+void DriveSubsystem::SetBrakeMode(bool state) {
+  ctre::phoenix::motorcontrol::NeutralMode mode;
+  if(state) mode = ctre::phoenix::motorcontrol::NeutralMode::Brake;
+  else mode = ctre::phoenix::motorcontrol::NeutralMode::Coast;
+  backLeft.SetNeutralMode(mode);
+  frontLeft.SetNeutralMode(mode);
+  backRight.SetNeutralMode(mode);
+  frontRight.SetNeutralMode(mode);
+  backLeftTheta.SetNeutralMode(mode);
+  frontLeftTheta.SetNeutralMode(mode);
+  backRightTheta.SetNeutralMode(mode);
+  frontRightTheta.SetNeutralMode(mode);
 }

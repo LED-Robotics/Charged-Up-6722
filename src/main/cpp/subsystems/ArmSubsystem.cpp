@@ -36,7 +36,7 @@ void ArmSubsystem::Periodic() {
     double rightAngle = (GetRightPosition() / kCountsPerDegree) * (M_PI/180);
     double leftFeedForward = sin(leftAngle) * kMaxFeedForward;
     double rightFeedForward = sin(rightAngle) * kMaxFeedForward;
-    SmartDashboard::PutNumber("armAngle", (leftAngle + rightAngle) / 2);  // print to Shuffleboard
+    SmartDashboard::PutNumber("armAngle", ((GetLeftPosition() / kCountsPerDegree) + (GetRightPosition() / kCountsPerDegree)) / 2);  // print to Shuffleboard
     left.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, leftFeedForward);
     // double rightFeedForward = 0.0; // GetRightPosition() / 5000   <-- tune this number after verifying the motion magic works in any capacity
     right.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, rightFeedForward);
@@ -76,7 +76,15 @@ double ArmSubsystem::GetRightPosition() {
 }
 
 double ArmSubsystem::GetAngle() {
-  double left = sin((GetLeftPosition() / kCountsPerDegree) * (M_PI/180));
-  double right = sin((GetRightPosition() / kCountsPerDegree) * (M_PI/180));
+  double left = sin((GetLeftPosition() / kCountsPerDegree));
+  double right = sin((GetRightPosition() / kCountsPerDegree));
   return (left + right) / 2;
+}
+
+void ArmSubsystem::SetBrakeMode(bool state) {
+  ctre::phoenix::motorcontrol::NeutralMode mode;
+  if(state) mode = ctre::phoenix::motorcontrol::NeutralMode::Brake;
+  else mode = ctre::phoenix::motorcontrol::NeutralMode::Coast;
+  left.SetNeutralMode(mode);
+  right.SetNeutralMode(mode);
 }

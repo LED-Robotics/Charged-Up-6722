@@ -73,6 +73,13 @@ class ElevatorSubsystem : public frc2::SubsystemBase {
    * Returns the current position of the right elevator's Falon500.
    */
   double GetRightPosition();
+
+  /**
+   * Sets the brake mode of the elevator.
+   *
+   * @param state the state of the brakes
+   */
+  void SetBrakeMode(bool state);
   
     
  private:

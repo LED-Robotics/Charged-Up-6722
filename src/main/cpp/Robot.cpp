@@ -10,6 +10,7 @@
 #include <frc2/command/CommandScheduler.h>
 
 void Robot::RobotInit() {
+  m_container.SetDriveBrakes(false);
   m_container.ResetOdometry();
   // SmartDashboard::PutNumber("armPos", 0.0);
   // SmartDashboard::PutNumber("armPower", 0.0);
@@ -17,7 +18,7 @@ void Robot::RobotInit() {
   // SmartDashboard::PutNumber("wristPower", 0.0);
   SmartDashboard::PutNumber("armAngle", 0.0);
   SmartDashboard::PutNumber("wristAngle", 0.0);
-  SmartDashboard::PutNumber("homingP", 0.00001);
+  SmartDashboard::PutNumber("elevatorPos", 0);
 }
 
 /**
@@ -37,7 +38,9 @@ void Robot::RobotPeriodic() {
  * can use it to reset any subsystem information you want to clear when the
  * robot is disabled.
  */
-void Robot::DisabledInit() {}
+void Robot::DisabledInit() {
+  m_container.SetDriveBrakes(false);
+}
 
 void Robot::DisabledPeriodic() {}
 
@@ -46,6 +49,7 @@ void Robot::DisabledPeriodic() {}
  * RobotContainer} class.
  */
 void Robot::AutonomousInit() {
+  m_container.SetDriveBrakes(true);
   m_container.ResetOdometry();
   m_autonomousCommand = m_container.GetAutonomousCommand();
 
@@ -57,6 +61,7 @@ void Robot::AutonomousInit() {
 void Robot::AutonomousPeriodic() {}
 
 void Robot::TeleopInit() {
+  m_container.SetDriveBrakes(true);
   m_container.ResetOdometry();
   // This makes sure that the autonomous stops running when
   // teleop starts running. If you want the autonomous to

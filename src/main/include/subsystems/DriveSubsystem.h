@@ -116,6 +116,13 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
    void SetLimiting(bool state);
 
+   /**
+   * Enable or disable braking.
+   *
+   * @param state Whether or not braking is enabled.
+   */
+   void SetBrakeMode(bool state);
+
 
   // frc::Translation2d frontRightLocation{-0.449072_m, -0.449072_m};
   // frc::Translation2d frontLeftLocation{-0.449072_m, 0.449072_m};
@@ -127,16 +134,16 @@ class DriveSubsystem : public frc2::SubsystemBase {
   // frc::Translation2d frontLeftLocation{0.449072_m, -0.449072_m};
   // frc::Translation2d frontRightLocation{-0.449072_m, -0.449072_m};
 
-  // frc::Translation2d frontRightLocation{-0.449072_m, -0.449072_m};
-  // frc::Translation2d backRightLocation{0.449072_m, -0.449072_m};
-  // frc::Translation2d frontLeftLocation{-0.449072_m, 0.449072_m};
-  // frc::Translation2d backLeftLocation{0.449072_m, 0.449072_m};
+  frc::Translation2d frontRightLocation{-0.449072_m, -0.449072_m};
+  frc::Translation2d backRightLocation{0.449072_m, -0.449072_m};
+  frc::Translation2d frontLeftLocation{-0.449072_m, 0.449072_m};
+  frc::Translation2d backLeftLocation{0.449072_m, 0.449072_m};
 
-  //Florida, France, Bland, Brazil
-  frc::Translation2d backLeftLocation{-0.449072_m, 0.449072_m};
-  frc::Translation2d frontLeftLocation{0.449072_m, 0.449072_m};
-  frc::Translation2d backRightLocation{-0.449072_m, -0.449072_m};
-  frc::Translation2d frontRightLocation{0.449072_m, -0.449072_m};
+  //Bland, Florida, Brazil, France
+  // frc::Translation2d backLeftLocation{-0.449072_m, 0.449072_m};
+  // frc::Translation2d frontLeftLocation{0.449072_m, 0.449072_m};
+  // frc::Translation2d backRightLocation{-0.449072_m, -0.449072_m};
+  // frc::Translation2d frontRightLocation{0.449072_m, -0.449072_m};
   frc::SwerveDriveKinematics<4> kDriveKinematics{frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation};
 
  private:

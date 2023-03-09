@@ -34,7 +34,7 @@ class RobotContainer {
 
   frc2::Command* GetAutonomousCommand();
 
-  frc2::Command* GetZeroCommand();
+  void SetDriveBrakes(bool state);
 
   void ResetOdometry();
 

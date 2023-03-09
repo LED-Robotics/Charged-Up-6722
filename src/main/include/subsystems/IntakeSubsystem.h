@@ -98,6 +98,11 @@ class IntakeSubsystem : public frc2::SubsystemBase {
    */
   void ResetWristEncoder();
 
+  /**
+   * Sets Intake brake mode.
+   */
+  void SetBrakeMode(bool state);
+
     
  private:
   ArmSubsystem *arm;

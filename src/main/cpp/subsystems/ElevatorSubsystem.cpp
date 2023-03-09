@@ -7,6 +7,7 @@
 #include <frc/geometry/Rotation2d.h>
 #include <iostream>
 #include <frc/kinematics/DifferentialDriveWheelSpeeds.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 using namespace ElevatorConstants;
 using namespace frc;
@@ -23,16 +24,21 @@ ElevatorSubsystem::ElevatorSubsystem()
 
 void ElevatorSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here
+  // std::cout << "Left Current Position: " << GetLeftPosition() << '\n';
+  SmartDashboard::PutNumber("leftPos", GetLeftPosition());
+  SmartDashboard::PutNumber("rightPos", GetRightPosition());
+  SmartDashboard::PutNumber("targetPos", position);
+  // std::cout << "Right Current Position: " << GetRightPosition() << '\n';
   if(state == kOff) {
     left.Set(0.0);
     right.Set(0.0);
   } else if(state == kPowerMode) {
-    left.Set(leftStopSensor.Get() ? 0.0 : power);
-    right.Set(rightStopSensor.Get() ? 0.0 : power);
+    // left.Set(leftStopSensor.Get() ? 0.0 : power);
+    // right.Set(rightStopSensor.Get() ? 0.0 : power);
+    left.Set(power);
+    right.Set(power);
   } else if(state == kPositionMode) {
       // std::cout << "Position mode: " << position << '\n';
-      // std::cout << "Left Current Position: " << GetLeftPosition() << '\n';
-      // std::cout << "Right Current Position: " << GetRightPosition() << '\n';
       // if(leftStopSensor.Get()) left.Set(0.0);
       // else left.Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, position);
       double leftPos = GetLeftPosition();
@@ -81,4 +87,12 @@ double ElevatorSubsystem::GetLeftPosition() {
 
 double ElevatorSubsystem::GetRightPosition() {
   return left.GetSelectedSensorPosition(0);
+}
+
+void ElevatorSubsystem::SetBrakeMode(bool state) {
+  ctre::phoenix::motorcontrol::NeutralMode mode;
+  if(state) mode = ctre::phoenix::motorcontrol::NeutralMode::Brake;
+  else mode = ctre::phoenix::motorcontrol::NeutralMode::Coast;
+  left.SetNeutralMode(mode);
+  right.SetNeutralMode(mode);
 }

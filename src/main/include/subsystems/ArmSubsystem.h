@@ -78,6 +78,13 @@ class ArmSubsystem : public frc2::SubsystemBase {
    * Returns the current estimated angle of the arm Subsystem.
    */
   double GetAngle();
+
+  /**
+   * Sets the state of the Arm brakes.
+   *
+   * @param state the state of the brakes.
+   */
+  void SetBrakeMode(bool state);
   
     
  private:
