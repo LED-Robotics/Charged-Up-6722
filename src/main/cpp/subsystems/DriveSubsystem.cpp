@@ -47,6 +47,16 @@ DriveSubsystem::DriveSubsystem()
       yLimiter{kDriveTranslationLimit} {
         ZeroSwervePosition();
         backRightTheta.SetSelectedSensorPosition(0);
+
+        backLeft.Config_kP(driveKp);
+        frontLeft.Config_kP(driveKp);
+        backRight.Config_kP(driveKp);
+        frontRight.Config_kP(driveKp);
+        backLeft.Config_kF(driveKp);
+        frontLeft.ConfigkP(driveKp);
+        backRight.ConfigkP(driveKp);
+        frontRight.ConfigkP(driveKp);
+
         // ResetEncoders();
         ResetOdometry(frc::Pose2d{});
       }

@@ -8,6 +8,7 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/CommandScheduler.h>
+#include "cameraserver/CameraServer.h"
 
 void Robot::RobotInit() {
   m_container.SetDriveBrakes(false);
@@ -16,9 +17,12 @@ void Robot::RobotInit() {
   // SmartDashboard::PutNumber("armPower", 0.0);
   // SmartDashboard::PutNumber("wristPos", 4000);
   // SmartDashboard::PutNumber("wristPower", 0.0);
-  SmartDashboard::PutNumber("armAngle", 0.0);
-  SmartDashboard::PutNumber("wristAngle", 0.0);
-  SmartDashboard::PutNumber("elevatorPos", 0);
+  // SmartDashboard::PutNumber("armAngle", 0.0);
+  // SmartDashboard::PutNumber("wristAngle", 0.0);
+  // SmartDashboard::PutNumber("elevatorPos", 0);
+
+  CameraServer::StartAutomaticCapture();
+  CameraServer::SetSize(CameraServer::kSize160x120);
 }
 
 /**

@@ -9,19 +9,33 @@ intake(intakeRef) {
 }
 
 void SetPosition::Initialize() {
-    switch(target) {
-        case 0:
-            break;
-        case 1:
-            break;
-        case 2:
-            break;
+    if(target == 0) {
+      elevator->SetTargetPosition(ElevatorConstants::kStartPosition);
+      intake->SetPosition(IntakeConstants::kStartPosition);
+    } else if(target == 1) {
+      elevator->SetTargetPosition(ElevatorConstants::kFloorPickupPosition);
+      intake->SetPosition(IntakeConstants::kFloorPickupPosition);
+    } else if(target == 2) {
+      elevator->SetTargetPosition(ElevatorConstants::kMidDropoffPosition);
+      arm->SetTargetPosition(ArmConstants::kMidDropoffPosition);
+      intake->SetPosition(IntakeConstants::kMidDropoffPosition);
+    } else if(target == 3) {
+      elevator->SetTargetPosition(ElevatorConstants::kHighDropoffPosition);
+      arm->SetTargetPosition(ArmConstants::kHighDropoffPosition);
+      intake->SetPosition(IntakeConstants::kHighDropoffPosition);
     }
 }
 
 void SetPosition::Execute() {
+  if(target == 0 && elevator->IsAtTarget() && intake->IsAtTarget()) {
+    elevator->SetTargetPosition(ElevatorConstants::kStartPosition);
+    arm->SetTargetPosition(ArmConstants::kStartPosition);
+  } else if(target == 1 && elevator->IsAtTarget() && intake->IsAtTarget()) {
+    arm->SetTargetPosition(ArmConstants::kFloorPickupPosition);
+    elevator->SetTargetPosition(ElevatorConstants::kFloorPickupPosition);
+  }
 }
 
 bool SetPosition::IsFinished() {
-  return true;
+  return elevator->IsAtTarget() && arm->IsAtTarget() && intake->IsAtTarget();
 }

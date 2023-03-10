@@ -99,6 +99,11 @@ class IntakeSubsystem : public frc2::SubsystemBase {
   void ResetWristEncoder();
 
   /**
+   * Returns whether the subsystem is at its intended target position.
+   */
+  bool IsAtTarget();
+
+  /**
    * Sets Intake brake mode.
    */
   void SetBrakeMode(bool state);

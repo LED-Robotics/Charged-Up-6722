@@ -32,11 +32,12 @@ void IntakeSubsystem::Periodic() {
 
   // Wrist position control
   double armAngle = arm->GetAngle();
-  std::cout << "Arm Angle: " << armAngle << '\n';
+  // std::cout << "Arm Angle: " << armAngle << '\n';
   // feed forward should be a changing constant that increases as the wrist moves further. It should be a static amount of power to overcome gravity.
   double wristAngle = (kStartAngle - armAngle + (GetCurrentPosition() / kCountsPerDegree)) * (M_PI/180);
+  // double feedForward = 0.0;
   double feedForward = sin(wristAngle) * kMaxFeedForward;
-  SmartDashboard::PutNumber("wristAngle", wristAngle);  // print to Shuffleboard
+  SmartDashboard::PutNumber("wristAngle", (kStartAngle - armAngle + (GetCurrentPosition() / kCountsPerDegree)));  // print to Shuffleboard
   wristMotor.Set(ctre::phoenix::motorcontrol::ControlMode::Position, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, feedForward);
 }
 
@@ -88,6 +89,12 @@ double IntakeSubsystem::GetCurrentPosition() {
 
 void IntakeSubsystem::ResetWristEncoder() {
   wristMotor.SetSelectedSensorPosition(0);
+}
+
+bool IntakeSubsystem::IsAtTarget() {
+  double pos = GetCurrentPosition();
+  bool atTarget = pos > position - (kPositionDeadzone / 2) && pos < position + (kPositionDeadzone / 2);
+  return atTarget;
 }
 
 void IntakeSubsystem::SetBrakeMode(bool state) {

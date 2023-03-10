@@ -89,6 +89,14 @@ double ElevatorSubsystem::GetRightPosition() {
   return left.GetSelectedSensorPosition(0);
 }
 
+bool ElevatorSubsystem::IsAtTarget() {
+  double leftPos = GetLeftPosition();
+  double rightPos = GetRightPosition();
+  bool leftAtTarget = leftPos > position - (kPositionDeadzone / 2) && leftPos < position + (kPositionDeadzone / 2);
+  bool rightAtTarget = rightPos > position - (kPositionDeadzone / 2) && rightPos < position + (kPositionDeadzone / 2);
+  return leftAtTarget && rightAtTarget;
+}
+
 void ElevatorSubsystem::SetBrakeMode(bool state) {
   ctre::phoenix::motorcontrol::NeutralMode mode;
   if(state) mode = ctre::phoenix::motorcontrol::NeutralMode::Brake;

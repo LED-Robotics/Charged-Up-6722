@@ -80,6 +80,11 @@ class ArmSubsystem : public frc2::SubsystemBase {
   double GetAngle();
 
   /**
+   * Returns whether the subsystem is at its intended target position.
+   */
+  bool IsAtTarget();
+
+  /**
    * Sets the state of the Arm brakes.
    *
    * @param state the state of the brakes.

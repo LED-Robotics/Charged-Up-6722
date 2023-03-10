@@ -75,6 +75,11 @@ class ElevatorSubsystem : public frc2::SubsystemBase {
   double GetRightPosition();
 
   /**
+   * Returns whether the subsystem is at its intended target position.
+   */
+  bool IsAtTarget();
+
+  /**
    * Sets the brake mode of the elevator.
    *
    * @param state the state of the brakes

@@ -21,11 +21,20 @@
 
 #include "Constants.h"
 
+frc2::Command* RobotContainer::GetPositionCommand(int position) {
+  return new SetPosition(position, &elevator, &arm, &intake);
+}
+
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
   // Configure the button bindings
   ConfigureButtonBindings();
+
+  dpadUp.OnTrue(GetPositionCommand(3));
+  dpadRight.OnTrue(GetPositionCommand(2));
+  dpadDown.OnTrue(GetPositionCommand(1));
+  controller.Back().OnTrue(GetPositionCommand(0));
 
   // Set up default drive command
     m_drive.SetDefaultCommand(frc2::RunCommand(
@@ -65,23 +74,31 @@ RobotContainer::RobotContainer() {
       [this] {
           intake.SetState(IntakeConstants::kPowerMode);
           double speed = controller.GetRightTriggerAxis() - controller.GetLeftTriggerAxis();
-          if(speed > 0.1 || speed < -0.1) intake.SetPower(speed);
-          if(controller.GetRightBumperPressed()) intake.SetPower(0.07);
-          if(controller.GetLeftBumperPressed()) intake.SetPower(0.0);
-          int pov = controller.GetPOV();
-          switch(pov) {
-            case 0: 
-              intake.SetPosition(IntakeConstants::kHighDropoffPosition);
-              break;
-            case 90:
-              intake.SetPosition(IntakeConstants::kMidDropoffPosition);
-              break;
-            case 180:
-              intake.SetPosition(IntakeConstants::kFloorPickupPosition);
-              break;
+          if(speed > 0.1 || speed < -0.1) {
+            intakeHold = false;
+            intake.SetPower(speed);
+          } else if(!intakeHold) intake.SetPower(0.0);
+          if(controller.GetRightBumperPressed()) {
+            intakeHold = true;
+            intake.SetPower(0.07);
           }
+          if(controller.GetLeftBumperPressed()) {
+            intake.SetPower(0.0);
+          }
+          // int pov = controller.GetPOV();
+          // switch(pov) {
+          //   case 0: 
+          //     intake.SetPosition(IntakeConstants::kHighDropoffPosition);
+          //     break;
+          //   case 90:
+          //     intake.SetPosition(IntakeConstants::kMidDropoffPosition);
+          //     break;
+          //   case 180:
+          //     intake.SetPosition(IntakeConstants::kFloorPickupPosition);
+          //     break;
+          // }
 
-          if(controller.GetBackButton()) intake.SetPosition(IntakeConstants::kStartPosition);
+          // if(controller.GetBackButton()) intake.SetPosition(IntakeConstants::kStartPosition);
       },
       {&intake}));
 
@@ -96,40 +113,40 @@ RobotContainer::RobotContainer() {
             // elevator.SetState(ElevatorConstants::kPositionMode);
             // elevator.SetTargetPosition(SmartDashboard::GetNumber("elevatorPos", 0));
             elevator.SetState(ElevatorConstants::kPositionMode);
-            int pov = controller.GetPOV();
-            switch(pov) {
-            case 0: 
-              elevator.SetTargetPosition(ElevatorConstants::kHighDropoffPosition);
-              break;
-            case 90:
-              elevator.SetTargetPosition(ElevatorConstants::kMidDropoffPosition);
-              break;
-            case 180:
-              elevator.SetTargetPosition(ElevatorConstants::kFloorPickupPosition);
-              break;
-          }
+          //   int pov = controller.GetPOV();
+          //   switch(pov) {
+          //   case 0: 
+          //     elevator.SetTargetPosition(ElevatorConstants::kHighDropoffPosition);
+          //     break;
+          //   case 90:
+          //     elevator.SetTargetPosition(ElevatorConstants::kMidDropoffPosition);
+          //     break;
+          //   case 180:
+          //     elevator.SetTargetPosition(ElevatorConstants::kFloorPickupPosition);
+          //     break;
+          // }
 
-          if(controller.GetBackButton()) elevator.SetTargetPosition(ElevatorConstants::kStartPosition);
+          // if(controller.GetBackButton()) elevator.SetTargetPosition(ElevatorConstants::kStartPosition);
       },
       {&elevator}));
 
       arm.SetDefaultCommand(frc2::RunCommand(
       [this] {
             arm.SetState(ArmConstants::kPositionMode);
-            int pov = controller.GetPOV();
-            switch(pov) {
-            case 0: 
-              arm.SetTargetPosition(ArmConstants::kHighDropoffPosition);
-              break;
-            case 90:
-              arm.SetTargetPosition(ArmConstants::kMidDropoffPosition);
-              break;
-            case 180:
-              arm.SetTargetPosition(ArmConstants::kFloorPickupPosition);
-              break;
-          }
+          //   int pov = controller.GetPOV();
+          //   switch(pov) {
+          //   case 0: 
+          //     arm.SetTargetPosition(ArmConstants::kHighDropoffPosition);
+          //     break;
+          //   case 90:
+          //     arm.SetTargetPosition(ArmConstants::kMidDropoffPosition);
+          //     break;
+          //   case 180:
+          //     arm.SetTargetPosition(ArmConstants::kFloorPickupPosition);
+          //     break;
+          // }
 
-          if(controller.GetBackButton()) arm.SetTargetPosition(ArmConstants::kStartPosition);
+          // if(controller.GetBackButton()) arm.SetTargetPosition(ArmConstants::kStartPosition);
       },
       {&arm}));
 }

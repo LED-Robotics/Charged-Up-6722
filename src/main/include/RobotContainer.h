@@ -5,6 +5,7 @@
 #pragma once
 
 #include <frc/XboxController.h>
+#include <frc2/command/button/CommandXboxController.h>
 #include <frc/controller/PIDController.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
@@ -15,6 +16,7 @@
 #include "units/angle.h"
 
 #include "Constants.h"
+#include "commands/SetPosition.h"
 #include "subsystems/DriveSubsystem.h"
 #include "subsystems/IntakeSubsystem.h"
 #include "subsystems/ElevatorSubsystem.h"
@@ -40,8 +42,10 @@ class RobotContainer {
 
  private:
   // The driver's controller
-  frc::XboxController controller{OIConstants::kDriverControllerPort};
-  frc::XboxController controller2{OIConstants::kCoDriverControllerPort};
+  // frc::XboxController controller{OIConstants::kDriverControllerPort};
+  frc2::CommandXboxController controller{OIConstants::kDriverControllerPort};
+  // frc::XboxController controller2{OIConstants::kCoDriverControllerPort};
+  frc2::CommandXboxController controller2{OIConstants::kCoDriverControllerPort};
 
   // The robot's subsystems and commands are defined here...
 
@@ -53,8 +57,12 @@ class RobotContainer {
   ArmSubsystem arm;
 
   IntakeSubsystem intake{&arm};
+  bool intakeHold = false;
 
-  
+  frc2::Trigger dpadUp{[this]() { return controller.GetPOV() == 0; }};
+  frc2::Trigger dpadRight{[this]() { return controller.GetPOV() == 90; }};
+  frc2::Trigger dpadDown{[this]() { return controller.GetPOV() == 180; }};
+  frc2::Trigger dpadLeft{[this]() { return controller.GetPOV() == 270; }};
 
   // LimelightSubsystem limelight;
 
@@ -68,6 +76,7 @@ class RobotContainer {
   //                                       {}};
   // frc2::InstantCommand intakeOff{[this] { intake.Off(); },
   //                                       {}};
+  frc2::Command* GetPositionCommand(int position);
 
   // The chooser for the autonomous routines
   frc::SendableChooser<frc2::Command*> m_chooser;

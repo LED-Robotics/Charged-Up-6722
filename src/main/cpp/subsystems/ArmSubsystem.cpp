@@ -76,9 +76,17 @@ double ArmSubsystem::GetRightPosition() {
 }
 
 double ArmSubsystem::GetAngle() {
-  double left = sin((GetLeftPosition() / kCountsPerDegree));
-  double right = sin((GetRightPosition() / kCountsPerDegree));
+  double left = GetLeftPosition() / kCountsPerDegree;
+  double right = GetRightPosition() / kCountsPerDegree;
   return (left + right) / 2;
+}
+
+bool ArmSubsystem::IsAtTarget() {
+  double leftPos = GetLeftPosition();
+  double rightPos = GetRightPosition();
+  bool leftAtTarget = leftPos > position - (kPositionDeadzone / 2) && leftPos < position + (kPositionDeadzone / 2);
+  bool rightAtTarget = rightPos > position - (kPositionDeadzone / 2) && rightPos < position + (kPositionDeadzone / 2);
+  return leftAtTarget && rightAtTarget;
 }
 
 void ArmSubsystem::SetBrakeMode(bool state) {

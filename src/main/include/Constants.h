@@ -71,17 +71,14 @@ namespace DriveConstants {
     // Toolsuite provides a convenient tool for obtaining these values for your
     // robot.
 
-    constexpr auto driveKs = 0.2256_V;
-    constexpr auto driveKv = 2.2285 * 1_V * 1_s / 1_m;
-    constexpr auto driveKa = 0.19337 * 1_V * 1_s * 1_s / 1_m;
+    constexpr auto driveKf = 0.04;
+    constexpr auto driveKp = 0.1;
 
-    constexpr auto turnKs = 0.257951_V;
-    constexpr auto turnKv = 0.0020769 * 1_V * 1_s / 1_deg;
-    constexpr auto turnKa = 6.1723E-05 * 1_V * 1_s * 1_s / 1_deg;
+    constexpr auto turnKp = 0.275;
 
     constexpr double kDriveDeadzone = 0.05;
-    constexpr double kDriveCurveExtent = 0.5;
-    constexpr auto kDriveTranslationLimit = 3_mps_sq;
+    constexpr double kDriveCurveExtent = 0.8;
+    constexpr auto kDriveTranslationLimit = 4_mps_sq;
     // Example value only - as above, this must be tuned for your drive!
     constexpr double kPDriveVel = 1.0;
     constexpr double kPTurnVel = 0.001;
@@ -100,8 +97,10 @@ namespace ElevatorConstants {
     constexpr double kElevatorDeadzone = 500;
     constexpr int kStartPosition = 10;
     constexpr int kFloorPickupPosition = 10;
-    constexpr int kMidDropoffPosition = 10;
-    constexpr int kHighDropoffPosition = 70000;
+    constexpr int kMidDropoffPosition = 15000;
+    constexpr int kHighDropoffPosition = 90000;
+    constexpr int kPositionDeadzone = 3000;
+    constexpr int kP = 0.1;
 }
 
 namespace ArmConstants {
@@ -118,10 +117,12 @@ namespace ArmConstants {
     constexpr int kCountsPerDegree = 545;
     constexpr double kMaxFeedForward = 0.06;
     // constexpr int kFloorPickupPosition = 2080; original
-    constexpr int kStartPosition = 6435;
+    constexpr int kStartPosition = 4500;
     constexpr int kFloorPickupPosition = 13360;
     constexpr int kMidDropoffPosition = 74500;
     constexpr int kHighDropoffPosition = 74500;
+    constexpr int kPositionDeadzone = 15000;
+    constexpr int kP = 0.012;
 }
 
 namespace IntakeConstants {
@@ -138,9 +139,11 @@ namespace IntakeConstants {
     constexpr double kStartAngle = -30.0;
     constexpr int kStartPosition = 4000;
     // constexpr int kFloorPickupPosition = 20600;
-    constexpr int kFloorPickupPosition = 28400;
-    constexpr int kMidDropoffPosition = 36000;
-    constexpr int kHighDropoffPosition = 36000;
+    constexpr int kFloorPickupPosition = 27400;
+    constexpr int kMidDropoffPosition = 46000;
+    constexpr int kHighDropoffPosition = 42500;
+    constexpr int kPositionDeadzone = 10000;
+    constexpr int kP = 0.03;
 }
 
 namespace LimelightConstants {
@@ -151,7 +154,7 @@ namespace LimelightConstants {
 }
 
 namespace AutoConstants {
-        constexpr auto kMaxSpeed = 3_mps;
+        constexpr auto kMaxSpeed = 4_mps;
         constexpr auto kMaxAcceleration = 3_mps_sq;
         constexpr auto kAngularSpeed = 180_deg_per_s;
         constexpr auto kMaxAngularAcceleration = 180_deg_per_s_sq;
