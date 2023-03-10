@@ -4,7 +4,7 @@
 
 #include "Constants.h"
 
-using namespace DriveConstants;
-
-const frc::DifferentialDriveKinematics DriveConstants::kDriveKinematics(
-    kTrackwidth);
+namespace AutoConstants {
+    const frc::TrapezoidProfile<units::radians>::Constraints
+        kThetaControllerConstraints{kAngularSpeed, kMaxAngularAcceleration};
+}

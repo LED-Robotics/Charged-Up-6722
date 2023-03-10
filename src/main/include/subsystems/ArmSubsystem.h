@@ -21,9 +21,9 @@
 
 using namespace frc;
 
-class ElevatorSubsystem : public frc2::SubsystemBase {
+class ArmSubsystem : public frc2::SubsystemBase {
  public:
-  ElevatorSubsystem();
+  ArmSubsystem();
 
   /**
    * Will be called periodically whenever the CommandScheduler runs.
@@ -31,48 +31,53 @@ class ElevatorSubsystem : public frc2::SubsystemBase {
   void Periodic() override;
   
   /**
-   * Turns the elevator state to kOff.
+   * Turns the Arm state to kOff.
    */
   void Off();
   
   /**
-   * Turns the elevator state to kPowerMode.
+   * Turns the Arm state to kPowerMode.
    */
   void On();
 
   /**
-   * Sets the power for the elevator to use when in kPowerMode.
+   * Sets the power for the Arm to use when in kPowerMode.
    *
-   * @param power the power for the elevator to use
+   * @param power the power for the Arm to use
    */
   void SetPower(double newPower);
 
   /**
-   * Returns the current state of the elevator.
+   * Returns the current state of the Arm.
    *
-   * @return The current state of the elevator
+   * @return The current state of the Arm
    */
   int GetState();
 
   /**
-   * Sets the current state of the elevator.
+   * Sets the current state of the Arm.
    */
   void SetState(int newState);
 
   /**
-   * Returns the current position of the left elevator's Falon500.
+   * Returns the current position of the left Arm's Falon500.
    */
   void SetTargetPosition(double newPosition);
 
   /**
-   * Returns the current position of the left elevator's Falon500.
+   * Returns the current position of the left Arm's Falon500.
    */
   double GetLeftPosition();
 
   /**
-   * Returns the current position of the right elevator's Falon500.
+   * Returns the current position of the right Arm's Falon500.
    */
   double GetRightPosition();
+
+  /**
+   * Returns the current estimated angle of the arm Subsystem.
+   */
+  double GetAngle();
 
   /**
    * Returns whether the subsystem is at its intended target position.
@@ -80,25 +85,21 @@ class ElevatorSubsystem : public frc2::SubsystemBase {
   bool IsAtTarget();
 
   /**
-   * Sets the brake mode of the elevator.
+   * Sets the state of the Arm brakes.
    *
-   * @param state the state of the brakes
+   * @param state the state of the brakes.
    */
   void SetBrakeMode(bool state);
   
     
  private:
-//  while the state is kOn the elevator will run at the current power setting
-  int state = ElevatorConstants::kPositionMode;
-  double power = ElevatorConstants::kDefaultPower;
-  double position = 0.0;
+//  while the state is kOn the Arm will run at the current power setting
+  int state = ArmConstants::kOff;
+  double power = ArmConstants::kDefaultPower;
+  double position = 6435;
 
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
-
-  // limit switches at the bottom elevator position
-  DigitalInput leftStopSensor;
-  DigitalInput rightStopSensor;
 
   // The motor controllers
   // WPI_TalonSRX left;

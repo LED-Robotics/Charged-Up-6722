@@ -8,17 +8,22 @@
 
 #include <iostream>
 #include <frc/controller/PIDController.h>
-#include <frc/controller/RamseteController.h>
 #include <frc/shuffleboard/Shuffleboard.h>
+#include <frc/SmartDashboard/SmartDashboard.h>
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc/trajectory/constraint/DifferentialDriveVoltageConstraint.h>
 #include <frc2/command/InstantCommand.h>
-#include <frc2/command/RamseteCommand.h>
+#include <frc2/command/FunctionalCommand.h>
+#include <frc2/command/SwerveControllerCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/button/JoystickButton.h>
 
 #include "Constants.h"
+
+frc2::Command* RobotContainer::GetPositionCommand(int position) {
+  return new SetPosition(position, &elevator, &arm, &intake);
+}
 
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
@@ -26,137 +31,203 @@ RobotContainer::RobotContainer() {
   // Configure the button bindings
   ConfigureButtonBindings();
 
+  dpadUp.OnTrue(GetPositionCommand(3));
+  dpadRight.OnTrue(GetPositionCommand(2));
+  dpadDown.OnTrue(GetPositionCommand(1));
+  controller.Back().OnTrue(GetPositionCommand(0));
+
   // Set up default drive command
     m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
-            // m_drive.ArcadeDrive(controller.GetLeftY(),
-            //                 controller.GetLeftX() * -1);
-            m_drive.ArcadeDrive(controller.GetRightTriggerAxis() - controller.GetLeftTriggerAxis(),
-                            controller.GetLeftX());
+            if(controller.GetAButtonPressed()) {
+              // if(m_drive.ZeroSwervePosition()) {
+              //   m_drive.ResetEncoders();
+              // }
+            } else {
+              double x = controller.GetLeftX();
+              double y = controller.GetLeftY();
+
+              // zero out axes if they fall within deadzone
+              if (x > -DriveConstants::kDriveDeadzone && x < DriveConstants::kDriveDeadzone)
+                  x = 0.0;
+              if (y > -DriveConstants::kDriveDeadzone && y < DriveConstants::kDriveDeadzone)
+                  y = 0.0;
+
+              // put speeds through a polynomial to smooth out joystick input
+              // check the curve out here: https://www.desmos.com/calculator/65tpwhxyai the range between 0.0 to 1.0 is used for the motors
+              // change driveCurveExtent to modify curve strength
+              float xSpeed = DriveConstants::kDriveCurveExtent * pow(x, 3) + (1 - DriveConstants::kDriveCurveExtent) * x;
+              float ySpeed = DriveConstants::kDriveCurveExtent * pow(y, 3) + (1 - DriveConstants::kDriveCurveExtent) * y;
+              m_drive.Drive(
+                units::meters_per_second_t{ySpeed * 4.0},
+                units::meters_per_second_t{xSpeed * -4.0},
+                units::degrees_per_second_t{controller.GetRightX() * 150}, false);
+              // m_drive.Drive(
+              //   units::meters_per_second_t{xSpeed * 4.0},
+              //   units::meters_per_second_t{ySpeed * -4.0},
+              //   units::degrees_per_second_t{controller.GetRightX() * 150}, false);
+            }
       },
       {&m_drive}));
-
-    flywheel.SetDefaultCommand(frc2::RunCommand(
-      [this] {
-          if(controller.GetAButtonPressed()) flywheel.SetFlywheelState(!flywheel.GetFlywheelState());
-          if(controller.GetYButtonPressed()) flywheel.SetMotorPower(flywheel.GetMotorPower() + 0.01);
-          if(controller.GetBButtonPressed()) flywheel.SetMotorPower(flywheel.GetMotorPower() - 0.01);
-      },
-      {&flywheel}));
     
     intake.SetDefaultCommand(frc2::RunCommand(
       [this] {
-            intake.SetPower(controller2.GetRightTriggerAxis() - controller2.GetLeftTriggerAxis());
-            if(controller.GetXButton()) {
-                intake.On();
-            } else {
-                if(intake.GetPower() > IntakeConstants::kIntakeDeadzone) {
-                    intake.UsePowerMode();
-                } else intake.Off();
-            }
+          intake.SetState(IntakeConstants::kPowerMode);
+          double speed = controller.GetRightTriggerAxis() - controller.GetLeftTriggerAxis();
+          if(speed > 0.1 || speed < -0.1) {
+            intakeHold = false;
+            intake.SetPower(speed);
+          } else if(!intakeHold) intake.SetPower(0.0);
+          if(controller.GetRightBumperPressed()) {
+            intakeHold = true;
+            intake.SetPower(0.07);
+          }
+          if(controller.GetLeftBumperPressed()) {
+            intake.SetPower(0.0);
+          }
+          // int pov = controller.GetPOV();
+          // switch(pov) {
+          //   case 0: 
+          //     intake.SetPosition(IntakeConstants::kHighDropoffPosition);
+          //     break;
+          //   case 90:
+          //     intake.SetPosition(IntakeConstants::kMidDropoffPosition);
+          //     break;
+          //   case 180:
+          //     intake.SetPosition(IntakeConstants::kFloorPickupPosition);
+          //     break;
+          // }
+
+          // if(controller.GetBackButton()) intake.SetPosition(IntakeConstants::kStartPosition);
       },
       {&intake}));
 
     elevator.SetDefaultCommand(frc2::RunCommand(
       [this] {
-            int pov = controller.GetPOV();
-            if(pov != 0 && pov != 180) pov = controller2.GetPOV();
-            if(pov == 0) {
-                elevator.On();
-                elevator.SetPower(ElevatorConstants::kDefaultPower);
-            } else if(pov == 180) {
-                elevator.On();
-                elevator.SetPower(-ElevatorConstants::kDefaultPower);
-            } else {
-                elevator.Off();
-            }
+            // elevator.SetTargetPosition(controller.GetLeftTriggerAxis() * 30000);
+            // int state = elevator.GetState();
+            // if(controller.GetAButtonPressed()) {
+            //   if(state == ElevatorConstants::kPositionMode) elevator.SetState(ElevatorConstants::kOff);
+            //   else if(state == ElevatorConstants::kOff) elevator.SetState(ElevatorConstants::kPositionMode);
+            // }
+            // elevator.SetState(ElevatorConstants::kPositionMode);
+            // elevator.SetTargetPosition(SmartDashboard::GetNumber("elevatorPos", 0));
+            elevator.SetState(ElevatorConstants::kPositionMode);
+          //   int pov = controller.GetPOV();
+          //   switch(pov) {
+          //   case 0: 
+          //     elevator.SetTargetPosition(ElevatorConstants::kHighDropoffPosition);
+          //     break;
+          //   case 90:
+          //     elevator.SetTargetPosition(ElevatorConstants::kMidDropoffPosition);
+          //     break;
+          //   case 180:
+          //     elevator.SetTargetPosition(ElevatorConstants::kFloorPickupPosition);
+          //     break;
+          // }
+
+          // if(controller.GetBackButton()) elevator.SetTargetPosition(ElevatorConstants::kStartPosition);
       },
       {&elevator}));
 
-    turret.SetDefaultCommand(frc2::RunCommand(
+      arm.SetDefaultCommand(frc2::RunCommand(
       [this] {
-            int pov = controller.GetPOV();
-            if(pov != 90 && pov != 270) pov = controller2.GetPOV();
-            if(pov == 90) {
-                turret.SetState(TurretConstants::kPowerMode);
-                turret.SetPower(TurretConstants::kDefaultPower);
-            } else if(pov == 270) {
-                turret.SetState(TurretConstants::kPowerMode);
-                turret.SetPower(-TurretConstants::kDefaultPower);
-            } else {
-                turret.SetState(TurretConstants::kOff);
-            }
-      },
-      {&turret}));
+            arm.SetState(ArmConstants::kPositionMode);
+          //   int pov = controller.GetPOV();
+          //   switch(pov) {
+          //   case 0: 
+          //     arm.SetTargetPosition(ArmConstants::kHighDropoffPosition);
+          //     break;
+          //   case 90:
+          //     arm.SetTargetPosition(ArmConstants::kMidDropoffPosition);
+          //     break;
+          //   case 180:
+          //     arm.SetTargetPosition(ArmConstants::kFloorPickupPosition);
+          //     break;
+          // }
 
-      lift.SetDefaultCommand(frc2::RunCommand(
-      [this] {
-          lift.SetState(LiftConstants::kPowerMode);
-          lift.SetPower(abs(controller.GetRightY()) > 0.1 ? controller.GetRightY() : 0);
+          // if(controller.GetBackButton()) arm.SetTargetPosition(ArmConstants::kStartPosition);
       },
-      {&lift}));
+      {&arm}));
 }
 
 void RobotContainer::ResetOdometry() {
-        m_drive.ResetOdometry({});
+        // m_drive.ResetOdometry({});
+}
+
+void RobotContainer::SetDriveBrakes(bool state) {
+        m_drive.SetBrakeMode(state);
+        elevator.SetBrakeMode(state);
+        arm.SetBrakeMode(state);
+        intake.SetBrakeMode(state);
 }
 
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
   // While holding the shoulder button, drive at half speed
-  frc2::JoystickButton(&controller, 5)
-      .WhenPressed(&m_driveHalfSpeed)
-      .WhenReleased(&m_driveFullSpeed);
+//   frc2::JoystickButton(&controller, 5)
+//       .WhenPressed(&m_driveHalfSpeed)
+//       .WhenReleased(&m_driveFullSpeed);
   
 //   frc2::JoystickButton(&controller, 1)
 //       .WhenPressed(&toggleFlywheel);
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
-  // Create a voltage constraint to ensure we don't accelerate too fast
-  frc::DifferentialDriveVoltageConstraint autoVoltageConstraint(
-      frc::SimpleMotorFeedforward<units::meters>(
-          DriveConstants::ks, DriveConstants::kv, DriveConstants::ka),
-      DriveConstants::kDriveKinematics, 10_V);
-
   // Set up config for trajectory
+  
   frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
                                AutoConstants::kMaxAcceleration);
   // Add kinematics to ensure max speed is actually obeyed
-  config.SetKinematics(DriveConstants::kDriveKinematics);
-  // Apply the voltage constraint
-  config.AddConstraint(autoVoltageConstraint);
+  config.SetKinematics(m_drive.kDriveKinematics);
 
   // An example trajectory to follow.  All units in meters.
   auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
+    
       // Start at the origin facing the +X direction
-      frc::Pose2d(0_m, 0_m, frc::Rotation2d(0_deg)),
-      // Pass through these two interior waypoints, making an 's' curve path
-      {frc::Translation2d(0_m, 1_m)},
+      {frc::Pose2d{0.0_m, 0.0_m, 0.0_deg}, frc::Pose2d{1.0_m, 1.0_m, 0_deg}, 
+      frc::Pose2d{-1.0_m, 2.0_m, 0_deg},
       // End 3 meters straight ahead of where we started, facing forward
-      frc::Pose2d(0_m, 1_m, frc::Rotation2d(0_deg)),
+      frc::Pose2d{0.0_m, 3.0_m, 0_deg},
+      },
       // Pass the config
       config);
 
-  frc2::RamseteCommand ramseteCommand(
+  frc::ProfiledPIDController<units::radians> thetaController{
+      AutoConstants::kPThetaController, 0, 0,
+      AutoConstants::kThetaControllerConstraints};
+
+  thetaController.EnableContinuousInput(units::radian_t{-std::numbers::pi},
+                                        units::radian_t{std::numbers::pi});
+
+  frc2::SwerveControllerCommand<4> swerveControllerCommand(
       exampleTrajectory, [this]() { return m_drive.GetPose(); },
-      frc::RamseteController(AutoConstants::kRamseteB,
-                             AutoConstants::kRamseteZeta),
-      frc::SimpleMotorFeedforward<units::meters>(
-          DriveConstants::ks, DriveConstants::kv, DriveConstants::ka),
-      DriveConstants::kDriveKinematics,
-      [this] { return m_drive.GetWheelSpeeds(); },
-      frc2::PIDController(DriveConstants::kPDriveVel, 0, 0),
-      frc2::PIDController(DriveConstants::kPDriveVel, 0, 0),
-      [this](auto left, auto right) { m_drive.TankDriveVolts(left, right); },
+
+      m_drive.kDriveKinematics,
+
+      frc2::PIDController{AutoConstants::kPXController, 0, 0},
+      frc2::PIDController{AutoConstants::kPYController, 0, 0}, thetaController,
+
+      [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
+
       {&m_drive});
 
   // Reset odometry to the starting pose of the trajectory.
   m_drive.ResetOdometry(exampleTrajectory.InitialPose());
 
   // no auto
+  // return std::move(swerveControllerCommand);
   return new frc2::SequentialCommandGroup(
-      std::move(ramseteCommand),
-      frc2::InstantCommand([this] { m_drive.TankDriveVolts(0_V, 0_V); }, {}));
+      frc2::InstantCommand(
+          [this]() { 
+            m_drive.SetLimiting(false);
+           }, {}),
+      std::move(swerveControllerCommand),
+      frc2::InstantCommand(
+          [this]() { m_drive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
+            m_drive.SetLimiting(true);
+          m_drive.SetInverted(false); 
+          }, {}));
+  
 }

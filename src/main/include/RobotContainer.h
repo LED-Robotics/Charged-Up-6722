@@ -5,6 +5,7 @@
 #pragma once
 
 #include <frc/XboxController.h>
+#include <frc2/command/button/CommandXboxController.h>
 #include <frc/controller/PIDController.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
@@ -12,14 +13,14 @@
 #include <frc2/command/PIDCommand.h>
 #include <frc2/command/ParallelRaceGroup.h>
 #include <frc2/command/RunCommand.h>
+#include "units/angle.h"
 
 #include "Constants.h"
+#include "commands/SetPosition.h"
 #include "subsystems/DriveSubsystem.h"
-#include "subsystems/FlywheelSubsystem.h"
 #include "subsystems/IntakeSubsystem.h"
 #include "subsystems/ElevatorSubsystem.h"
-#include "subsystems/TurretSubsystem.h"
-#include "subsystems/LiftSubsystem.h"
+#include "subsystems/ArmSubsystem.h"
 #include "subsystems/LimelightSubsystem.h"
 
 /**
@@ -35,40 +36,47 @@ class RobotContainer {
 
   frc2::Command* GetAutonomousCommand();
 
+  void SetDriveBrakes(bool state);
+
   void ResetOdometry();
 
  private:
   // The driver's controller
-  frc::XboxController controller{OIConstants::kDriverControllerPort};
-  frc::XboxController controller2{OIConstants::kCoDriverControllerPort};
+  // frc::XboxController controller{OIConstants::kDriverControllerPort};
+  frc2::CommandXboxController controller{OIConstants::kDriverControllerPort};
+  // frc::XboxController controller2{OIConstants::kCoDriverControllerPort};
+  frc2::CommandXboxController controller2{OIConstants::kCoDriverControllerPort};
 
   // The robot's subsystems and commands are defined here...
 
   // The robot's subsystems
   DriveSubsystem m_drive;
   
-  FlywheelSubsystem flywheel;
-
-  IntakeSubsystem intake;
-
   ElevatorSubsystem elevator;
   
-  TurretSubsystem turret;
+  ArmSubsystem arm;
 
-  LiftSubsystem lift;
+  IntakeSubsystem intake{&arm};
+  bool intakeHold = false;
 
-  LimelightSubsystem limelight;
+  frc2::Trigger dpadUp{[this]() { return controller.GetPOV() == 0; }};
+  frc2::Trigger dpadRight{[this]() { return controller.GetPOV() == 90; }};
+  frc2::Trigger dpadDown{[this]() { return controller.GetPOV() == 180; }};
+  frc2::Trigger dpadLeft{[this]() { return controller.GetPOV() == 270; }};
 
-  frc2::InstantCommand m_driveHalfSpeed{[this] { m_drive.SetMaxOutput(0.5); },
-                                        {}};
-  frc2::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); },
-                                        {}};
+  // LimelightSubsystem limelight;
+
+  // frc2::InstantCommand m_driveHalfSpeed{[this] { m_drive.SetMaxOutput(0.5); },
+  //                                       {}};
+  // frc2::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); },
+  //                                       {}};
   // frc2::InstantCommand toggleFlywheel{[this] { flywheel.SetFlywheelState(!flywheel.GetFlywheelState()); },
   //                                       {}};
   // frc2::InstantCommand intakeFullPower{[this] { intake.On(); },
   //                                       {}};
   // frc2::InstantCommand intakeOff{[this] { intake.Off(); },
   //                                       {}};
+  frc2::Command* GetPositionCommand(int position);
 
   // The chooser for the autonomous routines
   frc::SendableChooser<frc2::Command*> m_chooser;
