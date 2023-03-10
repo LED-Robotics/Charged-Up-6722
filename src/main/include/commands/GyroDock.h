@@ -4,18 +4,16 @@
 #include <frc2/command/CommandBase.h>
 #include <frc2/command/CommandHelper.h>
 
-#include "subsystems/ElevatorSubsystem.h"
-#include "subsystems/ArmSubsystem.h"
-#include "subsystems/IntakeSubsystem.h"
+#include "subsystems/DriveSubsystem.h"
 
 /**
  * A command that sets the position of the elevator, intake, and arm subsystems. 
  * This command controls the order in which the subsystems move based on the target position,
  * as opposed to the original method of moving all three simultaneously all the time.
  */
-class SetPosition : public frc2::CommandHelper<frc2::CommandBase, SetPosition> {
+class GyroDock : public frc2::CommandHelper<frc2::CommandBase, GyroDock> {
  public:
-  explicit SetPosition(int position, ElevatorSubsystem* elevRef, ArmSubsystem* armRef, IntakeSubsystem* intakeRef);
+  explicit GyroDock(double targetSpeed, DriveSubsystem* driveRef);
 
   void Initialize() override;
 
@@ -24,8 +22,6 @@ class SetPosition : public frc2::CommandHelper<frc2::CommandBase, SetPosition> {
   bool IsFinished() override;
 
  private:
-    int target = 0;
-    ElevatorSubsystem* elevator;
-    ArmSubsystem* arm;
-    IntakeSubsystem* intake;
+    double speed = 1.5;
+    DriveSubsystem* drive;
 };

@@ -20,6 +20,7 @@ ElevatorSubsystem::ElevatorSubsystem()
       right.SetInverted(true);
       left.SetSelectedSensorPosition(0);
       right.SetSelectedSensorPosition(0);
+      ConfigMotors();
 }
 
 void ElevatorSubsystem::Periodic() {
@@ -103,4 +104,9 @@ void ElevatorSubsystem::SetBrakeMode(bool state) {
   else mode = ctre::phoenix::motorcontrol::NeutralMode::Coast;
   left.SetNeutralMode(mode);
   right.SetNeutralMode(mode);
+}
+
+void ElevatorSubsystem::ConfigMotors() {
+  left.Config_kP(0, kP);
+  right.Config_kP(0, kP);
 }

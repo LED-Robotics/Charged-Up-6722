@@ -25,16 +25,37 @@ frc2::Command* RobotContainer::GetPositionCommand(int position) {
   return new SetPosition(position, &elevator, &arm, &intake);
 }
 
+frc2::Command* RobotContainer::HandlePartnerCommands(frc2::Command* solo, frc2::Command* partner) {
+  if(controller2.IsConnected()) return partner;
+  else return solo;
+}
+
+frc2::Command* RobotContainer::GetEmptyCommand() {
+  return new frc2::InstantCommand(
+          [this]() { 
+           }, {});
+}
+
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
   // Configure the button bindings
   ConfigureButtonBindings();
 
-  dpadUp.OnTrue(GetPositionCommand(3));
-  dpadRight.OnTrue(GetPositionCommand(2));
-  dpadDown.OnTrue(GetPositionCommand(1));
-  controller.Back().OnTrue(GetPositionCommand(0));
+  // dpadUp.OnTrue(GetPositionCommand(3));
+  // dpadRight.OnTrue(GetPositionCommand(2));
+  // dpadDown.OnTrue(GetPositionCommand(1));
+  // controller.Back().OnTrue(GetPositionCommand(0));
+
+  mainDpadUp.OnTrue(HandlePartnerCommands(GetPositionCommand(3), GetEmptyCommand()));
+  mainDpadRight.OnTrue(HandlePartnerCommands(GetPositionCommand(2), GetEmptyCommand()));
+  mainDpadDown.OnTrue(HandlePartnerCommands(GetPositionCommand(1), GetEmptyCommand()));
+  controller.Back().OnTrue(HandlePartnerCommands(GetPositionCommand(0), GetEmptyCommand()));
+
+  partnerDpadUp.OnTrue(GetPositionCommand(3));
+  partnerDpadRight.OnTrue(GetPositionCommand(2));
+  partnerDpadDown.OnTrue(GetPositionCommand(1));
+  controller2.Back().OnTrue(GetPositionCommand(0));
 
   // Set up default drive command
     m_drive.SetDefaultCommand(frc2::RunCommand(
@@ -59,13 +80,9 @@ RobotContainer::RobotContainer() {
               float xSpeed = DriveConstants::kDriveCurveExtent * pow(x, 3) + (1 - DriveConstants::kDriveCurveExtent) * x;
               float ySpeed = DriveConstants::kDriveCurveExtent * pow(y, 3) + (1 - DriveConstants::kDriveCurveExtent) * y;
               m_drive.Drive(
-                units::meters_per_second_t{ySpeed * 4.0},
-                units::meters_per_second_t{xSpeed * -4.0},
+                units::meters_per_second_t{ySpeed * 3.5},
+                units::meters_per_second_t{xSpeed * -3.5},
                 units::degrees_per_second_t{controller.GetRightX() * 150}, false);
-              // m_drive.Drive(
-              //   units::meters_per_second_t{xSpeed * 4.0},
-              //   units::meters_per_second_t{ySpeed * -4.0},
-              //   units::degrees_per_second_t{controller.GetRightX() * 150}, false);
             }
       },
       {&m_drive}));

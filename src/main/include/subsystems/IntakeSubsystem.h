@@ -108,6 +108,11 @@ class IntakeSubsystem : public frc2::SubsystemBase {
    */
   void SetBrakeMode(bool state);
 
+  /**
+   * Initially configure onboard TalonFX settings for motors.
+   */
+   void ConfigMotors();
+
     
  private:
   ArmSubsystem *arm;

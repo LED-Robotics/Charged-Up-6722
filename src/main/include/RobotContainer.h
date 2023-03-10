@@ -17,6 +17,7 @@
 
 #include "Constants.h"
 #include "commands/SetPosition.h"
+#include "commands/GyroDock.h"
 #include "subsystems/DriveSubsystem.h"
 #include "subsystems/IntakeSubsystem.h"
 #include "subsystems/ElevatorSubsystem.h"
@@ -59,10 +60,15 @@ class RobotContainer {
   IntakeSubsystem intake{&arm};
   bool intakeHold = false;
 
-  frc2::Trigger dpadUp{[this]() { return controller.GetPOV() == 0; }};
-  frc2::Trigger dpadRight{[this]() { return controller.GetPOV() == 90; }};
-  frc2::Trigger dpadDown{[this]() { return controller.GetPOV() == 180; }};
-  frc2::Trigger dpadLeft{[this]() { return controller.GetPOV() == 270; }};
+  frc2::Trigger mainDpadUp{[this]() { return controller.GetPOV() == 0; }};
+  frc2::Trigger mainDpadRight{[this]() { return controller.GetPOV() == 90; }};
+  frc2::Trigger mainDpadDown{[this]() { return controller.GetPOV() == 180; }};
+  frc2::Trigger mainDpadLeft{[this]() { return controller.GetPOV() == 270; }};
+
+  frc2::Trigger partnerDpadUp{[this]() { return controller2.GetPOV() == 0; }};
+  frc2::Trigger partnerDpadRight{[this]() { return controller2.GetPOV() == 90; }};
+  frc2::Trigger partnerDpadDown{[this]() { return controller2.GetPOV() == 180; }};
+  frc2::Trigger partnerDpadLeft{[this]() { return controller2.GetPOV() == 270; }};
 
   // LimelightSubsystem limelight;
 
@@ -77,6 +83,10 @@ class RobotContainer {
   // frc2::InstantCommand intakeOff{[this] { intake.Off(); },
   //                                       {}};
   frc2::Command* GetPositionCommand(int position);
+
+  frc2::Command* HandlePartnerCommands(frc2::Command* solo, frc2::Command* partner);
+
+  frc2::Command* GetEmptyCommand();
 
   // The chooser for the autonomous routines
   frc::SendableChooser<frc2::Command*> m_chooser;

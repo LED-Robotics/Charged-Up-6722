@@ -72,11 +72,11 @@ class DriveSubsystem : public frc2::SubsystemBase {
 
 
   /**
-   * Returns the heading of the robot.
+   * Returns the degrees of the robot.
    *
-   * @return the robot's heading in degrees, from 180 to 180
+   * @return the robot's degrees, from -180 to 180
    */
-  units::degree_t GetHeading() const;
+  units::degree_t GetAngle() const;
 
   /**
    * Zeroes the heading of the robot.
@@ -122,6 +122,11 @@ class DriveSubsystem : public frc2::SubsystemBase {
    * @param state Whether or not braking is enabled.
    */
    void SetBrakeMode(bool state);
+
+   /**
+   * Initially configure onboard TalonFX settings for motors.
+   */
+   void ConfigMotors();
 
 
   // frc::Translation2d frontRightLocation{-0.449072_m, -0.449072_m};

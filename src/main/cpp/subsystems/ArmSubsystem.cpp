@@ -18,6 +18,7 @@ ArmSubsystem::ArmSubsystem()
       left.SetInverted(true);
       left.SetSelectedSensorPosition(0);
       right.SetSelectedSensorPosition(0);
+      ConfigMotors();
 }
 
 void ArmSubsystem::Periodic() {
@@ -95,4 +96,9 @@ void ArmSubsystem::SetBrakeMode(bool state) {
   else mode = ctre::phoenix::motorcontrol::NeutralMode::Coast;
   left.SetNeutralMode(mode);
   right.SetNeutralMode(mode);
+}
+
+void ArmSubsystem::ConfigMotors() {
+  left.Config_kP(0, kP);
+  right.Config_kP(0, kP);
 }

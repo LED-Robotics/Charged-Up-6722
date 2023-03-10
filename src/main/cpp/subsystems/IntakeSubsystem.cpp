@@ -17,6 +17,7 @@ IntakeSubsystem::IntakeSubsystem(ArmSubsystem *reference)
       arm = reference;
       intakeMotor.SetInverted(true);
       wristMotor.SetSelectedSensorPosition(0);
+      ConfigMotors();
 }
 
 void IntakeSubsystem::Periodic() {
@@ -103,4 +104,8 @@ void IntakeSubsystem::SetBrakeMode(bool state) {
   else mode = ctre::phoenix::motorcontrol::NeutralMode::Coast;
   intakeMotor.SetNeutralMode(mode);
   wristMotor.SetNeutralMode(mode);
+}
+
+void IntakeSubsystem::ConfigMotors() {
+  wristMotor.Config_kP(0, kP);
 }

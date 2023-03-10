@@ -56,24 +56,6 @@ class SwerveModule {
         void ResetEncoders();
 
     private:
-  
-        // const frc::SwerveModuleState *last;
-        static constexpr auto kModuleMaxAngularVelocity =
-            std::numbers::pi * 57.2958_deg_per_s;  // radians per second
-        static constexpr auto kModuleMaxAngularAcceleration =
-            std::numbers::pi * 114.592_deg_per_s / 1_s;  // radians per second^2
-
         WPI_TalonFX *driveMotor;
         WPI_TalonFX *turnMotor;
-
-        frc2::PIDController drivePIDController{DriveConstants::kPDriveVel, 0, 0};
-        // frc2::PIDController drivePIDController{1.0, 0, 0};
-        frc::ProfiledPIDController<units::degrees> turningPIDController{
-            DriveConstants::kPTurnVel,
-            0.0,
-            0.0,
-            {kModuleMaxAngularVelocity, kModuleMaxAngularAcceleration}};
-
-        frc::SimpleMotorFeedforward<units::meters> driveFeedforward{DriveConstants::driveKs, DriveConstants::driveKv, DriveConstants::driveKa};
-        frc::SimpleMotorFeedforward<units::degrees> turnFeedforward{DriveConstants::turnKs, DriveConstants::turnKv, DriveConstants::turnKa};
 };
