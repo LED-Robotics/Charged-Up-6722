@@ -75,9 +75,21 @@ class IntakeSubsystem : public frc2::SubsystemBase {
   void SetState(int newState);
 
   /**
+   * Returns the current state of the intake's wrist.
+   *
+   * @return The current state of the intake's wrist
+   */  
+  int GetWristState();
+
+  /**
+   * Sets the current state of the intake's wrist.
+   */  
+  void SetWristState(int newState);
+
+  /**
    * Sets the position of the Intake wrist.
    */
-  void SetPosition(double newPosition);
+  void SetTargetPosition(double newPosition);
 
   /**
    * Returns the target position of the intake's Wrist.
@@ -92,6 +104,25 @@ class IntakeSubsystem : public frc2::SubsystemBase {
    * @return The current Intake wrist position
    */
   double GetCurrentPosition();
+
+  /**
+   * Sets the target angle of the Intake wrist.
+   */
+  void SetTargetAngle(double newAngle);
+
+  /**
+   * Returns the target position of the intake's Wrist.
+   *
+   * @return The target Intake wrist position
+   */
+  double GetTargetAngle();
+
+  /**
+   * Returns the current angle of the intake's Wrist.
+   *
+   * @return The current Intake wrist angle
+   */
+  double GetCurrentAngle();
 
   /**
    * Resets the Intake wrist encoder.
@@ -117,9 +148,11 @@ class IntakeSubsystem : public frc2::SubsystemBase {
  private:
   ArmSubsystem *arm;
   int state = IntakeConstants::kOff;
+  int wristState = IntakeConstants::kAngleMode;
   double power = 0.0;
   double wristPower = 0.0;
   double position = 4000;
+  double angle = 0.0;
 
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.

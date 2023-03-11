@@ -80,6 +80,11 @@ class ArmSubsystem : public frc2::SubsystemBase {
   double GetAngle();
 
   /**
+   * Sets the target angle of the Arm.
+   */
+  void SetTargetAngle(double newAngle);
+
+  /**
    * Returns whether the subsystem is at its intended target position.
    */
   bool IsAtTarget();
@@ -101,7 +106,8 @@ class ArmSubsystem : public frc2::SubsystemBase {
 //  while the state is kOn the Arm will run at the current power setting
   int state = ArmConstants::kOff;
   double power = ArmConstants::kDefaultPower;
-  double position = 6435;
+  double position = ArmConstants::kStartPosition;
+  double angle = 0.0;
 
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.

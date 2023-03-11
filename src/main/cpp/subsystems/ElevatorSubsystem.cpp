@@ -20,7 +20,7 @@ ElevatorSubsystem::ElevatorSubsystem()
       right.SetInverted(true);
       left.SetSelectedSensorPosition(0);
       right.SetSelectedSensorPosition(0);
-      ConfigMotors();
+      // ConfigMotors();
 }
 
 void ElevatorSubsystem::Periodic() {
@@ -107,6 +107,6 @@ void ElevatorSubsystem::SetBrakeMode(bool state) {
 }
 
 void ElevatorSubsystem::ConfigMotors() {
-  left.Config_kP(0, kP);
-  right.Config_kP(0, kP);
+  left.Config_kP(0, kP, 100);
+  right.Config_kP(0, kP, 100);
 }

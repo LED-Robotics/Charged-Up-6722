@@ -40,6 +40,8 @@ class RobotContainer {
   void SetDriveBrakes(bool state);
 
   void ResetOdometry();
+ 
+  void HandleIntake();
 
  private:
   // The driver's controller
@@ -72,8 +74,25 @@ class RobotContainer {
 
   // LimelightSubsystem limelight;
 
-  // frc2::InstantCommand m_driveHalfSpeed{[this] { m_drive.SetMaxOutput(0.5); },
-  //                                       {}};
+  frc2::RunCommand verticalPickup{
+      [this] {
+        double elevatorY = controller2.GetLeftY();
+        if(elevatorY > 0.0) elevatorY = 0.0;
+        elevator.SetTargetPosition(15000 + (-elevatorY * 75000));
+        double armY = controller2.GetRightY();
+        if(armY < 0.0) armY = 0.0;
+        arm.SetTargetAngle(136.0 - (armY * 106.0));
+        HandleIntake();
+        intake.SetWristState(IntakeConstants::kAngleMode);
+        double wristAdjust = controller2.GetRightTriggerAxis() * 90.0;
+        intake.SetTargetAngle(200 - wristAdjust);
+      },
+      {&elevator, &arm, &intake}};
+
+  frc2::InstantCommand rumbleMain{[this] { controller.SetRumble(frc::GenericHID::RumbleType::kBothRumble, 1.0); },
+                                        {}};
+  frc2::InstantCommand rumblePartner{[this] { controller2.SetRumble(frc::GenericHID::RumbleType::kBothRumble, 1.0); },
+                                        {}};
   // frc2::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); },
   //                                       {}};
   // frc2::InstantCommand toggleFlywheel{[this] { flywheel.SetFlywheelState(!flywheel.GetFlywheelState()); },

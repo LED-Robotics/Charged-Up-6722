@@ -26,8 +26,11 @@ frc2::Command* RobotContainer::GetPositionCommand(int position) {
 }
 
 frc2::Command* RobotContainer::HandlePartnerCommands(frc2::Command* solo, frc2::Command* partner) {
-  if(controller2.IsConnected()) return partner;
-  else return solo;
+  return new frc2::InstantCommand(
+    [this, solo, partner]() { 
+        if(controller2.IsConnected()) partner->Schedule();
+        else solo->Schedule();
+      }, {});
 }
 
 frc2::Command* RobotContainer::GetEmptyCommand() {
@@ -52,10 +55,15 @@ RobotContainer::RobotContainer() {
   mainDpadDown.OnTrue(HandlePartnerCommands(GetPositionCommand(1), GetEmptyCommand()));
   controller.Back().OnTrue(HandlePartnerCommands(GetPositionCommand(0), GetEmptyCommand()));
 
+  controller.Start().OnTrue(&rumblePartner);
+  controller2.Start().OnTrue(&rumbleMain);
+
   partnerDpadUp.OnTrue(GetPositionCommand(3));
   partnerDpadRight.OnTrue(GetPositionCommand(2));
   partnerDpadDown.OnTrue(GetPositionCommand(1));
-  controller2.Back().OnTrue(GetPositionCommand(0));
+  controller2.B().OnTrue(GetPositionCommand(0));
+
+  controller2.X().ToggleOnTrue(&verticalPickup);
 
   // Set up default drive command
     m_drive.SetDefaultCommand(frc2::RunCommand(
@@ -89,33 +97,7 @@ RobotContainer::RobotContainer() {
     
     intake.SetDefaultCommand(frc2::RunCommand(
       [this] {
-          intake.SetState(IntakeConstants::kPowerMode);
-          double speed = controller.GetRightTriggerAxis() - controller.GetLeftTriggerAxis();
-          if(speed > 0.1 || speed < -0.1) {
-            intakeHold = false;
-            intake.SetPower(speed);
-          } else if(!intakeHold) intake.SetPower(0.0);
-          if(controller.GetRightBumperPressed()) {
-            intakeHold = true;
-            intake.SetPower(0.07);
-          }
-          if(controller.GetLeftBumperPressed()) {
-            intake.SetPower(0.0);
-          }
-          // int pov = controller.GetPOV();
-          // switch(pov) {
-          //   case 0: 
-          //     intake.SetPosition(IntakeConstants::kHighDropoffPosition);
-          //     break;
-          //   case 90:
-          //     intake.SetPosition(IntakeConstants::kMidDropoffPosition);
-          //     break;
-          //   case 180:
-          //     intake.SetPosition(IntakeConstants::kFloorPickupPosition);
-          //     break;
-          // }
-
-          // if(controller.GetBackButton()) intake.SetPosition(IntakeConstants::kStartPosition);
+          HandleIntake();
       },
       {&intake}));
 
@@ -191,6 +173,22 @@ void RobotContainer::ConfigureButtonBindings() {
 //       .WhenPressed(&toggleFlywheel);
 }
 
+void RobotContainer::HandleIntake() {
+  intake.SetState(IntakeConstants::kPowerMode);
+  double speed = controller.GetRightTriggerAxis() - controller.GetLeftTriggerAxis();
+  if(speed > 0.1 || speed < -0.1) {
+    intakeHold = false;
+    intake.SetPower(speed);
+  } else if(!intakeHold) intake.SetPower(0.0);
+  if(controller.GetRightBumperPressed()) {
+    intakeHold = true;
+    intake.SetPower(0.07);
+  }
+  if(controller.GetLeftBumperPressed()) {
+    intake.SetPower(0.0);
+  }
+}
+
 frc2::Command* RobotContainer::GetAutonomousCommand() {
   // Set up config for trajectory
   
@@ -203,10 +201,9 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
     
       // Start at the origin facing the +X direction
-      {frc::Pose2d{0.0_m, 0.0_m, 0.0_deg}, frc::Pose2d{1.0_m, 1.0_m, 0_deg}, 
-      frc::Pose2d{-1.0_m, 2.0_m, 0_deg},
+      {frc::Pose2d{0.0_m, 0.0_m, 0.0_deg},
       // End 3 meters straight ahead of where we started, facing forward
-      frc::Pose2d{0.0_m, 3.0_m, 0_deg},
+      frc::Pose2d{0.0_m, 1.0_m, 0_deg},
       },
       // Pass the config
       config);
@@ -217,7 +214,6 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
 
   thetaController.EnableContinuousInput(units::radian_t{-std::numbers::pi},
                                         units::radian_t{std::numbers::pi});
-
   frc2::SwerveControllerCommand<4> swerveControllerCommand(
       exampleTrajectory, [this]() { return m_drive.GetPose(); },
 
@@ -238,13 +234,14 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   return new frc2::SequentialCommandGroup(
       frc2::InstantCommand(
           [this]() { 
+            m_drive.SetInverted(true); 
             m_drive.SetLimiting(false);
            }, {}),
       std::move(swerveControllerCommand),
       frc2::InstantCommand(
           [this]() { m_drive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
             m_drive.SetLimiting(true);
-          m_drive.SetInverted(false); 
+            m_drive.SetInverted(false); 
           }, {}));
   
 }

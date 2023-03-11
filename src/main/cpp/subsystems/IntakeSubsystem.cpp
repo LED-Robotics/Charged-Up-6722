@@ -17,7 +17,7 @@ IntakeSubsystem::IntakeSubsystem(ArmSubsystem *reference)
       arm = reference;
       intakeMotor.SetInverted(true);
       wristMotor.SetSelectedSensorPosition(0);
-      ConfigMotors();
+      // ConfigMotors();
 }
 
 void IntakeSubsystem::Periodic() {
@@ -32,14 +32,19 @@ void IntakeSubsystem::Periodic() {
   }
 
   // Wrist position control
-  double armAngle = arm->GetAngle();
+  // double armAngle = arm->GetAngle();
   // std::cout << "Arm Angle: " << armAngle << '\n';
   // feed forward should be a changing constant that increases as the wrist moves further. It should be a static amount of power to overcome gravity.
-  double wristAngle = (kStartAngle - armAngle + (GetCurrentPosition() / kCountsPerDegree)) * (M_PI/180);
+  double wristAngle = GetCurrentAngle() * (M_PI/180);
   // double feedForward = 0.0;
   double feedForward = sin(wristAngle) * kMaxFeedForward;
-  SmartDashboard::PutNumber("wristAngle", (kStartAngle - armAngle + (GetCurrentPosition() / kCountsPerDegree)));  // print to Shuffleboard
-  wristMotor.Set(ctre::phoenix::motorcontrol::ControlMode::Position, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, feedForward);
+  SmartDashboard::PutNumber("wristAngle", GetCurrentAngle());  // print to Shuffleboard
+  if(wristState == kPositionMode) {
+    wristMotor.Set(ctre::phoenix::motorcontrol::ControlMode::Position, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, feedForward);
+  } else if(wristState == kAngleMode) {
+    wristMotor.Set(ctre::phoenix::motorcontrol::ControlMode::Position, (angle * kCountsPerDegree) + (arm->GetAngle() * kCountsPerDegree), ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, feedForward);
+
+  }
 }
 
 void IntakeSubsystem::Off() {
@@ -76,7 +81,15 @@ void IntakeSubsystem::SetState(int newState) {
   state = newState;
 }
 
-void IntakeSubsystem::SetPosition(double newPosition) {
+int IntakeSubsystem::GetWristState() {
+  return wristState;
+}
+
+void IntakeSubsystem::SetWristState(int newState) {
+  wristState = newState;
+}
+
+void IntakeSubsystem::SetTargetPosition(double newPosition) {
   position = newPosition;
 }
 
@@ -88,13 +101,34 @@ double IntakeSubsystem::GetCurrentPosition() {
   return wristMotor.GetSelectedSensorPosition();
 }
 
+void IntakeSubsystem::SetTargetAngle(double newAngle) {
+  angle = newAngle;
+}
+
+double IntakeSubsystem::GetTargetAngle() {
+  return angle;
+}
+
+double IntakeSubsystem::GetCurrentAngle() {
+  return kStartAngle - arm->GetAngle() + (GetCurrentPosition() / kCountsPerDegree);
+  
+}
+
 void IntakeSubsystem::ResetWristEncoder() {
   wristMotor.SetSelectedSensorPosition(0);
 }
 
 bool IntakeSubsystem::IsAtTarget() {
-  double pos = GetCurrentPosition();
-  bool atTarget = pos > position - (kPositionDeadzone / 2) && pos < position + (kPositionDeadzone / 2);
+  double current = 0.0;
+  double target = 0.0;
+  if(wristState == kPositionMode) {
+    current = GetCurrentPosition();
+    target = position;
+  } else if(wristState == kAngleMode) {
+    current = GetCurrentAngle();
+    target = angle;
+  }
+  bool atTarget = current > position - (kPositionDeadzone / 2) && current < position + (kPositionDeadzone / 2);
   return atTarget;
 }
 
@@ -107,5 +141,5 @@ void IntakeSubsystem::SetBrakeMode(bool state) {
 }
 
 void IntakeSubsystem::ConfigMotors() {
-  wristMotor.Config_kP(0, kP);
+  wristMotor.Config_kP(0, kP, 100);
 }
