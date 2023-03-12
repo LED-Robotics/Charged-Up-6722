@@ -41,12 +41,14 @@ DriveSubsystem::DriveSubsystem()
 
       //Odometry
       odometry{kDriveKinematics, {gyro.GetRotation2d()}, {s_frontLeft.GetPosition(), s_frontRight.GetPosition(), s_backLeft.GetPosition(),
-      s_backRight.GetPosition()}, frc::Pose2d{}},
+      s_backRight.GetPosition()}, Pose2d{}},
       
       xLimiter{kDriveTranslationLimit},
       yLimiter{kDriveTranslationLimit} {
         ZeroSwervePosition();
-        gyro.Calibrate();
+        gyro.Reset();
+        initialPitch = gyro.GetPitch();
+        // gyro.Calibrate();
         // backRightTheta.SetSelectedSensorPosition(0);
         // ConfigMotors();
 
@@ -71,12 +73,16 @@ void DriveSubsystem::Periodic() {
   odometry.Update(gyro.GetRotation2d(),
                   {s_frontLeft.GetPosition(), s_frontRight.GetPosition(),
                   s_backLeft.GetPosition(), s_backRight.GetPosition()});
-  SmartDashboard::PutNumber("odomGyro", (double)odometry.GetPose().Rotation().Degrees());
-  SmartDashboard::PutNumber("navxGyro", (double)GetAngle());
+  // SmartDashboard::PutNumber("odomGyro", (double)odometry.GetPose().Rotation().Degrees());
+  // SmartDashboard::PutNumber("navxGyro", (double)GetAngle());
   auto pose = odometry.GetPose();
   SmartDashboard::PutNumber("poseX", (double)pose.X());
   SmartDashboard::PutNumber("poseY", (double)pose.Y());
   SmartDashboard::PutNumber("poseAngle", (double)pose.Rotation().Degrees());
+  SmartDashboard::PutNumber("gyroPitch", gyro.GetPitch());
+  // SmartDashboard::PutNumber("frontLeftVel", (double)s_frontLeft.GetState().speed);
+  // SmartDashboard::PutNumber("frontRightVel", (double)s_frontRight.GetState().speed);
+
 }
 
 void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
@@ -84,9 +90,16 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
                           units::degrees_per_second_t rot,
                           bool fieldRelative) {
   if(enableLimiting) {
+    // std::cout << "Slew Rate Limiter Is On!\n";
     xSpeed = xLimiter.Calculate(xSpeed);
     ySpeed = yLimiter.Calculate(ySpeed);
+  } else {
+    // std::cout << "Slew Rate Limiter Is Off!\n";
   }
+
+  // SmartDashboard::PutNumber("targetXVel", (double)xSpeed);
+  // SmartDashboard::PutNumber("targetYVel", (double)ySpeed);
+  SmartDashboard::PutNumber("fieldCentric", fieldRelative);
   auto states = kDriveKinematics.ToSwerveModuleStates(
     fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
         xSpeed, ySpeed, rot, gyro.GetRotation2d() * -1)
@@ -217,4 +230,8 @@ void DriveSubsystem::ConfigMotors() {
   frontLeftTheta.Config_kP(0, turnKp, 100);
   backRightTheta.Config_kP(0, turnKp, 100);
   frontRightTheta.Config_kP(0, turnKp, 100);
+}
+
+double DriveSubsystem::GetPitch() {
+  return gyro.GetPitch();
 }

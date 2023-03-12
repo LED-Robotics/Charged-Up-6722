@@ -104,10 +104,10 @@ class ArmSubsystem : public frc2::SubsystemBase {
     
  private:
 //  while the state is kOn the Arm will run at the current power setting
-  int state = ArmConstants::kOff;
+  int state = ArmConstants::kPositionMode;
   double power = ArmConstants::kDefaultPower;
   double position = ArmConstants::kStartPosition;
-  double angle = 0.0;
+  double angle = ArmConstants::kStartAngle;
 
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.

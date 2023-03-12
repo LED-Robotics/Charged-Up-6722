@@ -97,7 +97,8 @@ namespace ElevatorConstants {
     constexpr double kElevatorDeadzone = 500;
     constexpr int kStartPosition = 10;
     constexpr int kFloorPickupPosition = 10;
-    constexpr int kMidDropoffPosition = 15000;
+    constexpr int kFloorStandingPickupPosition = 10;
+    constexpr int kMidDropoffPosition = 22000;
     constexpr int kHighDropoffPosition = 90000;
     constexpr int kPositionDeadzone = 3000;
     constexpr int kP = 0.1;
@@ -120,9 +121,10 @@ namespace ArmConstants {
     // constexpr int kFloorPickupPosition = 2080; original
     constexpr int kStartPosition = 4500;
     // constexpr double kStartAngle = 8.26;
-    constexpr double kStartAngle = 5.26;
+    constexpr double kStartAngle = 8.26;
     constexpr int kFloorPickupPosition = 13360;
     constexpr double kFloorPickupAngle = 24.5;
+    constexpr double kFloorStandingPickupAngle = 50.0;
     constexpr int kMidDropoffPosition = 74500;
     constexpr double kMidDropoffAngle = 136.7;
     constexpr int kHighDropoffPosition = 74500;
@@ -145,11 +147,12 @@ namespace IntakeConstants {
     constexpr int kCountsPerDegree = 149;
     constexpr double kMaxFeedForward = -0.07;
     constexpr double kStartAngle = -30.0;
-    constexpr int kStartPosition = 2000;
+    constexpr int kStartPosition = 4000;
     // constexpr int kFloorPickupPosition = 20600;
-    constexpr int kFloorPickupPosition = 22200;
-    constexpr int kMidDropoffPosition = 46000;
-    constexpr int kHighDropoffPosition = 42500;
+    constexpr int kFloorPickupPosition = 23200;
+    constexpr int kFloorStandingPickupPosition = 24800;
+    constexpr int kMidDropoffPosition = 42200;
+    constexpr int kHighDropoffPosition = 39200;
     constexpr int kPositionDeadzone = 10000;
     constexpr int kP = 0.03;
 }
@@ -162,14 +165,14 @@ namespace LimelightConstants {
 }
 
 namespace AutoConstants {
-        constexpr auto kMaxSpeed = 3_mps;
-        constexpr auto kMaxAcceleration = 3_mps_sq;
+        constexpr auto kMaxSpeed = 3.5_mps;
+        constexpr auto kMaxAcceleration = 6_mps_sq;
         constexpr auto kAngularSpeed = 180_deg_per_s;
         constexpr auto kMaxAngularAcceleration = 180_deg_per_s_sq;
 
-        constexpr double kPXController = 0.00001;
-        constexpr double kPYController = 0.00001;
-        constexpr double kPThetaController = 0.00001;
+        constexpr double kPXController = 0.0;
+        constexpr double kPYController = 0.0;
+        constexpr double kPThetaController = 0.0;
 
         extern const frc::TrapezoidProfile<units::radians>::Constraints
             kThetaControllerConstraints;

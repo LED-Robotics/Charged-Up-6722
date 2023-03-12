@@ -42,6 +42,10 @@ class RobotContainer {
   void ResetOdometry();
  
   void HandleIntake();
+  
+  void SetSlew(bool state);
+
+  void SetDriveReversed(bool reversed);
 
  private:
   // The driver's controller
@@ -60,7 +64,10 @@ class RobotContainer {
   ArmSubsystem arm;
 
   IntakeSubsystem intake{&arm};
+  
   bool intakeHold = false;
+
+  bool fieldCentric = false;
 
   frc2::Trigger mainDpadUp{[this]() { return controller.GetPOV() == 0; }};
   frc2::Trigger mainDpadRight{[this]() { return controller.GetPOV() == 90; }};
@@ -92,6 +99,9 @@ class RobotContainer {
   frc2::InstantCommand rumbleMain{[this] { controller.SetRumble(frc::GenericHID::RumbleType::kBothRumble, 1.0); },
                                         {}};
   frc2::InstantCommand rumblePartner{[this] { controller2.SetRumble(frc::GenericHID::RumbleType::kBothRumble, 1.0); },
+                                        {}};
+
+  frc2::InstantCommand toggleFieldCentric{[this] { fieldCentric = !fieldCentric; },
                                         {}};
   // frc2::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); },
   //                                       {}};

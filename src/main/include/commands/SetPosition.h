@@ -25,7 +25,7 @@ class SetPosition : public frc2::CommandHelper<frc2::CommandBase, SetPosition> {
 
  private:
     int target = 0;
-    ElevatorSubsystem* elevator;
-    ArmSubsystem* arm;
-    IntakeSubsystem* intake;
+    ElevatorSubsystem *elevator;
+    ArmSubsystem *arm;
+    IntakeSubsystem *intake;
 };

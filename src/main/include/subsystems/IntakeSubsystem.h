@@ -148,7 +148,7 @@ class IntakeSubsystem : public frc2::SubsystemBase {
  private:
   ArmSubsystem *arm;
   int state = IntakeConstants::kOff;
-  int wristState = IntakeConstants::kAngleMode;
+  int wristState = IntakeConstants::kPositionMode;
   double power = 0.0;
   double wristPower = 0.0;
   double position = 4000;

@@ -13,7 +13,7 @@
 void Robot::RobotInit() {
   m_container.SetDriveBrakes(false);
   m_container.ResetOdometry();
-  SmartDashboard::PutNumber("autoP", 0.3);
+  // SmartDashboard::PutNumber("autoP", 0.3);
   // SmartDashboard::PutNumber("armPos", 0.0);
   // SmartDashboard::PutNumber("armPower", 0.0);
   // SmartDashboard::PutNumber("wristPos", 4000);
@@ -55,6 +55,8 @@ void Robot::DisabledPeriodic() {}
  */
 void Robot::AutonomousInit() {
   m_container.SetDriveBrakes(true);
+  m_container.SetSlew(false);
+  m_container.SetDriveReversed(false);
   m_container.ResetOdometry();
   m_autonomousCommand = m_container.GetAutonomousCommand();
 
@@ -67,6 +69,8 @@ void Robot::AutonomousPeriodic() {}
 
 void Robot::TeleopInit() {
   m_container.SetDriveBrakes(true);
+  m_container.SetSlew(true);
+  m_container.SetDriveReversed(false);
   m_container.ResetOdometry();
   // This makes sure that the autonomous stops running when
   // teleop starts running. If you want the autonomous to

@@ -26,9 +26,9 @@ ElevatorSubsystem::ElevatorSubsystem()
 void ElevatorSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here
   // std::cout << "Left Current Position: " << GetLeftPosition() << '\n';
-  SmartDashboard::PutNumber("leftPos", GetLeftPosition());
-  SmartDashboard::PutNumber("rightPos", GetRightPosition());
-  SmartDashboard::PutNumber("targetPos", position);
+  // SmartDashboard::PutNumber("leftPos", GetLeftPosition());
+  // SmartDashboard::PutNumber("rightPos", GetRightPosition());
+  // SmartDashboard::PutNumber("targetPos", position);
   // std::cout << "Right Current Position: " << GetRightPosition() << '\n';
   if(state == kOff) {
     left.Set(0.0);

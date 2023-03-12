@@ -23,7 +23,7 @@ units::degree_t SwerveModule::GetTurnEncoderAngle() const {
 }
 
 units::meters_per_second_t SwerveModule::GetDriveEncoderRate() const {
-    return units::meters_per_second_t{driveMotor->GetSelectedSensorVelocity() * DriveConstants::kDriveEncoderDistancePerPulse};
+    return units::meters_per_second_t{driveMotor->GetSelectedSensorVelocity() * DriveConstants::kDriveEncoderDistancePerPulse * 10};
 }
 
 frc::SwerveModuleState SwerveModule::GetState() const {

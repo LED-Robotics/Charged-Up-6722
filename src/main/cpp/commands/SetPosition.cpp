@@ -1,6 +1,6 @@
 #include "commands/SetPosition.h"
 
-SetPosition::SetPosition(int position, ElevatorSubsystem* elevRef, ArmSubsystem* armRef, IntakeSubsystem* intakeRef) 
+SetPosition::SetPosition(int position, ElevatorSubsystem *elevRef, ArmSubsystem *armRef, IntakeSubsystem *intakeRef) 
 : elevator(elevRef),
 arm(armRef),
 intake(intakeRef) {
@@ -15,6 +15,7 @@ void SetPosition::Initialize() {
       intake->SetTargetPosition(IntakeConstants::kStartPosition);
     } else if(target == 1) {
       elevator->SetTargetPosition(ElevatorConstants::kFloorPickupPosition);
+      arm->SetTargetAngle(ArmConstants::kFloorPickupAngle);
       intake->SetWristState(IntakeConstants::kPositionMode);
       intake->SetTargetPosition(IntakeConstants::kFloorPickupPosition);
     } else if(target == 2) {
@@ -28,12 +29,17 @@ void SetPosition::Initialize() {
       arm->SetTargetAngle(ArmConstants::kHighDropoffAngle);
       intake->SetWristState(IntakeConstants::kPositionMode);
       intake->SetTargetPosition(IntakeConstants::kHighDropoffPosition);
+    } else if(target == 4) {
+      elevator->SetTargetPosition(ElevatorConstants::kFloorStandingPickupPosition);
+      arm->SetTargetAngle(ArmConstants::kFloorStandingPickupAngle);
+      intake->SetWristState(IntakeConstants::kPositionMode);
+      intake->SetTargetPosition(IntakeConstants::kFloorStandingPickupPosition);
     }
 }
 
 void SetPosition::Execute() {
-  if(target == 0 && elevator->IsAtTarget() && intake->IsAtTarget()) {
-    elevator->SetTargetPosition(ElevatorConstants::kStartPosition);
+  if(target == 0 && elevator->IsAtTarget()) {
+    // elevator->SetTargetPosition(ElevatorConstants::kStartPosition);
     // arm->SetTargetPosition(ArmConstants::kStartPosition);
     arm->SetTargetAngle(ArmConstants::kStartAngle);
   } else if(target == 1 && elevator->IsAtTarget() && intake->IsAtTarget()) {

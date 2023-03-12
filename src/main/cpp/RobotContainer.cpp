@@ -51,14 +51,14 @@ RobotContainer::RobotContainer() {
   // controller.Back().OnTrue(GetPositionCommand(0));
 
   mainDpadUp.OnTrue(HandlePartnerCommands(GetPositionCommand(3), GetEmptyCommand()));
+  mainDpadLeft.OnTrue(HandlePartnerCommands(GetPositionCommand(4), GetEmptyCommand()));
   mainDpadRight.OnTrue(HandlePartnerCommands(GetPositionCommand(2), GetEmptyCommand()));
   mainDpadDown.OnTrue(HandlePartnerCommands(GetPositionCommand(1), GetEmptyCommand()));
   controller.Back().OnTrue(HandlePartnerCommands(GetPositionCommand(0), GetEmptyCommand()));
-
-  controller.Start().OnTrue(&rumblePartner);
-  controller2.Start().OnTrue(&rumbleMain);
+  // controller.B().ToggleOnTrue(new GyroDock(1.5, &m_drive));
 
   partnerDpadUp.OnTrue(GetPositionCommand(3));
+  partnerDpadLeft.OnTrue(GetPositionCommand(4));
   partnerDpadRight.OnTrue(GetPositionCommand(2));
   partnerDpadDown.OnTrue(GetPositionCommand(1));
   controller2.B().OnTrue(GetPositionCommand(0));
@@ -68,30 +68,27 @@ RobotContainer::RobotContainer() {
   // Set up default drive command
     m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
-            if(controller.GetAButtonPressed()) {
-              // if(m_drive.ZeroSwervePosition()) {
-              //   m_drive.ResetEncoders();
-              // }
-            } else {
-              double x = controller.GetLeftX();
-              double y = controller.GetLeftY();
+            if(controller.GetYButtonPressed()) fieldCentric = !fieldCentric;
+            controller.SetRumble(GenericHID::RumbleType::kBothRumble, controller2.GetStartButton() ? 1.0 : 0.0);
+            controller2.SetRumble(GenericHID::RumbleType::kBothRumble, controller.GetStartButton() ? 1.0 : 0.0);
+            double x = controller.GetLeftX();
+            double y = controller.GetLeftY();
 
-              // zero out axes if they fall within deadzone
-              if (x > -DriveConstants::kDriveDeadzone && x < DriveConstants::kDriveDeadzone)
-                  x = 0.0;
-              if (y > -DriveConstants::kDriveDeadzone && y < DriveConstants::kDriveDeadzone)
-                  y = 0.0;
+            // zero out axes if they fall within deadzone
+            if (x > -DriveConstants::kDriveDeadzone && x < DriveConstants::kDriveDeadzone)
+                x = 0.0;
+            if (y > -DriveConstants::kDriveDeadzone && y < DriveConstants::kDriveDeadzone)
+                y = 0.0;
 
-              // put speeds through a polynomial to smooth out joystick input
-              // check the curve out here: https://www.desmos.com/calculator/65tpwhxyai the range between 0.0 to 1.0 is used for the motors
-              // change driveCurveExtent to modify curve strength
-              float xSpeed = DriveConstants::kDriveCurveExtent * pow(x, 3) + (1 - DriveConstants::kDriveCurveExtent) * x;
-              float ySpeed = DriveConstants::kDriveCurveExtent * pow(y, 3) + (1 - DriveConstants::kDriveCurveExtent) * y;
-              m_drive.Drive(
-                units::meters_per_second_t{ySpeed * 3.5},
-                units::meters_per_second_t{xSpeed * -3.5},
-                units::degrees_per_second_t{controller.GetRightX() * 150}, false);
-            }
+            // put speeds through a polynomial to smooth out joystick input
+            // check the curve out here: https://www.desmos.com/calculator/65tpwhxyai the range between 0.0 to 1.0 is used for the motors
+            // change driveCurveExtent to modify curve strength
+            float xSpeed = DriveConstants::kDriveCurveExtent * pow(x, 3) + (1 - DriveConstants::kDriveCurveExtent) * x;
+            float ySpeed = DriveConstants::kDriveCurveExtent * pow(y, 3) + (1 - DriveConstants::kDriveCurveExtent) * y;
+            m_drive.Drive(
+              units::meters_per_second_t{ySpeed * 3.5},
+              units::meters_per_second_t{xSpeed * -3.5},
+              units::degrees_per_second_t{controller.GetRightX() * 115}, fieldCentric);
       },
       {&m_drive}));
     
@@ -182,11 +179,19 @@ void RobotContainer::HandleIntake() {
   } else if(!intakeHold) intake.SetPower(0.0);
   if(controller.GetRightBumperPressed()) {
     intakeHold = true;
-    intake.SetPower(0.07);
+    intake.SetPower(0.1);
   }
   if(controller.GetLeftBumperPressed()) {
     intake.SetPower(0.0);
   }
+}
+
+void RobotContainer::SetSlew(bool state) {
+  m_drive.SetLimiting(state);
+}
+
+void RobotContainer::SetDriveReversed(bool reversed) {
+  m_drive.SetInverted(reversed);
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
@@ -198,12 +203,22 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   config.SetKinematics(m_drive.kDriveKinematics);
 
   // An example trajectory to follow.  All units in meters.
-  auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
+  auto moveFromLink = frc::TrajectoryGenerator::GenerateTrajectory(
     
       // Start at the origin facing the +X direction
       {frc::Pose2d{0.0_m, 0.0_m, 0.0_deg},
       // End 3 meters straight ahead of where we started, facing forward
-      frc::Pose2d{0.0_m, 1.0_m, 0_deg},
+      frc::Pose2d{-0.5_m, 0.0_m, 0.0_deg},
+      },
+      // Pass the config
+      config);
+
+  auto moveToLink = frc::TrajectoryGenerator::GenerateTrajectory(
+    
+      // Start at the origin facing the +X direction
+      {frc::Pose2d{-0.5_m, 0.0_m, 0.0_deg},
+      // End 3 meters straight ahead of where we started, facing forward
+      frc::Pose2d{0.0_m, 0.0_m, 0.0_deg},
       },
       // Pass the config
       config);
@@ -214,8 +229,20 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
 
   thetaController.EnableContinuousInput(units::radian_t{-std::numbers::pi},
                                         units::radian_t{std::numbers::pi});
-  frc2::SwerveControllerCommand<4> swerveControllerCommand(
-      exampleTrajectory, [this]() { return m_drive.GetPose(); },
+  frc2::SwerveControllerCommand<4> commandMoveFromLink(
+      moveFromLink, [this]() { return m_drive.GetPose(); },
+
+      m_drive.kDriveKinematics,
+
+      frc2::PIDController{AutoConstants::kPXController, 0, 0},
+      frc2::PIDController{AutoConstants::kPYController, 0, 0}, thetaController,
+
+      [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
+
+      {&m_drive});
+
+  frc2::SwerveControllerCommand<4> commandMoveToLink(
+      moveToLink, [this]() { return m_drive.GetPose(); },
 
       m_drive.kDriveKinematics,
 
@@ -227,21 +254,32 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       {&m_drive});
 
   // Reset odometry to the starting pose of the trajectory.
-  m_drive.ResetOdometry(exampleTrajectory.InitialPose());
+  m_drive.ResetOdometry(moveFromLink.InitialPose());
+
 
   // no auto
   // return std::move(swerveControllerCommand);
+  // return new frc2::SequentialCommandGroup(
+  //     std::move(commandMoveFromLink),
+  //     SetPosition(2, &elevator, &arm, &intake),
+  //     std::move(commandMoveToLink),
+  //     frc2::InstantCommand(
+  //         [this]() { 
+  //           intake.SetState(IntakeConstants::kPowerMode);
+  //           intake.SetPower(-1.0);
+  //           Wait(2.5_s);
+  //           intake.SetPower(0.0);
+  //           SetDriveReversed(false);
+  //         }, {&intake}),
+  //     SetPosition(0, &elevator, &arm, &intake),
+  //     GyroDock(-1.5, &m_drive),
+  //     frc2::InstantCommand(
+  //         [this]() { m_drive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
+  //         }, {}));
   return new frc2::SequentialCommandGroup(
-      frc2::InstantCommand(
-          [this]() { 
-            m_drive.SetInverted(true); 
-            m_drive.SetLimiting(false);
-           }, {}),
-      std::move(swerveControllerCommand),
+      GyroDock(1.5, &m_drive),
       frc2::InstantCommand(
           [this]() { m_drive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
-            m_drive.SetLimiting(true);
-            m_drive.SetInverted(false); 
           }, {}));
   
 }
