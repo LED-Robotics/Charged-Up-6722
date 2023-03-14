@@ -16,7 +16,7 @@ void GyroDock::Initialize() {
       drive->Drive(units::meters_per_second_t{speed}, 0_mps, 0_deg_per_s, false);
     };
   } else {
-    while(current < initialPitch - range) {
+    while(current < initialPitch + range) {
       current = drive->GetPitch();
       drive->Drive(units::meters_per_second_t{speed}, 0_mps, 0_deg_per_s, false);
     };

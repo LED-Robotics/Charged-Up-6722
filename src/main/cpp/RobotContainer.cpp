@@ -281,5 +281,4 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
       frc2::InstantCommand(
           [this]() { m_drive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
           }, {}));
-  
 }
