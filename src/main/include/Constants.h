@@ -17,6 +17,7 @@
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/ProfiledPIDSubsystem.h>
 #include <units/angle.h>
+#include <ctre\Phoenix.h>
 
 #pragma once
 
@@ -96,8 +97,8 @@ namespace ElevatorConstants {
     constexpr double kDefaultPower = 1.0;
     constexpr double kElevatorDeadzone = 500;
     constexpr int kStartPosition = 10;
-    constexpr int kFloorPickupPosition = 10;
-    constexpr int kFloorStandingPickupPosition = 10;
+    constexpr int kFloorPickupPosition = 100;
+    constexpr int kFloorStandingPickupPosition = 100;
     constexpr int kMidDropoffPosition = 22000;
     constexpr int kHighDropoffPosition = 90000;
     constexpr int kPositionDeadzone = 3000;
@@ -150,7 +151,7 @@ namespace IntakeConstants {
     constexpr int kStartPosition = 4000;
     // constexpr int kFloorPickupPosition = 20600;
     constexpr int kFloorPickupPosition = 23200;
-    constexpr int kFloorStandingPickupPosition = 24800;
+    constexpr int kFloorStandingPickupPosition = 27400;
     constexpr int kMidDropoffPosition = 42200;
     constexpr int kHighDropoffPosition = 39200;
     constexpr int kPositionDeadzone = 10000;
@@ -179,6 +180,10 @@ namespace AutoConstants {
 } //namespace AutoConstants
 
 namespace OIConstants {
-constexpr int kDriverControllerPort = 0;
-constexpr int kCoDriverControllerPort = 1;
+    constexpr int kDriverControllerPort = 0;
+    constexpr int kCoDriverControllerPort = 1;
 }  // namespace OIConstants
+
+namespace BlinkinConstants {
+    constexpr int kBlinkinPort = 18;
+}   //namespace BlinkinConstants

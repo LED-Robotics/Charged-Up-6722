@@ -62,15 +62,20 @@ RobotContainer::RobotContainer() {
   partnerDpadRight.OnTrue(GetPositionCommand(2));
   partnerDpadDown.OnTrue(GetPositionCommand(1));
   controller2.B().OnTrue(GetPositionCommand(0));
-
+  controller2.A().OnTrue(&SetBlinkinAButton);
   controller2.X().ToggleOnTrue(&verticalPickup);
+  controller2.LeftBumper().OnTrue(&SetBlinkinLeftBumper);
+  controller2.RightBumper().OnTrue(&SetBlinkinRightBumper);
+
+  controller.Start().OnTrue(&rumbleSecondaryOn);
+  controller2.Start().OnTrue(&rumblePrimaryOn);
+  controller.Start().OnFalse(&rumbleSecondaryOff);
+  controller2.Start().OnFalse(&rumblePrimaryOff);
 
   // Set up default drive command
     m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
             if(controller.GetYButtonPressed()) fieldCentric = !fieldCentric;
-            controller.SetRumble(GenericHID::RumbleType::kBothRumble, controller2.GetStartButton() ? 1.0 : 0.0);
-            controller2.SetRumble(GenericHID::RumbleType::kBothRumble, controller.GetStartButton() ? 1.0 : 0.0);
             double x = controller.GetLeftX();
             double y = controller.GetLeftY();
 
@@ -88,7 +93,7 @@ RobotContainer::RobotContainer() {
             m_drive.Drive(
               units::meters_per_second_t{ySpeed * 3.5},
               units::meters_per_second_t{xSpeed * -3.5},
-              units::degrees_per_second_t{controller.GetRightX() * 115}, fieldCentric);
+              units::degrees_per_second_t{controller.GetRightX() * 80.0}, fieldCentric);
       },
       {&m_drive}));
     

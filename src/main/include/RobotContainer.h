@@ -14,6 +14,7 @@
 #include <frc2/command/ParallelRaceGroup.h>
 #include <frc2/command/RunCommand.h>
 #include "units/angle.h"
+#include <ctre\Phoenix.h>
 
 #include "Constants.h"
 #include "commands/SetPosition.h"
@@ -23,6 +24,8 @@
 #include "subsystems/ElevatorSubsystem.h"
 #include "subsystems/ArmSubsystem.h"
 #include "subsystems/LimelightSubsystem.h"
+#include "iostream"
+#include "frc/motorcontrol/Spark.h"
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -31,6 +34,7 @@
  * scheduler calls).  Instead, the structure of the robot (including subsystems,
  * commands, and button mappings) should be declared here.
  */
+
 class RobotContainer {
  public:
   RobotContainer();
@@ -53,6 +57,9 @@ class RobotContainer {
   frc2::CommandXboxController controller{OIConstants::kDriverControllerPort};
   // frc::XboxController controller2{OIConstants::kCoDriverControllerPort};
   frc2::CommandXboxController controller2{OIConstants::kCoDriverControllerPort};
+
+  //Blinkin
+  Spark blinkin{18};
 
   // The robot's subsystems and commands are defined here...
 
@@ -96,13 +103,32 @@ class RobotContainer {
       },
       {&elevator, &arm, &intake}};
 
-  frc2::InstantCommand rumbleMain{[this] { controller.SetRumble(frc::GenericHID::RumbleType::kBothRumble, 1.0); },
-                                        {}};
-  frc2::InstantCommand rumblePartner{[this] { controller2.SetRumble(frc::GenericHID::RumbleType::kBothRumble, 1.0); },
-                                        {}};
 
   frc2::InstantCommand toggleFieldCentric{[this] { fieldCentric = !fieldCentric; },
                                         {}};
+
+  frc2::InstantCommand rumblePrimaryOn{[this] { controller.SetRumble(GenericHID::kBothRumble, 1.0); },
+                                        {}};
+
+  frc2::InstantCommand rumbleSecondaryOn{[this] { controller2.SetRumble(GenericHID::kBothRumble, 1.0); },
+                                        {}};
+  
+  frc2::InstantCommand rumblePrimaryOff{[this] { controller.SetRumble(GenericHID::kBothRumble, 0.0); },
+                                        {}};
+
+  frc2::InstantCommand rumbleSecondaryOff{[this] { controller2.SetRumble(GenericHID::kBothRumble, 0.0); },
+                                        {}};
+  
+  
+  frc2::InstantCommand SetBlinkinAButton{[this] { blinkin.Set(.45); /*End to End; Color 1 (Purple) and Color 2 (Green)*/ },
+                                        {}};
+
+  frc2::InstantCommand SetBlinkinLeftBumper{[this] { blinkin.Set(.07); /*Fast Heartbeat; Color 1 (Purple)*/ },
+                                        {}};
+
+  frc2::InstantCommand SetBlinkinRightBumper{[this] { blinkin.Set(.27); /*Fast Heartbeat; Color 2 (Yellow)*/; },
+                                        {}};
+
   // frc2::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); },
   //                                       {}};
   // frc2::InstantCommand toggleFlywheel{[this] { flywheel.SetFlywheelState(!flywheel.GetFlywheelState()); },
@@ -111,11 +137,14 @@ class RobotContainer {
   //                                       {}};
   // frc2::InstantCommand intakeOff{[this] { intake.Off(); },
   //                                       {}};
+
   frc2::Command* GetPositionCommand(int position);
 
   frc2::Command* HandlePartnerCommands(frc2::Command* solo, frc2::Command* partner);
 
   frc2::Command* GetEmptyCommand();
+
+  frc2::Command* SetBlinkin(int inputMode);
 
   // The chooser for the autonomous routines
   frc::SendableChooser<frc2::Command*> m_chooser;
