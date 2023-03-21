@@ -79,7 +79,7 @@ namespace DriveConstants {
 
     constexpr double kDriveDeadzone = 0.05;
     constexpr double kDriveCurveExtent = 0.8;
-    constexpr auto kDriveTranslationLimit = 4_mps_sq;
+    constexpr auto kDriveTranslationLimit = 5_mps_sq;
     // Example value only - as above, this must be tuned for your drive!
     constexpr double kPDriveVel = 1.0;
     constexpr double kPTurnVel = 0.001;
@@ -145,16 +145,24 @@ namespace IntakeConstants {
     constexpr double kFullPower = 1.0;
     constexpr double kCurrentLimit = 15.0;
     constexpr double kIntakeDeadzone = 0.1;
-    constexpr int kCountsPerDegree = 149;
+    // constexpr int kCountsPerDegree = 149;
+    constexpr int kCountsPerDegree = 69;
     constexpr double kMaxFeedForward = -0.07;
     constexpr double kStartAngle = -30.0;
-    constexpr int kStartPosition = 4000;
+    // constexpr int kStartPosition = 4000;
+    // // constexpr int kFloorPickupPosition = 20600;
+    // constexpr int kFloorPickupPosition = 23200;
+    // constexpr int kFloorStandingPickupPosition = 27400;
+    // constexpr int kMidDropoffPosition = 42200;
+    // constexpr int kHighDropoffPosition = 39200;
+    // constexpr int kPositionDeadzone = 10000;
+    constexpr int kStartPosition = 1950;
     // constexpr int kFloorPickupPosition = 20600;
-    constexpr int kFloorPickupPosition = 23200;
-    constexpr int kFloorStandingPickupPosition = 27400;
-    constexpr int kMidDropoffPosition = 42200;
-    constexpr int kHighDropoffPosition = 39200;
-    constexpr int kPositionDeadzone = 10000;
+    constexpr int kFloorPickupPosition = 10300;
+    constexpr int kFloorStandingPickupPosition = 12200;
+    constexpr int kMidDropoffPosition = 19542;
+    constexpr int kHighDropoffPosition = 18153;
+    constexpr int kPositionDeadzone = 3333;
     constexpr int kP = 0.03;
 }
 
@@ -185,5 +193,5 @@ namespace OIConstants {
 }  // namespace OIConstants
 
 namespace BlinkinConstants {
-    constexpr int kBlinkinPort = 18;
+    constexpr int kBlinkinPort = 0;
 }   //namespace BlinkinConstants

@@ -18,8 +18,8 @@ ElevatorSubsystem::ElevatorSubsystem()
     left{kLeftMotorPort},
     right{kRightMotorPort} {
       right.SetInverted(true);
-      left.SetSelectedSensorPosition(0);
-      right.SetSelectedSensorPosition(0);
+      // left.SetSelectedSensorPosition(0);
+      // right.SetSelectedSensorPosition(0);
       // ConfigMotors();
 }
 

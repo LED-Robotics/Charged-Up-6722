@@ -135,6 +135,16 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   double GetPitch();
 
+  void driveDistance(units::meter_t distance, units::meters_per_second_t speed);
+
+  void driveDistance(units::meter_t distance);
+
+  void strafeDistance(units::meter_t distance, units::meters_per_second_t speed);
+
+  void strafeDistance(units::meter_t distance);
+
+  void turnDegrees(units::degree_t angle, units::meters_per_second_t speed);
+
 
   // frc::Translation2d frontRightLocation{-0.449072_m, -0.449072_m};
   // frc::Translation2d frontLeftLocation{-0.449072_m, 0.449072_m};

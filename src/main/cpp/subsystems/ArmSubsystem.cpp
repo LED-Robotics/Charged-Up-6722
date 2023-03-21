@@ -16,8 +16,8 @@ ArmSubsystem::ArmSubsystem()
     : left{kLeftMotorPort},
     right{kRightMotorPort} {
       left.SetInverted(true);
-      left.SetSelectedSensorPosition(0);
-      right.SetSelectedSensorPosition(0);
+      // left.SetSelectedSensorPosition(0);
+      // right.SetSelectedSensorPosition(0);
       // ConfigMotors();
 }
 

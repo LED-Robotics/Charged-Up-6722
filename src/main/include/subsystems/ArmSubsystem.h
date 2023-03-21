@@ -107,7 +107,7 @@ class ArmSubsystem : public frc2::SubsystemBase {
   int state = ArmConstants::kPositionMode;
   double power = ArmConstants::kDefaultPower;
   double position = ArmConstants::kStartPosition;
-  double angle = ArmConstants::kStartAngle;
+  double angle = 11.5;
 
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.

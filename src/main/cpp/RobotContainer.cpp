@@ -78,6 +78,7 @@ RobotContainer::RobotContainer() {
             if(controller.GetYButtonPressed()) fieldCentric = !fieldCentric;
             double x = controller.GetLeftX();
             double y = controller.GetLeftY();
+            double turnX = controller.GetRightX();
 
             // zero out axes if they fall within deadzone
             if (x > -DriveConstants::kDriveDeadzone && x < DriveConstants::kDriveDeadzone)
@@ -90,10 +91,11 @@ RobotContainer::RobotContainer() {
             // change driveCurveExtent to modify curve strength
             float xSpeed = DriveConstants::kDriveCurveExtent * pow(x, 3) + (1 - DriveConstants::kDriveCurveExtent) * x;
             float ySpeed = DriveConstants::kDriveCurveExtent * pow(y, 3) + (1 - DriveConstants::kDriveCurveExtent) * y;
+            float turn = 0.95 * pow(turnX, 3) + (1 - 0.95) * turnX;
             m_drive.Drive(
               units::meters_per_second_t{ySpeed * 3.5},
               units::meters_per_second_t{xSpeed * -3.5},
-              units::degrees_per_second_t{controller.GetRightX() * 80.0}, fieldCentric);
+              units::degrees_per_second_t{turn * 130.0}, fieldCentric);
       },
       {&m_drive}));
     

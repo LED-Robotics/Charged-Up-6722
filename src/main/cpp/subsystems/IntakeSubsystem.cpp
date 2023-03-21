@@ -16,7 +16,7 @@ IntakeSubsystem::IntakeSubsystem(ArmSubsystem *reference)
     wristMotor{kWristPort} {
       arm = reference;
       intakeMotor.SetInverted(true);
-      wristMotor.SetSelectedSensorPosition(0);
+      // wristMotor.SetSelectedSensorPosition(0);
       // ConfigMotors();
 }
 
@@ -34,6 +34,7 @@ void IntakeSubsystem::Periodic() {
   // Wrist position control
   // double armAngle = arm->GetAngle();
   // std::cout << "Arm Angle: " << armAngle << '\n';
+  // std::cout << "Wrist Pos: " << wristMotor.GetSelectedSensorPosition() << '\n';
   // feed forward should be a changing constant that increases as the wrist moves further. It should be a static amount of power to overcome gravity.
   double wristAngle = GetCurrentAngle() * (M_PI/180);
   // double feedForward = 0.0;

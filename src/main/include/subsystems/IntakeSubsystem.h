@@ -151,7 +151,7 @@ class IntakeSubsystem : public frc2::SubsystemBase {
   int wristState = IntakeConstants::kPositionMode;
   double power = 0.0;
   double wristPower = 0.0;
-  double position = 4000;
+  double position = IntakeConstants::kStartPosition;
   double angle = 0.0;
 
   // Components (e.g. motor controllers and sensors) should generally be

@@ -20,12 +20,10 @@ void SetPosition::Initialize() {
       intake->SetTargetPosition(IntakeConstants::kFloorPickupPosition);
     } else if(target == 2) {
       elevator->SetTargetPosition(ElevatorConstants::kMidDropoffPosition);
-      // arm->SetTargetPosition(ArmConstants::kMidDropoffPosition);
       arm->SetTargetAngle(ArmConstants::kMidDropoffAngle);
       intake->SetWristState(IntakeConstants::kPositionMode);
       intake->SetTargetPosition(IntakeConstants::kMidDropoffPosition);
     } else if(target == 3) {
-      // arm->SetTargetPosition(ArmConstants::kHighDropoffPosition);
       arm->SetTargetAngle(ArmConstants::kHighDropoffAngle);
       intake->SetWristState(IntakeConstants::kPositionMode);
       intake->SetTargetPosition(IntakeConstants::kHighDropoffPosition);
@@ -39,11 +37,8 @@ void SetPosition::Initialize() {
 
 void SetPosition::Execute() {
   if(target == 0 && elevator->IsAtTarget()) {
-    // elevator->SetTargetPosition(ElevatorConstants::kStartPosition);
-    // arm->SetTargetPosition(ArmConstants::kStartPosition);
     arm->SetTargetAngle(ArmConstants::kStartAngle);
   } else if(target == 1 && elevator->IsAtTarget() && intake->IsAtTarget()) {
-    // arm->SetTargetPosition(ArmConstants::kFloorPickupPosition);
     arm->SetTargetAngle(ArmConstants::kFloorPickupAngle);
     elevator->SetTargetPosition(ElevatorConstants::kFloorPickupPosition);
   } else if(target == 3 && arm->IsAtTarget() && intake->IsAtTarget()) {

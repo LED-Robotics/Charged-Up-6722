@@ -59,7 +59,7 @@ class RobotContainer {
   frc2::CommandXboxController controller2{OIConstants::kCoDriverControllerPort};
 
   //Blinkin
-  Spark blinkin{18};
+  Spark blinkin{BlinkinConstants::kBlinkinPort};
 
   // The robot's subsystems and commands are defined here...
 
@@ -120,7 +120,7 @@ class RobotContainer {
                                         {}};
   
   
-  frc2::InstantCommand SetBlinkinAButton{[this] { blinkin.Set(.45); /*End to End; Color 1 (Purple) and Color 2 (Green)*/ },
+  frc2::InstantCommand SetBlinkinAButton{[this] { blinkin.Set(.41); /*End to End; Color 1 (Purple) and Color 2 (Yellow)*/ },
                                         {}};
 
   frc2::InstantCommand SetBlinkinLeftBumper{[this] { blinkin.Set(.07); /*Fast Heartbeat; Color 1 (Purple)*/ },
