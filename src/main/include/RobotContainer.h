@@ -18,6 +18,7 @@
 
 #include "Constants.h"
 #include "commands/SetPosition.h"
+#include "commands/HighDock.h"
 #include "commands/GyroDock.h"
 #include "subsystems/DriveSubsystem.h"
 #include "subsystems/IntakeSubsystem.h"
@@ -74,7 +75,7 @@ class RobotContainer {
   
   bool intakeHold = false;
 
-  bool fieldCentric = false;
+  bool fieldCentric = true;
 
   frc2::Trigger mainDpadUp{[this]() { return controller.GetPOV() == 0; }};
   frc2::Trigger mainDpadRight{[this]() { return controller.GetPOV() == 90; }};

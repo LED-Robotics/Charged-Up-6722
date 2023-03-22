@@ -142,8 +142,8 @@ class DriveSubsystem : public frc2::SubsystemBase {
   void strafeDistance(units::meter_t distance, units::meters_per_second_t speed);
 
   void strafeDistance(units::meter_t distance);
-
-  void turnDegrees(units::degree_t angle, units::meters_per_second_t speed);
+  
+  // void turnToDegrees(units::degree_t angle, units::angular_velocity::degrees_per_second_t speed);
 
 
   // frc::Translation2d frontRightLocation{-0.449072_m, -0.449072_m};

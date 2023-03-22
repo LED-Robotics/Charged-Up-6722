@@ -283,9 +283,15 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   //     frc2::InstantCommand(
   //         [this]() { m_drive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
   //         }, {}));
-  return new frc2::SequentialCommandGroup(
-      GyroDock(1.5, &m_drive),
-      frc2::InstantCommand(
-          [this]() { m_drive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
-          }, {}));
+  // return new frc2::SequentialCommandGroup(
+  //     HighDock(&m_drive, &elevator, &arm, &intake),
+  //     frc2::InstantCommand(
+  //         [this]() { m_drive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
+  //         }, {}));
+  // return new frc2::SequentialCommandGroup(
+  //     GyroDock(1.5, &m_drive),
+  //     frc2::InstantCommand(
+  //         [this]() { m_drive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
+  //         }, {}));
+    return new HighDock(&m_drive, &elevator, &arm, &intake);
 }

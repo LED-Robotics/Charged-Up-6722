@@ -124,7 +124,7 @@ namespace ArmConstants {
     // constexpr double kStartAngle = 8.26;
     constexpr double kStartAngle = 8.26;
     constexpr int kFloorPickupPosition = 13360;
-    constexpr double kFloorPickupAngle = 24.5;
+    constexpr double kFloorPickupAngle = 18.5;
     constexpr double kFloorStandingPickupAngle = 50.0;
     constexpr int kMidDropoffPosition = 74500;
     constexpr double kMidDropoffAngle = 136.7;
@@ -146,7 +146,7 @@ namespace IntakeConstants {
     constexpr double kCurrentLimit = 15.0;
     constexpr double kIntakeDeadzone = 0.1;
     // constexpr int kCountsPerDegree = 149;
-    constexpr int kCountsPerDegree = 69;
+    constexpr int kCountsPerDegree = 143;
     constexpr double kMaxFeedForward = -0.07;
     constexpr double kStartAngle = -30.0;
     // constexpr int kStartPosition = 4000;
@@ -156,13 +156,13 @@ namespace IntakeConstants {
     // constexpr int kMidDropoffPosition = 42200;
     // constexpr int kHighDropoffPosition = 39200;
     // constexpr int kPositionDeadzone = 10000;
-    constexpr int kStartPosition = 1950;
+    constexpr int kStartPosition = 5500;
     // constexpr int kFloorPickupPosition = 20600;
-    constexpr int kFloorPickupPosition = 10300;
-    constexpr int kFloorStandingPickupPosition = 12200;
-    constexpr int kMidDropoffPosition = 19542;
-    constexpr int kHighDropoffPosition = 18153;
-    constexpr int kPositionDeadzone = 3333;
+    constexpr int kFloorPickupPosition = 22700;
+    constexpr int kFloorStandingPickupPosition = 25417;
+    constexpr int kMidDropoffPosition = 40713;
+    constexpr int kHighDropoffPosition = 37819;
+    constexpr int kPositionDeadzone = 6666;
     constexpr int kP = 0.03;
 }
 

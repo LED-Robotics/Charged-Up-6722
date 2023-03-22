@@ -15,7 +15,7 @@ using namespace frc;
 ArmSubsystem::ArmSubsystem()
     : left{kLeftMotorPort},
     right{kRightMotorPort} {
-      left.SetInverted(true);
+      right.SetInverted(true);
       // left.SetSelectedSensorPosition(0);
       // right.SetSelectedSensorPosition(0);
       // ConfigMotors();
