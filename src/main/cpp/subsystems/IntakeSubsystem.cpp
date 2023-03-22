@@ -121,13 +121,10 @@ void IntakeSubsystem::ResetWristEncoder() {
 
 bool IntakeSubsystem::IsAtTarget() {
   double current = 0.0;
-  double target = 0.0;
   if(wristState == kPositionMode) {
     current = GetCurrentPosition();
-    target = position;
   } else if(wristState == kAngleMode) {
     current = GetCurrentAngle();
-    target = angle;
   }
   bool atTarget = current > position - (kPositionDeadzone / 2) && current < position + (kPositionDeadzone / 2);
   return atTarget;

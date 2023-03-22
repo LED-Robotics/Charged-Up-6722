@@ -61,7 +61,7 @@ void Robot::AutonomousInit() {
     m_container.SetDriveBrakes(true);
     m_container.SetSlew(false);
     m_container.SetDriveReversed(false);
-    m_container.ResetOdometry();
+    // m_container.ResetOdometry();
     m_autonomousCommand->Schedule();
   }
 }
@@ -72,7 +72,7 @@ void Robot::TeleopInit() {
   m_container.SetDriveBrakes(true);
   m_container.SetSlew(true);
   m_container.SetDriveReversed(false);
-  m_container.ResetOdometry();
+  // m_container.ResetOdometry();
   // This makes sure that the autonomous stops running when
   // teleop starts running. If you want the autonomous to
   // continue until interrupted by another command, remove

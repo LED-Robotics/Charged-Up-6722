@@ -45,6 +45,12 @@ RobotContainer::RobotContainer() {
   // Configure the button bindings
   ConfigureButtonBindings();
 
+  chooser.SetDefaultOption("High Dock", &highDock);
+  chooser.AddOption("Simple Dock", &dock);
+  chooser.AddOption("None", GetEmptyCommand());
+
+  SmartDashboard::PutData(&chooser);
+
   // dpadUp.OnTrue(GetPositionCommand(3));
   // dpadRight.OnTrue(GetPositionCommand(2));
   // dpadDown.OnTrue(GetPositionCommand(1));
@@ -204,85 +210,65 @@ void RobotContainer::SetDriveReversed(bool reversed) {
 frc2::Command* RobotContainer::GetAutonomousCommand() {
   // Set up config for trajectory
   
-  frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
-                               AutoConstants::kMaxAcceleration);
-  // Add kinematics to ensure max speed is actually obeyed
-  config.SetKinematics(m_drive.kDriveKinematics);
+  // frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
+  //                              AutoConstants::kMaxAcceleration);
+  // // Add kinematics to ensure max speed is actually obeyed
+  // config.SetKinematics(m_drive.kDriveKinematics);
 
-  // An example trajectory to follow.  All units in meters.
-  auto moveFromLink = frc::TrajectoryGenerator::GenerateTrajectory(
+  // // An example trajectory to follow.  All units in meters.
+  // auto moveFromLink = frc::TrajectoryGenerator::GenerateTrajectory(
     
-      // Start at the origin facing the +X direction
-      {frc::Pose2d{0.0_m, 0.0_m, 0.0_deg},
-      // End 3 meters straight ahead of where we started, facing forward
-      frc::Pose2d{-0.5_m, 0.0_m, 0.0_deg},
-      },
-      // Pass the config
-      config);
+  //     // Start at the origin facing the +X direction
+  //     {frc::Pose2d{0.0_m, 0.0_m, 0.0_deg},
+  //     // End 3 meters straight ahead of where we started, facing forward
+  //     frc::Pose2d{-0.5_m, 0.0_m, 0.0_deg},
+  //     },
+  //     // Pass the config
+  //     config);
 
-  auto moveToLink = frc::TrajectoryGenerator::GenerateTrajectory(
+  // auto moveToLink = frc::TrajectoryGenerator::GenerateTrajectory(
     
-      // Start at the origin facing the +X direction
-      {frc::Pose2d{-0.5_m, 0.0_m, 0.0_deg},
-      // End 3 meters straight ahead of where we started, facing forward
-      frc::Pose2d{0.0_m, 0.0_m, 0.0_deg},
-      },
-      // Pass the config
-      config);
+  //     // Start at the origin facing the +X direction
+  //     {frc::Pose2d{-0.5_m, 0.0_m, 0.0_deg},
+  //     // End 3 meters straight ahead of where we started, facing forward
+  //     frc::Pose2d{0.0_m, 0.0_m, 0.0_deg},
+  //     },
+  //     // Pass the config
+  //     config);
 
-  frc::ProfiledPIDController<units::radians> thetaController{
-      AutoConstants::kPThetaController, 0, 0,
-      AutoConstants::kThetaControllerConstraints};
+  // frc::ProfiledPIDController<units::radians> thetaController{
+  //     AutoConstants::kPThetaController, 0, 0,
+  //     AutoConstants::kThetaControllerConstraints};
 
-  thetaController.EnableContinuousInput(units::radian_t{-std::numbers::pi},
-                                        units::radian_t{std::numbers::pi});
-  frc2::SwerveControllerCommand<4> commandMoveFromLink(
-      moveFromLink, [this]() { return m_drive.GetPose(); },
+  // thetaController.EnableContinuousInput(units::radian_t{-std::numbers::pi},
+  //                                       units::radian_t{std::numbers::pi});
+  // frc2::SwerveControllerCommand<4> commandMoveFromLink(
+  //     moveFromLink, [this]() { return m_drive.GetPose(); },
 
-      m_drive.kDriveKinematics,
+  //     m_drive.kDriveKinematics,
 
-      frc2::PIDController{AutoConstants::kPXController, 0, 0},
-      frc2::PIDController{AutoConstants::kPYController, 0, 0}, thetaController,
+  //     frc2::PIDController{AutoConstants::kPXController, 0, 0},
+  //     frc2::PIDController{AutoConstants::kPYController, 0, 0}, thetaController,
 
-      [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
+  //     [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
 
-      {&m_drive});
+  //     {&m_drive});
 
-  frc2::SwerveControllerCommand<4> commandMoveToLink(
-      moveToLink, [this]() { return m_drive.GetPose(); },
+  // frc2::SwerveControllerCommand<4> commandMoveToLink(
+  //     moveToLink, [this]() { return m_drive.GetPose(); },
 
-      m_drive.kDriveKinematics,
+  //     m_drive.kDriveKinematics,
 
-      frc2::PIDController{AutoConstants::kPXController, 0, 0},
-      frc2::PIDController{AutoConstants::kPYController, 0, 0}, thetaController,
+  //     frc2::PIDController{AutoConstants::kPXController, 0, 0},
+  //     frc2::PIDController{AutoConstants::kPYController, 0, 0}, thetaController,
 
-      [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
+  //     [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
 
-      {&m_drive});
+  //     {&m_drive});
 
   // Reset odometry to the starting pose of the trajectory.
-  m_drive.ResetOdometry(moveFromLink.InitialPose());
+  // m_drive.ResetOdometry(moveFromLink.InitialPose());
 
-
-  // no auto
-  // return std::move(swerveControllerCommand);
-  // return new frc2::SequentialCommandGroup(
-  //     std::move(commandMoveFromLink),
-  //     SetPosition(2, &elevator, &arm, &intake),
-  //     std::move(commandMoveToLink),
-  //     frc2::InstantCommand(
-  //         [this]() { 
-  //           intake.SetState(IntakeConstants::kPowerMode);
-  //           intake.SetPower(-1.0);
-  //           Wait(2.5_s);
-  //           intake.SetPower(0.0);
-  //           SetDriveReversed(false);
-  //         }, {&intake}),
-  //     SetPosition(0, &elevator, &arm, &intake),
-  //     GyroDock(-1.5, &m_drive),
-  //     frc2::InstantCommand(
-  //         [this]() { m_drive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
-  //         }, {}));
   // return new frc2::SequentialCommandGroup(
   //     HighDock(&m_drive, &elevator, &arm, &intake),
   //     frc2::InstantCommand(
@@ -293,5 +279,11 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   //     frc2::InstantCommand(
   //         [this]() { m_drive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
   //         }, {}));
-    return new HighDock(&m_drive, &elevator, &arm, &intake);
+    // return new HighDock(&m_drive, &elevator, &arm, &intake);
+    frc2::Command* selected = chooser.GetSelected();
+    if(selected == &highDock) {
+      // flip odometry so that field centric works correctly
+      m_drive.ResetOdometry(frc::Pose2d{{0.0_m, 0.0_m}, {180_deg}});
+    }
+    return selected;
 }

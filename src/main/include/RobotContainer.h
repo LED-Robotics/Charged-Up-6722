@@ -53,6 +53,7 @@ class RobotContainer {
   void SetDriveReversed(bool reversed);
 
  private:
+
   // The driver's controller
   // frc::XboxController controller{OIConstants::kDriverControllerPort};
   frc2::CommandXboxController controller{OIConstants::kDriverControllerPort};
@@ -147,8 +148,12 @@ class RobotContainer {
 
   frc2::Command* SetBlinkin(int inputMode);
 
+  GyroDock dock{1.5, &m_drive};
+
+  HighDock highDock{&m_drive, &elevator, &arm, &intake};
+
   // The chooser for the autonomous routines
-  frc::SendableChooser<frc2::Command*> m_chooser;
+  frc::SendableChooser<frc2::Command*> chooser;
 
   void ConfigureButtonBindings();
 };

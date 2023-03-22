@@ -3,8 +3,11 @@
 #include "Constants.h"
 #include <iostream>
 #include "commands/SetPosition.h"
+#include "commands/SetIntakePower.h"
+#include "commands/WaitDrive.h"
 #include "commands/GyroDock.h"
 #include <frc2/command/CommandBase.h>
+#include <frc2/command/ParallelCommandGroup.h>
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/CommandHelper.h>
 #include <frc2/command/FunctionalCommand.h>
