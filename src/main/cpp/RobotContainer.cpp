@@ -45,9 +45,13 @@ RobotContainer::RobotContainer() {
   // Configure the button bindings
   ConfigureButtonBindings();
 
-  chooser.SetDefaultOption("High Dock", &highDock);
+  chooser.SetDefaultOption("Low Dock", &lowDock);
+  chooser.AddOption("High Dock", &highDock);
   chooser.AddOption("Simple Dock", &dock);
+  chooser.AddOption("Place Then Break", &placeThenBreak);
   chooser.AddOption("None", GetEmptyCommand());
+
+  blinkin.Set(.41);
 
   SmartDashboard::PutData(&chooser);
 
@@ -281,9 +285,9 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
   //         }, {}));
     // return new HighDock(&m_drive, &elevator, &arm, &intake);
     frc2::Command* selected = chooser.GetSelected();
-    if(selected == &highDock) {
+    if(selected == &dock) {
       // flip odometry so that field centric works correctly
-      m_drive.ResetOdometry(frc::Pose2d{{0.0_m, 0.0_m}, {180_deg}});
+      m_drive.ResetOdometry(frc::Pose2d{{0.0_m, 0.0_m}, {0_deg}});
     }
     return selected;
 }

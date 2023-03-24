@@ -41,7 +41,7 @@ DriveSubsystem::DriveSubsystem()
 
       //Odometry
       odometry{kDriveKinematics, {gyro.GetRotation2d()}, {s_frontLeft.GetPosition(), s_frontRight.GetPosition(), s_backLeft.GetPosition(),
-      s_backRight.GetPosition()}, Pose2d{}},
+      s_backRight.GetPosition()}, frc::Pose2d{{0.0_m, 0.0_m}, {180_deg}}},
       
       xLimiter{kDriveTranslationLimit},
       yLimiter{kDriveTranslationLimit} {
@@ -53,7 +53,7 @@ DriveSubsystem::DriveSubsystem()
         // ConfigMotors();
 
         // ResetEncoders();
-        ResetOdometry(frc::Pose2d{});
+        ResetOdometry(frc::Pose2d{{0.0_m, 0.0_m}, {180_deg}});
       }
 
 void DriveSubsystem::Periodic() {
@@ -76,10 +76,10 @@ void DriveSubsystem::Periodic() {
   // SmartDashboard::PutNumber("odomGyro", (double)odometry.GetPose().Rotation().Degrees());
   // SmartDashboard::PutNumber("navxGyro", (double)GetAngle());
   auto pose = odometry.GetPose();
-  SmartDashboard::PutNumber("poseX", (double)pose.X());
-  SmartDashboard::PutNumber("poseY", (double)pose.Y());
-  SmartDashboard::PutNumber("poseAngle", (double)pose.Rotation().Degrees());
-  SmartDashboard::PutNumber("gyroPitch", gyro.GetPitch());
+  // SmartDashboard::PutNumber("poseX", (double)pose.X());
+  // SmartDashboard::PutNumber("poseY", (double)pose.Y());
+  // SmartDashboard::PutNumber("poseAngle", (double)pose.Rotation().Degrees());
+  // SmartDashboard::PutNumber("gyroPitch", gyro.GetPitch());
   // SmartDashboard::PutNumber("frontLeftVel", (double)s_frontLeft.GetState().speed);
   // SmartDashboard::PutNumber("frontRightVel", (double)s_frontRight.GetState().speed);
 
@@ -102,7 +102,7 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
   SmartDashboard::PutNumber("fieldCentric", fieldRelative);
   auto states = kDriveKinematics.ToSwerveModuleStates(
     fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-        xSpeed, ySpeed, rot, gyro.GetRotation2d() * -1)
+        xSpeed, ySpeed, rot, GetPose().Rotation() * -1)
       : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
   kDriveKinematics.DesaturateWheelSpeeds(&states, AutoConstants::kMaxSpeed);

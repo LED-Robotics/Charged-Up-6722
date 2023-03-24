@@ -15,7 +15,7 @@ using namespace frc;
 ArmSubsystem::ArmSubsystem()
     : left{kLeftMotorPort},
     right{kRightMotorPort} {
-      right.SetInverted(true);
+      left.SetInverted(true);
       // left.SetSelectedSensorPosition(0);
       // right.SetSelectedSensorPosition(0);
       // ConfigMotors();
@@ -45,7 +45,7 @@ void ArmSubsystem::Periodic() {
     double rightAngle = (GetRightPosition() / kCountsPerDegree) * (M_PI/180);
     double leftFeedForward = sin(leftAngle) * kMaxFeedForward;
     double rightFeedForward = sin(rightAngle) * kMaxFeedForward;
-    SmartDashboard::PutNumber("armAngle", ((GetLeftPosition() / kCountsPerDegree) + (GetRightPosition() / kCountsPerDegree)) / 2);  // print to Shuffleboard
+    // SmartDashboard::PutNumber("armAngle", ((GetLeftPosition() / kCountsPerDegree) + (GetRightPosition() / kCountsPerDegree)) / 2);  // print to Shuffleboard
     left.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, angle * kCountsPerDegree, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, leftFeedForward);
     right.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, angle * kCountsPerDegree, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, rightFeedForward);
   }

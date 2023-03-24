@@ -18,7 +18,9 @@
 
 #include "Constants.h"
 #include "commands/SetPosition.h"
+#include "commands/PlaceThenBreak.h"
 #include "commands/HighDock.h"
+#include "commands/LowDock.h"
 #include "commands/GyroDock.h"
 #include "subsystems/DriveSubsystem.h"
 #include "subsystems/IntakeSubsystem.h"
@@ -150,7 +152,11 @@ class RobotContainer {
 
   GyroDock dock{1.5, &m_drive};
 
+  PlaceThenBreak placeThenBreak{&m_drive, &elevator, &arm, &intake};
+
   HighDock highDock{&m_drive, &elevator, &arm, &intake};
+
+  LowDock lowDock{&m_drive, &elevator, &arm, &intake};
 
   // The chooser for the autonomous routines
   frc::SendableChooser<frc2::Command*> chooser;

@@ -21,7 +21,7 @@ void Robot::RobotInit() {
   // SmartDashboard::PutNumber("armAngle", 0.0);
   // SmartDashboard::PutNumber("wristAngle", 0.0);
   // SmartDashboard::PutNumber("elevatorPos", 0);
-  SmartDashboard::PutBoolean("doAuton", true);
+  // SmartDashboard::PutBoolean("doAuton", true);
 
   CameraServer::StartAutomaticCapture();
   CameraServer::SetSize(CameraServer::kSize160x120);
@@ -55,15 +55,15 @@ void Robot::DisabledPeriodic() {}
  * RobotContainer} class.
  */
 void Robot::AutonomousInit() {
-  bool doAuton = SmartDashboard::GetBoolean("doAuton", false);
-  if (doAuton) {
-    m_autonomousCommand = m_container.GetAutonomousCommand();
-    m_container.SetDriveBrakes(true);
-    m_container.SetSlew(false);
-    m_container.SetDriveReversed(false);
-    // m_container.ResetOdometry();
-    m_autonomousCommand->Schedule();
-  }
+  // bool doAuton = SmartDashboard::GetBoolean("doAuton", false);
+  // if (doAuton) {
+  m_autonomousCommand = m_container.GetAutonomousCommand();
+  m_container.SetDriveBrakes(true);
+  m_container.SetSlew(false);
+  m_container.SetDriveReversed(false);
+  // m_container.ResetOdometry();
+  m_autonomousCommand->Schedule();
+  // }
 }
 
 void Robot::AutonomousPeriodic() {}

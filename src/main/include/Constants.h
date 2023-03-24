@@ -48,9 +48,9 @@ namespace DriveConstants {
     constexpr int kFrontRightTalonPort = 11;
 
     constexpr int kBLeftMagPos = 3120;
-    constexpr int kFLeftMagPos = 788;
-    constexpr int kBRightMagPos = 1539;
-    constexpr int kFRightMagPos = 455;
+    constexpr int kFLeftMagPos = 800;
+    constexpr int kBRightMagPos = 1549;
+    constexpr int kFRightMagPos = 454;
 
     constexpr int kZeroDeadzone = 100;
 
@@ -78,8 +78,8 @@ namespace DriveConstants {
     constexpr auto turnKp = 0.275;
 
     constexpr double kDriveDeadzone = 0.05;
-    constexpr double kDriveCurveExtent = 0.8;
-    constexpr auto kDriveTranslationLimit = 5_mps_sq;
+    constexpr double kDriveCurveExtent = 0.6;
+    constexpr auto kDriveTranslationLimit = 4.3_mps_sq;
     // Example value only - as above, this must be tuned for your drive!
     constexpr double kPDriveVel = 1.0;
     constexpr double kPTurnVel = 0.001;
@@ -100,7 +100,7 @@ namespace ElevatorConstants {
     constexpr int kFloorPickupPosition = 100;
     constexpr int kFloorStandingPickupPosition = 100;
     constexpr int kMidDropoffPosition = 22000;
-    constexpr int kHighDropoffPosition = 90000;
+    constexpr int kHighDropoffPosition = 87000;
     constexpr int kPositionDeadzone = 3000;
     constexpr int kP = 0.1;
 }
@@ -161,7 +161,7 @@ namespace IntakeConstants {
     constexpr int kFloorPickupPosition = 22700;
     constexpr int kFloorStandingPickupPosition = 25417;
     constexpr int kMidDropoffPosition = 40713;
-    constexpr int kHighDropoffPosition = 37819;
+    constexpr int kHighDropoffPosition = 38819;
     constexpr int kPositionDeadzone = 6666;
     constexpr int kP = 0.03;
 }

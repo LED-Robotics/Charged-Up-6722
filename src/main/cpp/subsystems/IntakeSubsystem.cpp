@@ -39,7 +39,7 @@ void IntakeSubsystem::Periodic() {
   double wristAngle = GetCurrentAngle() * (M_PI/180);
   // double feedForward = 0.0;
   double feedForward = sin(wristAngle) * kMaxFeedForward;
-  SmartDashboard::PutNumber("wristAngle", GetCurrentAngle());  // print to Shuffleboard
+  // SmartDashboard::PutNumber("wristAngle", GetCurrentAngle());  // print to Shuffleboard
   if(wristState == kPositionMode) {
     wristMotor.Set(ctre::phoenix::motorcontrol::ControlMode::Position, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, feedForward);
   } else if(wristState == kAngleMode) {

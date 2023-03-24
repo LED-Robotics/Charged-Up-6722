@@ -40,7 +40,7 @@ void GyroDock::Execute() {
       successTimer.Stop();
       successTimer.Reset();
     }
-    drive->Drive(units::meters_per_second_t{(tippedForward ? speed*0.55 : speed) * error}, 0_mps, 0_deg_per_s, false);
+    drive->Drive(units::meters_per_second_t{(tippedForward ? speed*0.5 : speed) * error}, 0_mps, 0_deg_per_s, false);
   }
 }
 
