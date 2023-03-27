@@ -100,7 +100,7 @@ namespace ElevatorConstants {
     constexpr int kFloorPickupPosition = 100;
     constexpr int kFloorStandingPickupPosition = 100;
     constexpr int kMidDropoffPosition = 22000;
-    constexpr int kHighDropoffPosition = 87000;
+    constexpr int kHighDropoffPosition = 90000;
     constexpr int kPositionDeadzone = 3000;
     constexpr int kP = 0.1;
 }
@@ -161,7 +161,7 @@ namespace IntakeConstants {
     constexpr int kFloorPickupPosition = 22700;
     constexpr int kFloorStandingPickupPosition = 25417;
     constexpr int kMidDropoffPosition = 40713;
-    constexpr int kHighDropoffPosition = 38819;
+    constexpr int kHighDropoffPosition = 37900;
     constexpr int kPositionDeadzone = 6666;
     constexpr int kP = 0.03;
 }

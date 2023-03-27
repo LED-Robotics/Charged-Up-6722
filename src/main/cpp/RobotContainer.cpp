@@ -48,6 +48,7 @@ RobotContainer::RobotContainer() {
   chooser.SetDefaultOption("Low Dock", &lowDock);
   chooser.AddOption("High Dock", &highDock);
   chooser.AddOption("Simple Dock", &dock);
+  chooser.AddOption("Low Place Then Break", &lowPlaceThenBreak);
   chooser.AddOption("Place Then Break", &placeThenBreak);
   chooser.AddOption("None", GetEmptyCommand());
 

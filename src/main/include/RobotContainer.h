@@ -18,6 +18,7 @@
 
 #include "Constants.h"
 #include "commands/SetPosition.h"
+#include "commands/LowPlaceThenBreak.h"
 #include "commands/PlaceThenBreak.h"
 #include "commands/HighDock.h"
 #include "commands/LowDock.h"
@@ -152,6 +153,8 @@ class RobotContainer {
 
   GyroDock dock{1.5, &m_drive};
 
+  LowPlaceThenBreak lowPlaceThenBreak{&m_drive, &elevator, &arm, &intake};
+  
   PlaceThenBreak placeThenBreak{&m_drive, &elevator, &arm, &intake};
 
   HighDock highDock{&m_drive, &elevator, &arm, &intake};
