@@ -17,6 +17,7 @@
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/ProfiledPIDSubsystem.h>
 #include <units/angle.h>
+#include <ctre\Phoenix.h>
 
 #pragma once
 
@@ -47,9 +48,9 @@ namespace DriveConstants {
     constexpr int kFrontRightTalonPort = 11;
 
     constexpr int kBLeftMagPos = 3120;
-    constexpr int kFLeftMagPos = 788;
-    constexpr int kBRightMagPos = 2058;
-    constexpr int kFRightMagPos = 4544;
+    constexpr int kFLeftMagPos = 800;
+    constexpr int kBRightMagPos = 1549;
+    constexpr int kFRightMagPos = 454;
 
     constexpr int kZeroDeadzone = 100;
 
@@ -71,14 +72,14 @@ namespace DriveConstants {
     // Toolsuite provides a convenient tool for obtaining these values for your
     // robot.
 
-    constexpr auto driveKf = 0.04;
+    constexpr auto driveKf = 0.05614;
     constexpr auto driveKp = 0.1;
 
     constexpr auto turnKp = 0.275;
 
     constexpr double kDriveDeadzone = 0.05;
-    constexpr double kDriveCurveExtent = 0.8;
-    constexpr auto kDriveTranslationLimit = 4_mps_sq;
+    constexpr double kDriveCurveExtent = 0.6;
+    constexpr auto kDriveTranslationLimit = 4.3_mps_sq;
     // Example value only - as above, this must be tuned for your drive!
     constexpr double kPDriveVel = 1.0;
     constexpr double kPTurnVel = 0.001;
@@ -96,8 +97,9 @@ namespace ElevatorConstants {
     constexpr double kDefaultPower = 1.0;
     constexpr double kElevatorDeadzone = 500;
     constexpr int kStartPosition = 10;
-    constexpr int kFloorPickupPosition = 10;
-    constexpr int kMidDropoffPosition = 15000;
+    constexpr int kFloorPickupPosition = 100;
+    constexpr int kFloorStandingPickupPosition = 100;
+    constexpr int kMidDropoffPosition = 22000;
     constexpr int kHighDropoffPosition = 90000;
     constexpr int kPositionDeadzone = 3000;
     constexpr int kP = 0.1;
@@ -109,6 +111,7 @@ namespace ArmConstants {
     constexpr int kOff = 0;
     constexpr int kPowerMode = 1;
     constexpr int kPositionMode = 2;
+    constexpr int kAngleMode = 3;
     constexpr double kDefaultPower = 1.0;
     constexpr int kArmDegreeMin = 0;   // encoder counts at the arm's minimum usable position
     constexpr int kMinAngleCounts = -200;   // encoder counts at the arm's minimum usable position
@@ -118,9 +121,15 @@ namespace ArmConstants {
     constexpr double kMaxFeedForward = 0.06;
     // constexpr int kFloorPickupPosition = 2080; original
     constexpr int kStartPosition = 4500;
+    // constexpr double kStartAngle = 8.26;
+    constexpr double kStartAngle = 8.26;
     constexpr int kFloorPickupPosition = 13360;
+    constexpr double kFloorPickupAngle = 18.5;
+    constexpr double kFloorStandingPickupAngle = 50.0;
     constexpr int kMidDropoffPosition = 74500;
+    constexpr double kMidDropoffAngle = 136.7;
     constexpr int kHighDropoffPosition = 74500;
+    constexpr double kHighDropoffAngle = 136.7;
     constexpr int kPositionDeadzone = 15000;
     constexpr int kP = 0.012;
 }
@@ -131,18 +140,29 @@ namespace IntakeConstants {
     constexpr int kOff = 0;
     constexpr int kFullMode = 1;
     constexpr int kPowerMode = 2;
+    constexpr int kPositionMode = 0;
+    constexpr int kAngleMode = 1;
     constexpr double kFullPower = 1.0;
     constexpr double kCurrentLimit = 15.0;
     constexpr double kIntakeDeadzone = 0.1;
-    constexpr int kCountsPerDegree = 149;
+    // constexpr int kCountsPerDegree = 149;
+    constexpr int kCountsPerDegree = 143;
     constexpr double kMaxFeedForward = -0.07;
     constexpr double kStartAngle = -30.0;
-    constexpr int kStartPosition = 4000;
+    // constexpr int kStartPosition = 4000;
+    // // constexpr int kFloorPickupPosition = 20600;
+    // constexpr int kFloorPickupPosition = 23200;
+    // constexpr int kFloorStandingPickupPosition = 27400;
+    // constexpr int kMidDropoffPosition = 42200;
+    // constexpr int kHighDropoffPosition = 39200;
+    // constexpr int kPositionDeadzone = 10000;
+    constexpr int kStartPosition = 5500;
     // constexpr int kFloorPickupPosition = 20600;
-    constexpr int kFloorPickupPosition = 27400;
-    constexpr int kMidDropoffPosition = 46000;
-    constexpr int kHighDropoffPosition = 42500;
-    constexpr int kPositionDeadzone = 10000;
+    constexpr int kFloorPickupPosition = 22700;
+    constexpr int kFloorStandingPickupPosition = 25417;
+    constexpr int kMidDropoffPosition = 40713;
+    constexpr int kHighDropoffPosition = 37900;
+    constexpr int kPositionDeadzone = 6666;
     constexpr int kP = 0.03;
 }
 
@@ -154,20 +174,24 @@ namespace LimelightConstants {
 }
 
 namespace AutoConstants {
-        constexpr auto kMaxSpeed = 4_mps;
-        constexpr auto kMaxAcceleration = 3_mps_sq;
+        constexpr auto kMaxSpeed = 3.5_mps;
+        constexpr auto kMaxAcceleration = 6_mps_sq;
         constexpr auto kAngularSpeed = 180_deg_per_s;
         constexpr auto kMaxAngularAcceleration = 180_deg_per_s_sq;
 
-        constexpr double kPXController = .5;
-        constexpr double kPYController = .5;
-        constexpr double kPThetaController = .5;
+        constexpr double kPXController = 0.0;
+        constexpr double kPYController = 0.0;
+        constexpr double kPThetaController = 0.0;
 
         extern const frc::TrapezoidProfile<units::radians>::Constraints
             kThetaControllerConstraints;
 } //namespace AutoConstants
 
 namespace OIConstants {
-constexpr int kDriverControllerPort = 0;
-constexpr int kCoDriverControllerPort = 1;
+    constexpr int kDriverControllerPort = 0;
+    constexpr int kCoDriverControllerPort = 1;
 }  // namespace OIConstants
+
+namespace BlinkinConstants {
+    constexpr int kBlinkinPort = 0;
+}   //namespace BlinkinConstants

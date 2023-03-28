@@ -80,6 +80,11 @@ class ArmSubsystem : public frc2::SubsystemBase {
   double GetAngle();
 
   /**
+   * Sets the target angle of the Arm.
+   */
+  void SetTargetAngle(double newAngle);
+
+  /**
    * Returns whether the subsystem is at its intended target position.
    */
   bool IsAtTarget();
@@ -90,13 +95,19 @@ class ArmSubsystem : public frc2::SubsystemBase {
    * @param state the state of the brakes.
    */
   void SetBrakeMode(bool state);
+
+  /**
+   * Initially configure onboard TalonFX settings for motors.
+   */
+   void ConfigMotors();
   
     
  private:
 //  while the state is kOn the Arm will run at the current power setting
-  int state = ArmConstants::kOff;
+  int state = ArmConstants::kPositionMode;
   double power = ArmConstants::kDefaultPower;
-  double position = 6435;
+  double position = ArmConstants::kStartPosition;
+  double angle = 11.5;
 
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.

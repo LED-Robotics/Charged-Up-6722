@@ -85,6 +85,11 @@ class ElevatorSubsystem : public frc2::SubsystemBase {
    * @param state the state of the brakes
    */
   void SetBrakeMode(bool state);
+
+  /**
+   * Initially configure onboard TalonFX settings for motors.
+   */
+   void ConfigMotors();
   
     
  private:

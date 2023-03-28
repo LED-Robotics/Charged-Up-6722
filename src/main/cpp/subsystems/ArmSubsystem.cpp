@@ -16,8 +16,9 @@ ArmSubsystem::ArmSubsystem()
     : left{kLeftMotorPort},
     right{kRightMotorPort} {
       left.SetInverted(true);
-      left.SetSelectedSensorPosition(0);
-      right.SetSelectedSensorPosition(0);
+      // left.SetSelectedSensorPosition(0);
+      // right.SetSelectedSensorPosition(0);
+      // ConfigMotors();
 }
 
 void ArmSubsystem::Periodic() {
@@ -32,14 +33,21 @@ void ArmSubsystem::Periodic() {
     // std::cout << "Arm Position mode: " << position << '\n';
     // feed forwards should be a changing constant that increases as the arm moves further. It should be a static amount of power to overcome gravity.
     
+    // double leftAngle = (GetLeftPosition() / kCountsPerDegree) * (M_PI/180);
+    // double rightAngle = (GetRightPosition() / kCountsPerDegree) * (M_PI/180);
+    // double leftFeedForward = sin(leftAngle) * kMaxFeedForward;
+    // double rightFeedForward = sin(rightAngle) * kMaxFeedForward;
+    // SmartDashboard::PutNumber("armAngle", ((GetLeftPosition() / kCountsPerDegree) + (GetRightPosition() / kCountsPerDegree)) / 2);  // print to Shuffleboard
+    // left.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, leftFeedForward);
+    // right.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, rightFeedForward);
+
     double leftAngle = (GetLeftPosition() / kCountsPerDegree) * (M_PI/180);
     double rightAngle = (GetRightPosition() / kCountsPerDegree) * (M_PI/180);
     double leftFeedForward = sin(leftAngle) * kMaxFeedForward;
     double rightFeedForward = sin(rightAngle) * kMaxFeedForward;
-    SmartDashboard::PutNumber("armAngle", ((GetLeftPosition() / kCountsPerDegree) + (GetRightPosition() / kCountsPerDegree)) / 2);  // print to Shuffleboard
-    left.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, leftFeedForward);
-    // double rightFeedForward = 0.0; // GetRightPosition() / 5000   <-- tune this number after verifying the motion magic works in any capacity
-    right.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, rightFeedForward);
+    // SmartDashboard::PutNumber("armAngle", ((GetLeftPosition() / kCountsPerDegree) + (GetRightPosition() / kCountsPerDegree)) / 2);  // print to Shuffleboard
+    left.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, angle * kCountsPerDegree, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, leftFeedForward);
+    right.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, angle * kCountsPerDegree, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, rightFeedForward);
   }
 }
 
@@ -81,11 +89,16 @@ double ArmSubsystem::GetAngle() {
   return (left + right) / 2;
 }
 
+void ArmSubsystem::SetTargetAngle(double newAngle) {
+  angle = newAngle;
+}
+
 bool ArmSubsystem::IsAtTarget() {
+  double target = angle * kCountsPerDegree;
   double leftPos = GetLeftPosition();
   double rightPos = GetRightPosition();
-  bool leftAtTarget = leftPos > position - (kPositionDeadzone / 2) && leftPos < position + (kPositionDeadzone / 2);
-  bool rightAtTarget = rightPos > position - (kPositionDeadzone / 2) && rightPos < position + (kPositionDeadzone / 2);
+  bool leftAtTarget = leftPos > target - (kPositionDeadzone / 2) && leftPos < target + (kPositionDeadzone / 2);
+  bool rightAtTarget = rightPos > target - (kPositionDeadzone / 2) && rightPos < target + (kPositionDeadzone / 2);
   return leftAtTarget && rightAtTarget;
 }
 
@@ -95,4 +108,9 @@ void ArmSubsystem::SetBrakeMode(bool state) {
   else mode = ctre::phoenix::motorcontrol::NeutralMode::Coast;
   left.SetNeutralMode(mode);
   right.SetNeutralMode(mode);
+}
+
+void ArmSubsystem::ConfigMotors() {
+  left.Config_kP(0, kP, 100);
+  right.Config_kP(0, kP, 100);
 }

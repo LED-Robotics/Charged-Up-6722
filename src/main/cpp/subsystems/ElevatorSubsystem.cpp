@@ -18,16 +18,17 @@ ElevatorSubsystem::ElevatorSubsystem()
     left{kLeftMotorPort},
     right{kRightMotorPort} {
       right.SetInverted(true);
-      left.SetSelectedSensorPosition(0);
-      right.SetSelectedSensorPosition(0);
+      // left.SetSelectedSensorPosition(0);
+      // right.SetSelectedSensorPosition(0);
+      // ConfigMotors();
 }
 
 void ElevatorSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here
   // std::cout << "Left Current Position: " << GetLeftPosition() << '\n';
-  SmartDashboard::PutNumber("leftPos", GetLeftPosition());
-  SmartDashboard::PutNumber("rightPos", GetRightPosition());
-  SmartDashboard::PutNumber("targetPos", position);
+  // SmartDashboard::PutNumber("leftPos", GetLeftPosition());
+  // SmartDashboard::PutNumber("rightPos", GetRightPosition());
+  // SmartDashboard::PutNumber("targetPos", position);
   // std::cout << "Right Current Position: " << GetRightPosition() << '\n';
   if(state == kOff) {
     left.Set(0.0);
@@ -103,4 +104,9 @@ void ElevatorSubsystem::SetBrakeMode(bool state) {
   else mode = ctre::phoenix::motorcontrol::NeutralMode::Coast;
   left.SetNeutralMode(mode);
   right.SetNeutralMode(mode);
+}
+
+void ElevatorSubsystem::ConfigMotors() {
+  left.Config_kP(0, kP, 100);
+  right.Config_kP(0, kP, 100);
 }

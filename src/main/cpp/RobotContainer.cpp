@@ -25,80 +25,94 @@ frc2::Command* RobotContainer::GetPositionCommand(int position) {
   return new SetPosition(position, &elevator, &arm, &intake);
 }
 
+frc2::Command* RobotContainer::HandlePartnerCommands(frc2::Command* solo, frc2::Command* partner) {
+  return new frc2::InstantCommand(
+    [this, solo, partner]() { 
+        if(controller2.IsConnected()) partner->Schedule();
+        else solo->Schedule();
+      }, {});
+}
+
+frc2::Command* RobotContainer::GetEmptyCommand() {
+  return new frc2::InstantCommand(
+          [this]() { 
+           }, {});
+}
+
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
   // Configure the button bindings
   ConfigureButtonBindings();
 
-  dpadUp.OnTrue(GetPositionCommand(3));
-  dpadRight.OnTrue(GetPositionCommand(2));
-  dpadDown.OnTrue(GetPositionCommand(1));
-  controller.Back().OnTrue(GetPositionCommand(0));
+  chooser.SetDefaultOption("Low Dock", &lowDock);
+  chooser.AddOption("High Dock", &highDock);
+  chooser.AddOption("Simple Dock", &dock);
+  chooser.AddOption("Low Place Then Break", &lowPlaceThenBreak);
+  chooser.AddOption("Place Then Break", &placeThenBreak);
+  chooser.AddOption("None", GetEmptyCommand());
+
+  blinkin.Set(.41);
+
+  SmartDashboard::PutData(&chooser);
+
+  // dpadUp.OnTrue(GetPositionCommand(3));
+  // dpadRight.OnTrue(GetPositionCommand(2));
+  // dpadDown.OnTrue(GetPositionCommand(1));
+  // controller.Back().OnTrue(GetPositionCommand(0));
+
+  mainDpadUp.OnTrue(HandlePartnerCommands(GetPositionCommand(3), GetEmptyCommand()));
+  mainDpadLeft.OnTrue(HandlePartnerCommands(GetPositionCommand(4), GetEmptyCommand()));
+  mainDpadRight.OnTrue(HandlePartnerCommands(GetPositionCommand(2), GetEmptyCommand()));
+  mainDpadDown.OnTrue(HandlePartnerCommands(GetPositionCommand(1), GetEmptyCommand()));
+  controller.Back().OnTrue(HandlePartnerCommands(GetPositionCommand(0), GetEmptyCommand()));
+  // controller.B().ToggleOnTrue(new GyroDock(1.5, &m_drive));
+
+  partnerDpadUp.OnTrue(GetPositionCommand(3));
+  partnerDpadLeft.OnTrue(GetPositionCommand(4));
+  partnerDpadRight.OnTrue(GetPositionCommand(2));
+  partnerDpadDown.OnTrue(GetPositionCommand(1));
+  controller2.B().OnTrue(GetPositionCommand(0));
+  controller2.A().OnTrue(&SetBlinkinAButton);
+  controller2.X().ToggleOnTrue(&verticalPickup);
+  controller2.LeftBumper().OnTrue(&SetBlinkinLeftBumper);
+  controller2.RightBumper().OnTrue(&SetBlinkinRightBumper);
+
+  controller.Start().OnTrue(&rumbleSecondaryOn);
+  controller2.Start().OnTrue(&rumblePrimaryOn);
+  controller.Start().OnFalse(&rumbleSecondaryOff);
+  controller2.Start().OnFalse(&rumblePrimaryOff);
 
   // Set up default drive command
     m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
-            if(controller.GetAButtonPressed()) {
-              // if(m_drive.ZeroSwervePosition()) {
-              //   m_drive.ResetEncoders();
-              // }
-            } else {
-              double x = controller.GetLeftX();
-              double y = controller.GetLeftY();
+            if(controller.GetYButtonPressed()) fieldCentric = !fieldCentric;
+            double x = controller.GetLeftX();
+            double y = controller.GetLeftY();
+            double turnX = controller.GetRightX();
 
-              // zero out axes if they fall within deadzone
-              if (x > -DriveConstants::kDriveDeadzone && x < DriveConstants::kDriveDeadzone)
-                  x = 0.0;
-              if (y > -DriveConstants::kDriveDeadzone && y < DriveConstants::kDriveDeadzone)
-                  y = 0.0;
+            // zero out axes if they fall within deadzone
+            if (x > -DriveConstants::kDriveDeadzone && x < DriveConstants::kDriveDeadzone)
+                x = 0.0;
+            if (y > -DriveConstants::kDriveDeadzone && y < DriveConstants::kDriveDeadzone)
+                y = 0.0;
 
-              // put speeds through a polynomial to smooth out joystick input
-              // check the curve out here: https://www.desmos.com/calculator/65tpwhxyai the range between 0.0 to 1.0 is used for the motors
-              // change driveCurveExtent to modify curve strength
-              float xSpeed = DriveConstants::kDriveCurveExtent * pow(x, 3) + (1 - DriveConstants::kDriveCurveExtent) * x;
-              float ySpeed = DriveConstants::kDriveCurveExtent * pow(y, 3) + (1 - DriveConstants::kDriveCurveExtent) * y;
-              m_drive.Drive(
-                units::meters_per_second_t{ySpeed * 4.0},
-                units::meters_per_second_t{xSpeed * -4.0},
-                units::degrees_per_second_t{controller.GetRightX() * 150}, false);
-              // m_drive.Drive(
-              //   units::meters_per_second_t{xSpeed * 4.0},
-              //   units::meters_per_second_t{ySpeed * -4.0},
-              //   units::degrees_per_second_t{controller.GetRightX() * 150}, false);
-            }
+            // put speeds through a polynomial to smooth out joystick input
+            // check the curve out here: https://www.desmos.com/calculator/65tpwhxyai the range between 0.0 to 1.0 is used for the motors
+            // change driveCurveExtent to modify curve strength
+            float xSpeed = DriveConstants::kDriveCurveExtent * pow(x, 3) + (1 - DriveConstants::kDriveCurveExtent) * x;
+            float ySpeed = DriveConstants::kDriveCurveExtent * pow(y, 3) + (1 - DriveConstants::kDriveCurveExtent) * y;
+            float turn = 0.95 * pow(turnX, 3) + (1 - 0.95) * turnX;
+            m_drive.Drive(
+              units::meters_per_second_t{ySpeed * 3.5},
+              units::meters_per_second_t{xSpeed * -3.5},
+              units::degrees_per_second_t{turn * 130.0}, fieldCentric);
       },
       {&m_drive}));
     
     intake.SetDefaultCommand(frc2::RunCommand(
       [this] {
-          intake.SetState(IntakeConstants::kPowerMode);
-          double speed = controller.GetRightTriggerAxis() - controller.GetLeftTriggerAxis();
-          if(speed > 0.1 || speed < -0.1) {
-            intakeHold = false;
-            intake.SetPower(speed);
-          } else if(!intakeHold) intake.SetPower(0.0);
-          if(controller.GetRightBumperPressed()) {
-            intakeHold = true;
-            intake.SetPower(0.07);
-          }
-          if(controller.GetLeftBumperPressed()) {
-            intake.SetPower(0.0);
-          }
-          // int pov = controller.GetPOV();
-          // switch(pov) {
-          //   case 0: 
-          //     intake.SetPosition(IntakeConstants::kHighDropoffPosition);
-          //     break;
-          //   case 90:
-          //     intake.SetPosition(IntakeConstants::kMidDropoffPosition);
-          //     break;
-          //   case 180:
-          //     intake.SetPosition(IntakeConstants::kFloorPickupPosition);
-          //     break;
-          // }
-
-          // if(controller.GetBackButton()) intake.SetPosition(IntakeConstants::kStartPosition);
+          HandleIntake();
       },
       {&intake}));
 
@@ -174,60 +188,107 @@ void RobotContainer::ConfigureButtonBindings() {
 //       .WhenPressed(&toggleFlywheel);
 }
 
+void RobotContainer::HandleIntake() {
+  intake.SetState(IntakeConstants::kPowerMode);
+  double speed = controller.GetRightTriggerAxis() - controller.GetLeftTriggerAxis();
+  if(speed > 0.1 || speed < -0.1) {
+    intakeHold = false;
+    intake.SetPower(speed);
+  } else if(!intakeHold) intake.SetPower(0.0);
+  if(controller.GetRightBumperPressed()) {
+    intakeHold = true;
+    intake.SetPower(0.1);
+  }
+  if(controller.GetLeftBumperPressed()) {
+    intake.SetPower(0.0);
+  }
+}
+
+void RobotContainer::SetSlew(bool state) {
+  m_drive.SetLimiting(state);
+}
+
+void RobotContainer::SetDriveReversed(bool reversed) {
+  m_drive.SetInverted(reversed);
+}
+
 frc2::Command* RobotContainer::GetAutonomousCommand() {
   // Set up config for trajectory
   
-  frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
-                               AutoConstants::kMaxAcceleration);
-  // Add kinematics to ensure max speed is actually obeyed
-  config.SetKinematics(m_drive.kDriveKinematics);
+  // frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
+  //                              AutoConstants::kMaxAcceleration);
+  // // Add kinematics to ensure max speed is actually obeyed
+  // config.SetKinematics(m_drive.kDriveKinematics);
 
-  // An example trajectory to follow.  All units in meters.
-  auto exampleTrajectory = frc::TrajectoryGenerator::GenerateTrajectory(
+  // // An example trajectory to follow.  All units in meters.
+  // auto moveFromLink = frc::TrajectoryGenerator::GenerateTrajectory(
     
-      // Start at the origin facing the +X direction
-      {frc::Pose2d{0.0_m, 0.0_m, 0.0_deg}, frc::Pose2d{1.0_m, 1.0_m, 0_deg}, 
-      frc::Pose2d{-1.0_m, 2.0_m, 0_deg},
-      // End 3 meters straight ahead of where we started, facing forward
-      frc::Pose2d{0.0_m, 3.0_m, 0_deg},
-      },
-      // Pass the config
-      config);
+  //     // Start at the origin facing the +X direction
+  //     {frc::Pose2d{0.0_m, 0.0_m, 0.0_deg},
+  //     // End 3 meters straight ahead of where we started, facing forward
+  //     frc::Pose2d{-0.5_m, 0.0_m, 0.0_deg},
+  //     },
+  //     // Pass the config
+  //     config);
 
-  frc::ProfiledPIDController<units::radians> thetaController{
-      AutoConstants::kPThetaController, 0, 0,
-      AutoConstants::kThetaControllerConstraints};
+  // auto moveToLink = frc::TrajectoryGenerator::GenerateTrajectory(
+    
+  //     // Start at the origin facing the +X direction
+  //     {frc::Pose2d{-0.5_m, 0.0_m, 0.0_deg},
+  //     // End 3 meters straight ahead of where we started, facing forward
+  //     frc::Pose2d{0.0_m, 0.0_m, 0.0_deg},
+  //     },
+  //     // Pass the config
+  //     config);
 
-  thetaController.EnableContinuousInput(units::radian_t{-std::numbers::pi},
-                                        units::radian_t{std::numbers::pi});
+  // frc::ProfiledPIDController<units::radians> thetaController{
+  //     AutoConstants::kPThetaController, 0, 0,
+  //     AutoConstants::kThetaControllerConstraints};
 
-  frc2::SwerveControllerCommand<4> swerveControllerCommand(
-      exampleTrajectory, [this]() { return m_drive.GetPose(); },
+  // thetaController.EnableContinuousInput(units::radian_t{-std::numbers::pi},
+  //                                       units::radian_t{std::numbers::pi});
+  // frc2::SwerveControllerCommand<4> commandMoveFromLink(
+  //     moveFromLink, [this]() { return m_drive.GetPose(); },
 
-      m_drive.kDriveKinematics,
+  //     m_drive.kDriveKinematics,
 
-      frc2::PIDController{AutoConstants::kPXController, 0, 0},
-      frc2::PIDController{AutoConstants::kPYController, 0, 0}, thetaController,
+  //     frc2::PIDController{AutoConstants::kPXController, 0, 0},
+  //     frc2::PIDController{AutoConstants::kPYController, 0, 0}, thetaController,
 
-      [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
+  //     [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
 
-      {&m_drive});
+  //     {&m_drive});
+
+  // frc2::SwerveControllerCommand<4> commandMoveToLink(
+  //     moveToLink, [this]() { return m_drive.GetPose(); },
+
+  //     m_drive.kDriveKinematics,
+
+  //     frc2::PIDController{AutoConstants::kPXController, 0, 0},
+  //     frc2::PIDController{AutoConstants::kPYController, 0, 0}, thetaController,
+
+  //     [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
+
+  //     {&m_drive});
 
   // Reset odometry to the starting pose of the trajectory.
-  m_drive.ResetOdometry(exampleTrajectory.InitialPose());
+  // m_drive.ResetOdometry(moveFromLink.InitialPose());
 
-  // no auto
-  // return std::move(swerveControllerCommand);
-  return new frc2::SequentialCommandGroup(
-      frc2::InstantCommand(
-          [this]() { 
-            m_drive.SetLimiting(false);
-           }, {}),
-      std::move(swerveControllerCommand),
-      frc2::InstantCommand(
-          [this]() { m_drive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
-            m_drive.SetLimiting(true);
-          m_drive.SetInverted(false); 
-          }, {}));
-  
+  // return new frc2::SequentialCommandGroup(
+  //     HighDock(&m_drive, &elevator, &arm, &intake),
+  //     frc2::InstantCommand(
+  //         [this]() { m_drive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
+  //         }, {}));
+  // return new frc2::SequentialCommandGroup(
+  //     GyroDock(1.5, &m_drive),
+  //     frc2::InstantCommand(
+  //         [this]() { m_drive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
+  //         }, {}));
+    // return new HighDock(&m_drive, &elevator, &arm, &intake);
+    frc2::Command* selected = chooser.GetSelected();
+    if(selected == &dock) {
+      // flip odometry so that field centric works correctly
+      m_drive.ResetOdometry(frc::Pose2d{{0.0_m, 0.0_m}, {0_deg}});
+    }
+    return selected;
 }

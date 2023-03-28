@@ -13,6 +13,7 @@
 void Robot::RobotInit() {
   m_container.SetDriveBrakes(false);
   m_container.ResetOdometry();
+  // SmartDashboard::PutNumber("autoP", 0.3);
   // SmartDashboard::PutNumber("armPos", 0.0);
   // SmartDashboard::PutNumber("armPower", 0.0);
   // SmartDashboard::PutNumber("wristPos", 4000);
@@ -20,6 +21,7 @@ void Robot::RobotInit() {
   // SmartDashboard::PutNumber("armAngle", 0.0);
   // SmartDashboard::PutNumber("wristAngle", 0.0);
   // SmartDashboard::PutNumber("elevatorPos", 0);
+  // SmartDashboard::PutBoolean("doAuton", true);
 
   CameraServer::StartAutomaticCapture();
   CameraServer::SetSize(CameraServer::kSize160x120);
@@ -53,20 +55,24 @@ void Robot::DisabledPeriodic() {}
  * RobotContainer} class.
  */
 void Robot::AutonomousInit() {
-  m_container.SetDriveBrakes(true);
-  m_container.ResetOdometry();
+  // bool doAuton = SmartDashboard::GetBoolean("doAuton", false);
+  // if (doAuton) {
   m_autonomousCommand = m_container.GetAutonomousCommand();
-
-  if (m_autonomousCommand != nullptr) {
-    m_autonomousCommand->Schedule();
-  }
+  m_container.SetDriveBrakes(true);
+  m_container.SetSlew(false);
+  m_container.SetDriveReversed(false);
+  // m_container.ResetOdometry();
+  m_autonomousCommand->Schedule();
+  // }
 }
 
 void Robot::AutonomousPeriodic() {}
 
 void Robot::TeleopInit() {
   m_container.SetDriveBrakes(true);
-  m_container.ResetOdometry();
+  m_container.SetSlew(true);
+  m_container.SetDriveReversed(false);
+  // m_container.ResetOdometry();
   // This makes sure that the autonomous stops running when
   // teleop starts running. If you want the autonomous to
   // continue until interrupted by another command, remove
