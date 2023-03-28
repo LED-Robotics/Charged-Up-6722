@@ -75,7 +75,7 @@ void DriveSubsystem::Periodic() {
                   s_backLeft.GetPosition(), s_backRight.GetPosition()});
   // SmartDashboard::PutNumber("odomGyro", (double)odometry.GetPose().Rotation().Degrees());
   // SmartDashboard::PutNumber("navxGyro", (double)GetAngle());
-  auto pose = odometry.GetPose();
+  // auto pose = odometry.GetPose();
   // SmartDashboard::PutNumber("poseX", (double)pose.X());
   // SmartDashboard::PutNumber("poseY", (double)pose.Y());
   // SmartDashboard::PutNumber("poseAngle", (double)pose.Rotation().Degrees());
@@ -154,67 +154,6 @@ bool DriveSubsystem::ZeroSwervePosition() {
   }
   return true;
 }
-
-void DriveSubsystem::driveDistance(units::meter_t distance, units::meters_per_second_t speed) {
-  speed *= -1.0;
-  while(true) {
-      auto pose = odometry.GetPose();
-      double current = (double)pose.X();
-      Drive(speed, 0_mps, 0_deg_per_s, false);
-      if((double)distance - current < 0.0) break;
-    }
-    Drive(0_mps, 0_mps, 0_deg_per_s, false);
-}
-
-void DriveSubsystem::driveDistance(units::meter_t distance) {
-  frc::SwerveModuleState forward{0_mps, frc::Rotation2d()};
-  SetModuleStates({forward, forward, forward, forward});
-  WPI_TalonFX *motors[4] = {&backLeft, &frontLeft, &backRight, &frontRight};
-  double initial[4];
-  double delta = (double)distance / kDriveEncoderDistancePerPulse;
-  delta *= -1.0;
-  for(int i = 0; i < 4; i++) {
-    initial[i] = motors[i]->GetSelectedSensorPosition();
-    motors[i]->SelectProfileSlot(1, 0);
-    motors[i]->ConfigSelectedFeedbackSensor(ctre::phoenix::motorcontrol::FeedbackDevice::IntegratedSensor, 1);
-    motors[i]->Set(TalonFXControlMode::Position, initial[i] + delta);
-  }
-  bool complete = false;
-  while(true) {
-    for(int i = 0; i < 4; i++) {
-      if(abs(motors[i]->GetSelectedSensorPosition() - initial[i]) > 500) break;
-      if(i == 3) complete = true;
-    }
-    if(complete) break;
-  }
-  motors[0]->SelectProfileSlot(0, 0);
-  motors[1]->SelectProfileSlot(0, 0);
-  motors[2]->SelectProfileSlot(0, 0);
-  motors[3]->SelectProfileSlot(0, 0);
-  motors[0]->ConfigSelectedFeedbackSensor(ctre::phoenix::motorcontrol::FeedbackDevice::IntegratedSensor, 0);
-  motors[1]->ConfigSelectedFeedbackSensor(ctre::phoenix::motorcontrol::FeedbackDevice::IntegratedSensor, 0);
-  motors[2]->ConfigSelectedFeedbackSensor(ctre::phoenix::motorcontrol::FeedbackDevice::IntegratedSensor, 0);
-  motors[3]->ConfigSelectedFeedbackSensor(ctre::phoenix::motorcontrol::FeedbackDevice::IntegratedSensor, 0);
-
-}
-
-void DriveSubsystem::strafeDistance(units::meter_t distance, units::meters_per_second_t speed) {
-
-}
-
-void DriveSubsystem::strafeDistance(units::meter_t distance) {
-
-}
-
-// void DriveSubsystem::turnToDegrees(units::degree_t angle, units::degrees_per_second_t speed) {
-//   while(true) {
-//     double current = (double)odometry.GetPose().Rotation().Degrees();
-//     Drive(0_mps, 0_mps, speed);
-//     if(abs(current - (double)angle) < 10.0) break;
-//     Wait(20_ms);
-//   }
-//   Drive(0_mps, 0_mps, 0_deg_per_s);
-// }
 
 void DriveSubsystem::ResetEncoders() {
   s_frontLeft.ResetEncoders();

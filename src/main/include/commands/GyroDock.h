@@ -28,6 +28,7 @@ class GyroDock : public frc2::CommandHelper<frc2::CommandBase, GyroDock> {
     double changeThreshold = 3.0;
     double range = 15.0;
     const double kP = 0.35;
+    bool initialApproachCompleted = false;
     bool sustained = false;
     bool tippedForward = false;
     bool backwards = false;

@@ -10,6 +10,9 @@ HighDock::HighDock(DriveSubsystem *drive, ElevatorSubsystem *elev, ArmSubsystem 
       SetPosition(3, elev, arm, intake)  // extent to mid
     ),
 
+    // TrajectoryRelative({frc::Pose2d{0.0_m, 0.0_m, 0.0_deg}, frc::Pose2d{0.5_m, 0.0_m, 0.0_deg}}, 
+    // {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}, drive),   test line for Trajectory code
+
     WaitDrive(0.5_m, -0.8_mps, drive),  // drive to link station
     
     // SetPosition(3, elev, arm, intake),  // extent to high
