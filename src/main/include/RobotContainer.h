@@ -7,6 +7,7 @@
 #include <frc/XboxController.h>
 #include <frc2/command/button/CommandXboxController.h>
 #include <frc/controller/PIDController.h>
+#include <frc/DriverStation.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
 #include <frc2/command/InstantCommand.h>
@@ -65,6 +66,8 @@ class RobotContainer {
 
   //Blinkin
   Spark blinkin{BlinkinConstants::kBlinkinPort};
+  
+  frc::DriverStation::Alliance alliance{frc::DriverStation::GetAlliance()};
 
   // The robot's subsystems and commands are defined here...
 
@@ -76,10 +79,13 @@ class RobotContainer {
   ArmSubsystem arm;
 
   IntakeSubsystem intake{&arm};
+
+  LimelightSubsystem limelight{"limelight", alliance};
   
   bool intakeHold = false;
 
   bool fieldCentric = true;
+  
 
   frc2::Trigger mainDpadUp{[this]() { return controller.GetPOV() == 0; }};
   frc2::Trigger mainDpadRight{[this]() { return controller.GetPOV() == 90; }};
