@@ -25,6 +25,11 @@ frc2::Command* RobotContainer::GetPositionCommand(int position) {
   return new SetPosition(position, &elevator, &arm, &intake);
 }
 
+frc2::Command* RobotContainer::GetRelativePathCommand(const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
+    const Pose2d& end, const TrajectoryConfig& config) {
+  return new TrajectoryRelative(start, interiorWaypoints, end, config, &m_drive);
+}
+
 frc2::Command* RobotContainer::HandlePartnerCommands(frc2::Command* solo, frc2::Command* partner) {
   return new frc2::InstantCommand(
     [this, solo, partner]() { 
@@ -50,6 +55,7 @@ RobotContainer::RobotContainer() {
   chooser.AddOption("Simple Dock", &dock);
   chooser.AddOption("Low Place Then Break", &lowPlaceThenBreak);
   chooser.AddOption("Place Then Break", &placeThenBreak);
+  chooser.AddOption("Wall No Balance", &wallNoBalance);
   chooser.AddOption("None", GetEmptyCommand());
 
   blinkin.Set(.41);
@@ -66,6 +72,12 @@ RobotContainer::RobotContainer() {
   mainDpadRight.OnTrue(HandlePartnerCommands(GetPositionCommand(2), GetEmptyCommand()));
   mainDpadDown.OnTrue(HandlePartnerCommands(GetPositionCommand(1), GetEmptyCommand()));
   controller.Back().OnTrue(HandlePartnerCommands(GetPositionCommand(0), GetEmptyCommand()));
+  controller.Start().OnTrue(HandlePartnerCommands(GetPositionCommand(5), GetEmptyCommand()));
+  controller.B().ToggleOnTrue(GetRelativePathCommand({0.0_m, 0.0_m, 0_deg}, {}, {2.0_m, 0.0_m, 0_deg}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}));
+  controller.X().ToggleOnTrue(&turnTo90);
+  controller.A().ToggleOnTrue(GetRelativePathCommand({0.0_m, 0.0_m, 0_deg}, {}, {5.0_m, 0.2_m, 0_deg}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}));
+  // controller.A().ToggleOnTrue(&driveL);
+  // controller.X().ToggleOnTrue(&driveL2);
   // controller.B().ToggleOnTrue(new GyroDock(1.5, &m_drive));
 
   partnerDpadUp.OnTrue(GetPositionCommand(3));

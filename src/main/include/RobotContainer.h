@@ -18,7 +18,11 @@
 #include <ctre\Phoenix.h>
 
 #include "Constants.h"
+#include "commands/TurnTo.h"
+#include "commands/TrajectoryRelative.h"
+#include "commands/TrajectoryAbsolute.h"
 #include "commands/SetPosition.h"
+#include "commands/WallNoBalance.h"
 #include "commands/LowPlaceThenBreak.h"
 #include "commands/PlaceThenBreak.h"
 #include "commands/HighDock.h"
@@ -151,14 +155,25 @@ class RobotContainer {
 
   frc2::Command* GetPositionCommand(int position);
 
+  frc2::Command* GetRelativePathCommand(const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
+    const Pose2d& end, const TrajectoryConfig& config);
+
   frc2::Command* HandlePartnerCommands(frc2::Command* solo, frc2::Command* partner);
 
   frc2::Command* GetEmptyCommand();
 
   frc2::Command* SetBlinkin(int inputMode);
 
+  // TrajectoryRelative driveForward{{{0.0_m, 0.0_m, 0_deg}, {2.0_m, 0.0_m, 0.0_deg}}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}, &m_drive};
+  // TrajectoryRelative driveL{{{0.0_m, 0.0_m, 0_deg}, {2.0_m, 0.0_m, 0.0_deg}, {2.0_m, 2.0_m, 0.0_deg}}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}, &m_drive};
+  // TrajectoryRelative driveL2{{{0.0_m, 0.0_m, 0.0_deg}, {2.0_m, 0.0_m, 0.0_deg}}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}, &m_drive};
+
+  TurnTo turnTo90{0.0, &m_drive};
+
   GyroDock dock{1.5, &m_drive};
 
+  WallNoBalance wallNoBalance{&m_drive, &elevator, &arm, &intake};
+  
   LowPlaceThenBreak lowPlaceThenBreak{&m_drive, &elevator, &arm, &intake};
   
   PlaceThenBreak placeThenBreak{&m_drive, &elevator, &arm, &intake};

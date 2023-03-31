@@ -18,5 +18,6 @@
  */
 class TrajectoryRelative : public frc2::CommandHelper<frc2::SequentialCommandGroup, TrajectoryRelative> {
  public:
-  explicit TrajectoryRelative(const std::vector<Pose2d>& waypoints, const TrajectoryConfig& config, DriveSubsystem* driveRef);
+  explicit TrajectoryRelative(const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
+    const Pose2d& end, const TrajectoryConfig& config, DriveSubsystem* driveRef);
 };

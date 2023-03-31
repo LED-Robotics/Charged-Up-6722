@@ -130,6 +130,7 @@ namespace ArmConstants {
     constexpr double kMidDropoffAngle = 136.7;
     constexpr int kHighDropoffPosition = 74500;
     constexpr double kHighDropoffAngle = 136.7;
+    constexpr double kAutonStart = 275.0;
     constexpr int kPositionDeadzone = 15000;
     constexpr int kP = 0.012;
 }
@@ -162,6 +163,7 @@ namespace IntakeConstants {
     constexpr int kFloorStandingPickupPosition = 25417;
     constexpr int kMidDropoffPosition = 40713;
     constexpr int kHighDropoffPosition = 37900;
+    constexpr int kAutonStart = 53900;
     constexpr int kPositionDeadzone = 6666;
     constexpr int kP = 0.03;
 }
@@ -175,12 +177,12 @@ namespace LimelightConstants {
 
 namespace AutoConstants {
         constexpr auto kMaxSpeed = 3.5_mps;
-        constexpr auto kMaxAcceleration = 6_mps_sq;
+        constexpr auto kMaxAcceleration = 2_mps_sq;
         constexpr auto kAngularSpeed = 180_deg_per_s;
         constexpr auto kMaxAngularAcceleration = 180_deg_per_s_sq;
 
-        constexpr double kPXController = 0.0;
-        constexpr double kPYController = 0.0;
+        constexpr double kPXController = 1.0;
+        constexpr double kPYController = 1.0;
         constexpr double kPThetaController = 0.0;
 
         extern const frc::TrapezoidProfile<units::radians>::Constraints

@@ -7,6 +7,7 @@
 #include <iostream>
 #include <cmath>
 #include <frc/geometry/Rotation2d.h>
+#include <frc/smartdashboard/Field2d.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
 using namespace DriveConstants;
@@ -75,10 +76,10 @@ void DriveSubsystem::Periodic() {
                   s_backLeft.GetPosition(), s_backRight.GetPosition()});
   // SmartDashboard::PutNumber("odomGyro", (double)odometry.GetPose().Rotation().Degrees());
   // SmartDashboard::PutNumber("navxGyro", (double)GetAngle());
-  // auto pose = odometry.GetPose();
-  // SmartDashboard::PutNumber("poseX", (double)pose.X());
-  // SmartDashboard::PutNumber("poseY", (double)pose.Y());
-  // SmartDashboard::PutNumber("poseAngle", (double)pose.Rotation().Degrees());
+  auto pose = odometry.GetPose();
+  SmartDashboard::PutNumber("poseX", (double)pose.X());
+  SmartDashboard::PutNumber("poseY", (double)pose.Y());
+  SmartDashboard::PutNumber("poseAngle", (double)pose.Rotation().Degrees());
   // SmartDashboard::PutNumber("gyroPitch", gyro.GetPitch());
   // SmartDashboard::PutNumber("frontLeftVel", (double)s_frontLeft.GetState().speed);
   // SmartDashboard::PutNumber("frontRightVel", (double)s_frontRight.GetState().speed);

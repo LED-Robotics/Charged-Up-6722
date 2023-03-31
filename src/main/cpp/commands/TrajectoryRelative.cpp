@@ -1,9 +1,12 @@
 #include "commands/TrajectoryRelative.h"
 
-TrajectoryRelative::TrajectoryRelative(const std::vector<Pose2d>& waypoints, const TrajectoryConfig& config, DriveSubsystem* driveRef) {
+TrajectoryRelative::TrajectoryRelative(const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
+    const Pose2d& end, const TrajectoryConfig& config, DriveSubsystem* driveRef) {
   auto trajectory = frc::TrajectoryGenerator::GenerateTrajectory(
     // waypoints
-    waypoints,
+    start,
+    interiorWaypoints, 
+    end,
     // Pass the config
     config);
   auto initial = driveRef->GetPose();  // get current pose from odometry

@@ -32,6 +32,9 @@ void SetPosition::Initialize() {
       arm->SetTargetAngle(ArmConstants::kFloorStandingPickupAngle);
       intake->SetWristState(IntakeConstants::kPositionMode);
       intake->SetTargetPosition(IntakeConstants::kFloorStandingPickupPosition);
+    } else if(target == 5) {
+      elevator->SetTargetPosition(300);
+      arm->SetTargetAngle(ArmConstants::kAutonStart);
     }
 }
 
@@ -43,6 +46,9 @@ void SetPosition::Execute() {
     elevator->SetTargetPosition(ElevatorConstants::kFloorPickupPosition);
   } else if(target == 3 && arm->IsAtTarget() && intake->IsAtTarget()) {
     elevator->SetTargetPosition(ElevatorConstants::kHighDropoffPosition);
+  } else if(target == 5 && elevator->IsAtTarget() && arm->IsAtTarget()) {
+    intake->SetWristState(IntakeConstants::kPositionMode);
+    intake->SetTargetPosition(IntakeConstants::kAutonStart);
   }
 }
 
