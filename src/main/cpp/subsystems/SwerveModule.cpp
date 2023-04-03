@@ -42,9 +42,9 @@ void SwerveModule::SetDesiredState(
     // Optimize the reference state to avoid spinning further than 90 degrees*
     const auto state = frc::SwerveModuleState::Optimize(referenceState, GetTurnEncoderAngle());
     
-    driveMotor->Set(TalonFXControlMode::Velocity, ((double)state.speed / 10.0) / DriveConstants::kDriveEncoderDistancePerPulse);
-    
     turnMotor->Set(TalonFXControlMode::Position, (double)state.angle.Degrees() / DriveConstants::kTurnEncoderDegreesPerPulse);
+
+    driveMotor->Set(TalonFXControlMode::Velocity, ((double)state.speed / 10.0) / DriveConstants::kDriveEncoderDistancePerPulse);    
 }
 
 void SwerveModule::SetDrivePower(double power) {

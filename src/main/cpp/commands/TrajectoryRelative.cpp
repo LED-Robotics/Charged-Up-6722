@@ -13,8 +13,12 @@ TrajectoryRelative::TrajectoryRelative(const Pose2d& start, const std::vector<Tr
   frc::Transform2d transform{initial.Translation(), initial.Rotation()};  // make trajectory transform
   auto newTrajectory = trajectory.TransformBy(transform); // transform generated trajectory
 
+  // frc::ProfiledPIDController<units::radians> thetaController{
+  //   AutoConstants::kPThetaController, 0, 0,
+  //   AutoConstants::kThetaControllerConstraints};
+
   frc::ProfiledPIDController<units::radians> thetaController{
-    AutoConstants::kPThetaController, 0, 0,
+    SmartDashboard::GetNumber("autoP", 0.1), 0, 0,
     AutoConstants::kThetaControllerConstraints};
 
   thetaController.EnableContinuousInput(units::radian_t{-std::numbers::pi},

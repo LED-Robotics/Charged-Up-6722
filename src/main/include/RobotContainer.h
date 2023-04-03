@@ -89,7 +89,6 @@ class RobotContainer {
   bool intakeHold = false;
 
   bool fieldCentric = true;
-  
 
   frc2::Trigger mainDpadUp{[this]() { return controller.GetPOV() == 0; }};
   frc2::Trigger mainDpadRight{[this]() { return controller.GetPOV() == 90; }};
@@ -135,14 +134,20 @@ class RobotContainer {
                                         {}};
   
   
-  frc2::InstantCommand SetBlinkinAButton{[this] { blinkin.Set(.41); /*End to End; Color 1 (Purple) and Color 2 (Yellow)*/ },
-                                        {}};
+  frc2::InstantCommand SetBlinkinAButton{[this] { 
+    arm.SetConeMode();
+    blinkin.Set(.41); /*End to End; Color 1 (Purple) and Color 2 (Yellow)*/ },
+                                        {&arm}};
 
-  frc2::InstantCommand SetBlinkinLeftBumper{[this] { blinkin.Set(.07); /*Fast Heartbeat; Color 1 (Purple)*/ },
-                                        {}};
+  frc2::InstantCommand SetBlinkinLeftBumper{[this] { 
+    arm.SetCubeMode();
+    blinkin.Set(.07); /*Fast Heartbeat; Color 1 (Purple)*/ },
+                                        {&arm}};
 
-  frc2::InstantCommand SetBlinkinRightBumper{[this] { blinkin.Set(.27); /*Fast Heartbeat; Color 2 (Yellow)*/; },
-                                        {}};
+  frc2::InstantCommand SetBlinkinRightBumper{[this] { 
+    arm.SetConeMode();
+    blinkin.Set(.27); /*Fast Heartbeat; Color 2 (Yellow)*/; },
+                                        {&arm}};
 
   // frc2::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); },
   //                                       {}};

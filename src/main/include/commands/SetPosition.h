@@ -8,6 +8,9 @@
 #include "subsystems/ArmSubsystem.h"
 #include "subsystems/IntakeSubsystem.h"
 
+#include <frc/smartdashboard/SmartDashboard.h>
+
+
 /**
  * A command that sets the position of the elevator, intake, and arm subsystems. 
  * This command controls the order in which the subsystems move based on the target position,
@@ -24,6 +27,7 @@ class SetPosition : public frc2::CommandHelper<frc2::CommandBase, SetPosition> {
   bool IsFinished() override;
 
  private:
+    bool isCone = true;
     int target = 0;
     ElevatorSubsystem *elevator;
     ArmSubsystem *arm;

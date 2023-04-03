@@ -44,6 +44,7 @@ void ElevatorSubsystem::Periodic() {
       // else left.Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, position);
       double leftPos = GetLeftPosition();
       double rightPos = GetRightPosition();
+      // SmartDashboard::PutNumber("elevPos", leftPos);  // print to Shuffleboard
       if(leftPos - rightPos > kElevatorDeadzone) {
         left.Set(ctre::phoenix::motorcontrol::ControlMode::Position, rightPos >= 0.0 ? rightPos : 0.0);
       } else {

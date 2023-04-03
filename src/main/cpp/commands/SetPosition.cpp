@@ -9,6 +9,8 @@ intake(intakeRef) {
 }
 
 void SetPosition::Initialize() {
+    // SmartDashboard::PutBoolean("coneInSet", isCone);  // print to Shuffleboard
+    isCone = arm->GetConeMode();
     if(target == 0) {
       elevator->SetTargetPosition(ElevatorConstants::kStartPosition);
       intake->SetWristState(IntakeConstants::kPositionMode);
@@ -19,14 +21,14 @@ void SetPosition::Initialize() {
       intake->SetWristState(IntakeConstants::kPositionMode);
       intake->SetTargetPosition(IntakeConstants::kFloorPickupPosition);
     } else if(target == 2) {
-      elevator->SetTargetPosition(ElevatorConstants::kMidDropoffPosition);
-      arm->SetTargetAngle(ArmConstants::kMidDropoffAngle);
+      elevator->SetTargetPosition(isCone ? ElevatorConstants::kMidDropoffPosition : ElevatorConstants::kCubePosition);
+      arm->SetTargetAngle(isCone ? ArmConstants::kMidDropoffAngle : ArmConstants::kMidCubeAngle);
       intake->SetWristState(IntakeConstants::kPositionMode);
-      intake->SetTargetPosition(IntakeConstants::kMidDropoffPosition);
+      intake->SetTargetPosition(isCone ? IntakeConstants::kMidDropoffPosition : IntakeConstants::kMidCubePosition);
     } else if(target == 3) {
-      arm->SetTargetAngle(ArmConstants::kHighDropoffAngle);
+      arm->SetTargetAngle(isCone ? ArmConstants::kHighDropoffAngle : ArmConstants::kHighCubeAngle);
       intake->SetWristState(IntakeConstants::kPositionMode);
-      intake->SetTargetPosition(IntakeConstants::kHighDropoffPosition);
+      intake->SetTargetPosition(isCone ? IntakeConstants::kHighDropoffPosition : IntakeConstants::kHighCubePosition);
     } else if(target == 4) {
       elevator->SetTargetPosition(ElevatorConstants::kFloorStandingPickupPosition);
       arm->SetTargetAngle(ArmConstants::kFloorStandingPickupAngle);
@@ -45,7 +47,7 @@ void SetPosition::Execute() {
     arm->SetTargetAngle(ArmConstants::kFloorPickupAngle);
     elevator->SetTargetPosition(ElevatorConstants::kFloorPickupPosition);
   } else if(target == 3 && arm->IsAtTarget() && intake->IsAtTarget()) {
-    elevator->SetTargetPosition(ElevatorConstants::kHighDropoffPosition);
+    elevator->SetTargetPosition(isCone ? ElevatorConstants::kHighDropoffPosition : ElevatorConstants::kCubePosition);
   } else if(target == 5 && elevator->IsAtTarget() && arm->IsAtTarget()) {
     intake->SetWristState(IntakeConstants::kPositionMode);
     intake->SetTargetPosition(IntakeConstants::kAutonStart);

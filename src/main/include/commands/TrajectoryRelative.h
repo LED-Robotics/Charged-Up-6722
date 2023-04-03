@@ -8,6 +8,7 @@
 #include <frc2/command/SwerveControllerCommand.h>
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 
 #include "subsystems/DriveSubsystem.h"
 

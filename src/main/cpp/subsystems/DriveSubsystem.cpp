@@ -48,13 +48,13 @@ DriveSubsystem::DriveSubsystem()
       yLimiter{kDriveTranslationLimit} {
         ZeroSwervePosition();
         gyro.Reset();
-        initialPitch = gyro.GetPitch();
         // gyro.Calibrate();
         // backRightTheta.SetSelectedSensorPosition(0);
         // ConfigMotors();
 
         // ResetEncoders();
         ResetOdometry(frc::Pose2d{{0.0_m, 0.0_m}, {180_deg}});
+        // ResetOdometry(frc::Pose2d{{0.0_m, 0.0_m}, {90_deg}});
       }
 
 void DriveSubsystem::Periodic() {

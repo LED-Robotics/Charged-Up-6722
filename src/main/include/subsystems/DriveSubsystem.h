@@ -156,10 +156,16 @@ class DriveSubsystem : public frc2::SubsystemBase {
   // frc::Translation2d frontLeftLocation{0.449072_m, -0.449072_m};
   // frc::Translation2d frontRightLocation{-0.449072_m, -0.449072_m};
 
+// CURRENT WORKING CONFIG
   frc::Translation2d frontRightLocation{-0.449072_m, -0.449072_m};
   frc::Translation2d backRightLocation{0.449072_m, -0.449072_m};
   frc::Translation2d frontLeftLocation{-0.449072_m, 0.449072_m};
   frc::Translation2d backLeftLocation{0.449072_m, 0.449072_m};
+
+  // frc::Translation2d frontRightLocation{0.449072_m, -0.449072_m};
+  // frc::Translation2d backRightLocation{-0.449072_m, -0.449072_m};
+  // frc::Translation2d frontLeftLocation{0.449072_m, 0.449072_m};
+  // frc::Translation2d backLeftLocation{-0.449072_m, 0.449072_m};
 
   //Bland, Florida, Brazil, France
   // frc::Translation2d backLeftLocation{-0.449072_m, 0.449072_m};
