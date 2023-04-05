@@ -173,7 +173,7 @@ class RobotContainer {
   // TrajectoryRelative driveL{{{0.0_m, 0.0_m, 0_deg}, {2.0_m, 0.0_m, 0.0_deg}, {2.0_m, 2.0_m, 0.0_deg}}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}, &m_drive};
   // TrajectoryRelative driveL2{{{0.0_m, 0.0_m, 0.0_deg}, {2.0_m, 0.0_m, 0.0_deg}}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}, &m_drive};
 
-  TurnTo turnTo90{0.0, &m_drive};
+  TurnTo turnTo90{3.0, &m_drive};
 
   GyroDock dock{1.5, &m_drive};
 

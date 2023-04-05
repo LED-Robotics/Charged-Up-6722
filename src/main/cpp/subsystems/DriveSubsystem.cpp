@@ -46,14 +46,24 @@ DriveSubsystem::DriveSubsystem()
       
       xLimiter{kDriveTranslationLimit},
       yLimiter{kDriveTranslationLimit} {
+        ResetEncoders();
         ZeroSwervePosition();
-        gyro.Reset();
+        // gyro.Reset();
+        // backLeft.SetInverted(true);
+        // frontLeft.SetInverted(true);
+        // backRight.SetInverted(true);
+        // frontRight.SetInverted(true);
+
+        backLeftTheta.SetInverted(true);
+        frontLeftTheta.SetInverted(true);
+        backRightTheta.SetInverted(true);
+        frontRightTheta.SetInverted(true);
         // gyro.Calibrate();
         // backRightTheta.SetSelectedSensorPosition(0);
         // ConfigMotors();
 
         // ResetEncoders();
-        ResetOdometry(frc::Pose2d{{0.0_m, 0.0_m}, {180_deg}});
+        // ResetOdometry(frc::Pose2d{{0.0_m, 0.0_m}, {180_deg}});
         // ResetOdometry(frc::Pose2d{{0.0_m, 0.0_m}, {90_deg}});
       }
 
@@ -103,7 +113,7 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
   SmartDashboard::PutNumber("fieldCentric", fieldRelative);
   auto states = kDriveKinematics.ToSwerveModuleStates(
     fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-        xSpeed, ySpeed, rot, GetPose().Rotation() * -1)
+        xSpeed, ySpeed, rot, GetPose().Rotation())
       : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
   kDriveKinematics.DesaturateWheelSpeeds(&states, AutoConstants::kMaxSpeed);

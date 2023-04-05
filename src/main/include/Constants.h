@@ -186,8 +186,8 @@ namespace AutoConstants {
         constexpr auto kAngularSpeed = 180_deg_per_s;
         constexpr auto kMaxAngularAcceleration = 180_deg_per_s_sq;
 
-        constexpr double kPXController = 0.1;
-        constexpr double kPYController = 0.1;
+        constexpr double kPXController = 0.4;
+        constexpr double kPYController = 0.4;
         constexpr double kPThetaController = 0.0;
 
         extern const frc::TrapezoidProfile<units::radians>::Constraints

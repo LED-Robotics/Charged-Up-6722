@@ -16,9 +16,8 @@ TrajectoryRelative::TrajectoryRelative(const Pose2d& start, const std::vector<Tr
   // frc::ProfiledPIDController<units::radians> thetaController{
   //   AutoConstants::kPThetaController, 0, 0,
   //   AutoConstants::kThetaControllerConstraints};
-
   frc::ProfiledPIDController<units::radians> thetaController{
-    SmartDashboard::GetNumber("autoP", 0.1), 0, 0,
+    AutoConstants::kPThetaController, 0, 0,
     AutoConstants::kThetaControllerConstraints};
 
   thetaController.EnableContinuousInput(units::radian_t{-std::numbers::pi},
