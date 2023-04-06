@@ -85,7 +85,7 @@ void DriveSubsystem::Periodic() {
                   {s_frontLeft.GetPosition(), s_frontRight.GetPosition(),
                   s_backLeft.GetPosition(), s_backRight.GetPosition()});
   // SmartDashboard::PutNumber("odomGyro", (double)odometry.GetPose().Rotation().Degrees());
-  // SmartDashboard::PutNumber("navxGyro", (double)GetAngle());
+  SmartDashboard::PutNumber("navxGyro", (double)gyro.GetRotation2d().Degrees());
   auto pose = odometry.GetPose();
   SmartDashboard::PutNumber("poseX", (double)pose.X());
   SmartDashboard::PutNumber("poseY", (double)pose.Y());
@@ -100,6 +100,8 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
                           units::meters_per_second_t ySpeed,
                           units::degrees_per_second_t rot,
                           bool fieldRelative) {
+  xSpeed *= -1.0;
+  // ySpeed *= -1.0;
   if(enableLimiting) {
     // std::cout << "Slew Rate Limiter Is On!\n";
     xSpeed = xLimiter.Calculate(xSpeed);

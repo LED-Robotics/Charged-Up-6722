@@ -10,8 +10,8 @@ std::vector<PathPlannerTrajectory> pathGroup = PathPlanner::loadPathGroup("AutoP
 // This is just an example event map. It would be better to have a constant, global event map
 // in your code that will be used by all path following commands/autobuilders.
 std::unordered_map<std::string, std::shared_ptr<frc2::Command>> eventMap;
-eventMap.emplace("marker1", std::make_shared<frc2::PrintCommand>("Passed Marker 1"));
-eventMap.emplace("intakeDown", std::make_shared<frc2::PrintCommand>("Passed Marker 2"));
+// eventMap.emplace("marker1", std::make_shared<frc2::PrintCommand>("Passed Marker 1"));
+// eventMap.emplace("intakeDown", std::make_shared<frc2::PrintCommand>("Passed Marker 2"));
 
 // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this could be in RobotContainer along with your subsystems
 

@@ -73,9 +73,13 @@ RobotContainer::RobotContainer() {
   mainDpadDown.OnTrue(HandlePartnerCommands(GetPositionCommand(1), GetEmptyCommand()));
   controller.Back().OnTrue(HandlePartnerCommands(GetPositionCommand(0), GetEmptyCommand()));
   controller.Start().OnTrue(HandlePartnerCommands(GetPositionCommand(5), GetEmptyCommand()));
-  controller.B().ToggleOnTrue(GetRelativePathCommand({0.0_m, 0.0_m, 0_deg}, {}, {-4.0_m, -0.05_m, 0_deg}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}));
-  controller.X().ToggleOnTrue(&turnTo90);
-  controller.A().ToggleOnTrue(GetRelativePathCommand({0.0_m, 0.0_m, 0_deg}, {}, {4.0_m, -0.0_m, 0_deg}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}));
+  // controller.B().ToggleOnTrue(GetRelativePathCommand({0.0_m, 0.0_m, 0_deg}, {}, {-4.0_m, -0.05_m, 0_deg}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}));
+  // controller.X().ToggleOnTrue(&turnTo90);
+  // controller.A().ToggleOnTrue(GetRelativePathCommand({0.0_m, 0.0_m, 0_deg}, {}, {4.0_m, -0.0_m, 0_deg}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}));
+
+  controller.B().ToggleOnTrue(std::move(testAuto));
+  controller.X().ToggleOnTrue(std::move(testPath));
+  controller.A().ToggleOnTrue(std::move(testRotate));
   // controller.A().ToggleOnTrue(&driveL);
   // controller.X().ToggleOnTrue(&driveL2);
   // controller.B().ToggleOnTrue(new GyroDock(1.5, &m_drive));
@@ -116,8 +120,9 @@ RobotContainer::RobotContainer() {
             float ySpeed = DriveConstants::kDriveCurveExtent * pow(y, 3) + (1 - DriveConstants::kDriveCurveExtent) * y;
             float turn = 0.95 * pow(turnX, 3) + (1 - 0.95) * turnX;
             m_drive.Drive(
-              units::meters_per_second_t{xSpeed * 3.5},
+              units::meters_per_second_t{xSpeed * -3.5},
               units::meters_per_second_t{ySpeed * 3.5},
+              
               units::degrees_per_second_t{turn * 130.0}, fieldCentric);
       },
       {&m_drive}));

@@ -32,7 +32,7 @@ frc::SwerveModuleState SwerveModule::GetState() const {
 }
 
 frc::SwerveModulePosition SwerveModule::GetPosition() const {
-    return {GetDriveEncoderDistance(),
+    return {GetDriveEncoderDistance() * -1,
             GetTurnEncoderAngle()};
 }
 
