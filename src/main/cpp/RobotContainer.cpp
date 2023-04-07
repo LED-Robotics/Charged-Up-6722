@@ -77,7 +77,8 @@ RobotContainer::RobotContainer() {
   // controller.X().ToggleOnTrue(&turnTo90);
   // controller.A().ToggleOnTrue(GetRelativePathCommand({0.0_m, 0.0_m, 0_deg}, {}, {4.0_m, -0.0_m, 0_deg}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}));
 
-  controller.B().ToggleOnTrue(std::move(testAuto));
+  // controller.B().ToggleOnTrue(std::move(testAuto));
+  controller.B().ToggleOnTrue(&driveRateTest);
   controller.X().ToggleOnTrue(std::move(testPath));
   controller.A().ToggleOnTrue(std::move(testRotate));
   // controller.A().ToggleOnTrue(&driveL);
@@ -121,9 +122,9 @@ RobotContainer::RobotContainer() {
             float turn = 0.95 * pow(turnX, 3) + (1 - 0.95) * turnX;
             m_drive.Drive(
               units::meters_per_second_t{xSpeed * -3.5},
-              units::meters_per_second_t{ySpeed * 3.5},
+              units::meters_per_second_t{ySpeed * -3.5},
               
-              units::degrees_per_second_t{turn * 130.0}, fieldCentric);
+              units::degrees_per_second_t{turn * 226.0}, fieldCentric);
       },
       {&m_drive}));
     

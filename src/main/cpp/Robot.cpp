@@ -13,7 +13,7 @@
 void Robot::RobotInit() {
   m_container.SetDriveBrakes(false);
   m_container.ResetOdometry();
-  SmartDashboard::PutNumber("autoP", 0.1);
+  // SmartDashboard::PutNumber("autoP", 0.1);
   // SmartDashboard::PutNumber("armPos", 0.0);
   // SmartDashboard::PutNumber("armPower", 0.0);
   // SmartDashboard::PutNumber("wristPos", 4000);

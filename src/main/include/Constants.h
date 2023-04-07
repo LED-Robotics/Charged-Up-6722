@@ -181,7 +181,7 @@ namespace LimelightConstants {
 }
 
 namespace AutoConstants {
-        constexpr auto kMaxSpeed = 3.5_mps;
+        constexpr auto kMaxSpeed = 2.5_mps;
         constexpr auto kMaxAcceleration = 2_mps_sq;
         constexpr auto kAngularSpeed = 180_deg_per_s;
         constexpr auto kMaxAngularAcceleration = 180_deg_per_s_sq;

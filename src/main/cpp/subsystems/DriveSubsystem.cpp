@@ -86,6 +86,7 @@ void DriveSubsystem::Periodic() {
                   s_backLeft.GetPosition(), s_backRight.GetPosition()});
   // SmartDashboard::PutNumber("odomGyro", (double)odometry.GetPose().Rotation().Degrees());
   SmartDashboard::PutNumber("navxGyro", (double)gyro.GetRotation2d().Degrees());
+  SmartDashboard::PutNumber("turnRate", (double)GetTurnRate());
   auto pose = odometry.GetPose();
   SmartDashboard::PutNumber("poseX", (double)pose.X());
   SmartDashboard::PutNumber("poseY", (double)pose.Y());
@@ -100,8 +101,9 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
                           units::meters_per_second_t ySpeed,
                           units::degrees_per_second_t rot,
                           bool fieldRelative) {
+  rot *= 0.5747;
   xSpeed *= -1.0;
-  // ySpeed *= -1.0;
+  ySpeed *= -1.0;
   if(enableLimiting) {
     // std::cout << "Slew Rate Limiter Is On!\n";
     xSpeed = xLimiter.Calculate(xSpeed);
@@ -110,9 +112,10 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
     // std::cout << "Slew Rate Limiter Is Off!\n";
   }
 
-  // SmartDashboard::PutNumber("targetXVel", (double)xSpeed);
-  // SmartDashboard::PutNumber("targetYVel", (double)ySpeed);
-  SmartDashboard::PutNumber("fieldCentric", fieldRelative);
+  SmartDashboard::PutNumber("targetXVel", (double)xSpeed);
+  SmartDashboard::PutNumber("targetYVel", (double)ySpeed);
+  SmartDashboard::PutNumber("targetOmega", (double)rot);
+  SmartDashboard::PutBoolean("fieldCentric", fieldRelative);
   auto states = kDriveKinematics.ToSwerveModuleStates(
     fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
         xSpeed, ySpeed, rot, GetPose().Rotation())
@@ -199,6 +202,13 @@ frc::Pose2d DriveSubsystem::GetPose() {
 }
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
+  // std::cout << "Auton X: " << (double)pose.X() << '\n';
+  // std::cout << "Auton Y: " << (double)pose.Y() << '\n';
+  // std::cout << "Auton Rotation: " << (double)pose.Rotation().Degrees() << '\n';
+  backLeft.SetSelectedSensorPosition(0);
+  frontLeft.SetSelectedSensorPosition(0);
+  backRight.SetSelectedSensorPosition(0);
+  frontRight.SetSelectedSensorPosition(0);
   odometry.ResetPosition(
     gyro.GetRotation2d(),
     {s_frontLeft.GetPosition(), s_frontRight.GetPosition(),

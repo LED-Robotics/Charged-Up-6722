@@ -103,18 +103,41 @@ class RobotContainer {
   SwerveAutoBuilder autoBuilder{
     [this]() { return m_drive.GetPose(); }, // Function to supply current robot pose
     [this](auto initPose) { m_drive.ResetOdometry(initPose); }, // Function used to reset odometry at the beginning of auto
-
-    PIDConstants(-0.1, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
-    PIDConstants(-0.15, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
+    PIDConstants(0.0, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
+    PIDConstants(0.0, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
     [this](auto speeds) { m_drive.Drive(speeds.vx, speeds.vy, speeds.omega, false); }, // Output function that accepts field relative ChassisSpeeds
     eventMap, // Our event map
     { &m_drive }, // Drive requirements, usually just a single drive subsystem
     true // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
   };
 
-  frc2::CommandPtr testAuto{autoBuilder.fullAuto(PathPlanner::loadPathGroup("AutoPath", {PathConstraints(AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration)}))};
-  frc2::CommandPtr testPath{autoBuilder.fullAuto(PathPlanner::loadPathGroup("TestPath", {PathConstraints(AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration)}))};
-  frc2::CommandPtr testRotate{autoBuilder.fullAuto(PathPlanner::loadPathGroup("TestRotate", {PathConstraints(AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration)}))};
+  frc2::CommandPtr testAuto{autoBuilder.fullAuto(PathPlanner::loadPath("AutoPath", {PathConstraints(AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration)}))};
+  frc2::CommandPtr testPath{autoBuilder.fullAuto(PathPlanner::loadPath("TestPath", {PathConstraints(AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration)}))};
+  frc2::CommandPtr testRotate{autoBuilder.fullAuto(PathPlanner::loadPath("TestRotate", {PathConstraints(AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration)}))};
+
+  frc2::SequentialCommandGroup turnRateTest{    
+      frc2::InstantCommand(
+      [this]() { 
+        m_drive.Drive(0.0_mps, 0_mps, 90_deg_per_s, false);
+      }, {&m_drive}),
+      frc2::WaitCommand(1.0_s),
+      frc2::InstantCommand(
+      [this]() { 
+        m_drive.Drive(0.0_mps, 0_mps, 0_deg_per_s, false);
+      }, {&m_drive}),
+   };
+
+   frc2::SequentialCommandGroup driveRateTest{    
+      frc2::InstantCommand(
+      [this]() { 
+        m_drive.Drive(0.0_mps, 1.0_mps, 0_deg_per_s, false);
+      }, {&m_drive}),
+      frc2::WaitCommand(1.0_s),
+      frc2::InstantCommand(
+      [this]() { 
+        m_drive.Drive(0.0_mps, 0_mps, 0_deg_per_s, false);
+      }, {&m_drive}),
+   };
 
   frc2::Trigger mainDpadUp{[this]() { return controller.GetPOV() == 0; }};
   frc2::Trigger mainDpadRight{[this]() { return controller.GetPOV() == 90; }};
