@@ -50,6 +50,8 @@ class SwerveModule {
         // frc::SwerveModuleState& GetTarget() const;
         frc::SwerveModuleState GetState() const;
         frc::SwerveModulePosition GetPosition() const;
+        static double PlaceInAppropriate0To360Scope(double scopeReference, double newAngle);
+        static frc::SwerveModuleState Optimize(const frc::SwerveModuleState& desiredState, frc::Rotation2d currentAngle);
         void SetDesiredState(const frc::SwerveModuleState& state);
         void SetDrivePower(double power);
         void SetTurnPower(double power);
