@@ -116,19 +116,19 @@ class DriveSubsystem : public frc2::SubsystemBase {
    *
    * @param state Whether or not limiting is enabled.
    */
-   void SetLimiting(bool state);
+  void SetLimiting(bool state);
 
    /**
    * Enable or disable braking.
    *
    * @param state Whether or not braking is enabled.
    */
-   void SetBrakeMode(bool state);
+  void SetBrakeMode(bool state);
 
    /**
    * Initially configure onboard TalonFX settings for motors.
    */
-   void ConfigMotors();
+  void ConfigMotors();
 
    /**
    * Returns the pitch of the robot.
@@ -137,28 +137,15 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   double GetPitch();
 
-  void driveDistance(units::meter_t distance, units::meters_per_second_t speed);
+  void SetPoseToHold(frc::Pose2d target);
 
-  void driveDistance(units::meter_t distance);
+  frc::Pose2d GetPoseToHold();
 
-  void strafeDistance(units::meter_t distance, units::meters_per_second_t speed);
+  void StartHolding();
 
-  void strafeDistance(units::meter_t distance);
-  
-  // void turnToDegrees(units::degree_t angle, units::angular_velocity::degrees_per_second_t speed);
+  frc::ChassisSpeeds CalculateHolding();
 
-
-  // frc::Translation2d frontRightLocation{-0.449072_m, -0.449072_m};
-  // frc::Translation2d frontLeftLocation{-0.449072_m, 0.449072_m};
-  // frc::Translation2d backRightLocation{0.449072_m, -0.449072_m};
-  // frc::Translation2d backLeftLocation{0.449072_m, 0.449072_m};
-
-  // frc::Translation2d backLeftLocation{0.449072_m, 0.449072_m};
-  // frc::Translation2d backRightLocation{-0.449072_m, 0.449072_m};
-  // frc::Translation2d frontLeftLocation{0.449072_m, -0.449072_m};
-  // frc::Translation2d frontRightLocation{-0.449072_m, -0.449072_m};
-
-// CURRENT WORKING CONFIG
+  // CURRENT WORKING CONFIG
   // frc::Translation2d frontLeftLocation{-0.449072_m, 0.449072_m};
   // frc::Translation2d frontRightLocation{-0.449072_m, -0.449072_m};
   // frc::Translation2d backLeftLocation{0.449072_m, 0.449072_m};
@@ -177,8 +164,13 @@ class DriveSubsystem : public frc2::SubsystemBase {
   frc::SwerveDriveKinematics<4> kDriveKinematics{frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation};
 
  private:
- bool enableLimiting = false;
- double initialPitch = 0.0;
+  bool enableLimiting = false;
+  double initialPitch = 0.0;
+
+  frc::Pose2d poseToHold{};
+  frc2::PIDController xHoldController{0.1, 0.0, 0.0};
+  frc2::PIDController yHoldController{0.1, 0.0, 0.0};
+  frc2::PIDController thetaHoldController{0.1, 0.0, 0.0};
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 

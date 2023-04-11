@@ -44,6 +44,40 @@ frc2::Command* RobotContainer::GetEmptyCommand() {
            }, {});
 }
 
+frc::Pose2d RobotContainer::GetTargetPose() {
+  frc::Pose2d target{};
+  switch(targetStation) {
+      case 0:
+        return {2.00_m, 5.0_m, {alliance == frc::DriverStation::Alliance::kBlue ? 180_deg : 0_deg}};
+        break;
+      case 1:
+        return {2.00_m, 4.42_m, {alliance == frc::DriverStation::Alliance::kBlue ? 180_deg : 0_deg}};
+        break;
+      case 2:
+        return {2.00_m, 3.88_m, {alliance == frc::DriverStation::Alliance::kBlue ? 180_deg : 0_deg}};
+        break;
+      case 3:
+        return {2.00_m, 3.30_m, {alliance == frc::DriverStation::Alliance::kBlue ? 180_deg : 0_deg}};
+        break;
+      case 4:
+        return {2.00_m, 2.75_m, {alliance == frc::DriverStation::Alliance::kBlue ? 180_deg : 0_deg}};
+        break;
+      case 5:
+        return {2.00_m, 2.20_m, {alliance == frc::DriverStation::Alliance::kBlue ? 180_deg : 0_deg}};
+        break;
+      case 6:
+        return {2.00_m, 1.60_m, {alliance == frc::DriverStation::Alliance::kBlue ? 180_deg : 0_deg}};
+        break;
+      case 7:
+        return {2.00_m, 1.05_m, {alliance == frc::DriverStation::Alliance::kBlue ? 180_deg : 0_deg}};
+        break;
+      case 8:
+        return {2.00_m, 0.5_m, {alliance == frc::DriverStation::Alliance::kBlue ? 180_deg : 0_deg}};
+        break;
+    }
+    return target;
+}
+
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
@@ -61,11 +95,9 @@ RobotContainer::RobotContainer() {
 
   odomTrigger.WhileTrue(&repeatOdom);
 
-  alignCancelTrigger.OnTrue(frc2::cmd::RunOnce([this] { 
-    stationAlignCancel = true;
-  }, {})
-  ).OnFalse(frc2::cmd::RunOnce([this] { 
-    stationAlignCancel = false;
+  moveRoutineCancel.OnTrue(frc2::cmd::RunOnce([this] { 
+    stationAlignActive = false;
+    positionHoldActive = false;
   }, {}));
 
   mainDpadUp.OnTrue(HandlePartnerCommands(GetPositionCommand(3), GetEmptyCommand()));
@@ -82,11 +114,17 @@ RobotContainer::RobotContainer() {
   // controller.B().ToggleOnTrue(&driveRateTest);
   // controller.X().ToggleOnTrue(std::move(testPath));
   // controller.A().ToggleOnTrue(std::move(testRotate));
+
   controller.A().OnTrue(&toggleStationAlign);
+  // controller.A().OnTrue(&togglePositionHold);
   controller.B().OnTrue(&decrementStation);
   controller.X().OnTrue(&incrementStation);
 
-  alignTrigger.OnTrue(std::move(alignFollow));
+  alignTrigger.WhileTrue(std::move(alignFollow));
+  // alignTrigger.OnTrue(std::move(alignFollow.AndThen()));
+
+  // holdingTrigger.OnTrue();
+  holdingTrigger.WhileTrue(std::move(startHolding).AndThen(std::move(holdPosition)));
 
   // controller.A().ToggleOnTrue(&driveL);
   // controller.X().ToggleOnTrue(&driveL2);

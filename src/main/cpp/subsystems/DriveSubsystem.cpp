@@ -258,3 +258,28 @@ void DriveSubsystem::ConfigMotors() {
 double DriveSubsystem::GetPitch() {
   return gyro.GetPitch();
 }
+
+void DriveSubsystem::SetPoseToHold(frc::Pose2d target) {
+  poseToHold = target;
+}
+
+frc::Pose2d DriveSubsystem::GetPoseToHold() {
+  return poseToHold;
+}
+
+void DriveSubsystem::StartHolding() {
+  xHoldController.Reset();
+  yHoldController.Reset();
+  thetaHoldController.Reset();
+
+  xHoldController.SetSetpoint((double)poseToHold.X());
+  yHoldController.SetSetpoint((double)poseToHold.Y());
+  thetaHoldController.SetSetpoint((double)poseToHold.Rotation().Radians());
+}
+
+frc::ChassisSpeeds DriveSubsystem::CalculateHolding() {
+  auto current = odometry.GetPose();
+  return frc::ChassisSpeeds{units::meters_per_second_t{xHoldController.Calculate((double)current.X())}, 
+  units::meters_per_second_t{yHoldController.Calculate((double)current.Y())}, 
+  units::radians_per_second_t{thetaHoldController.Calculate((double)current.Rotation().Radians())}};
+}

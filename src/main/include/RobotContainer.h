@@ -101,7 +101,7 @@ class RobotContainer {
 
   bool stationAlignActive = false;
 
-  bool stationAlignCancel = false;
+  bool positionHoldActive = false;
   
   bool intakeHold = false;
 
@@ -109,9 +109,12 @@ class RobotContainer {
 
   bool validTag = false;
 
-  frc2::Trigger alignCancelTrigger{[this]() { return alignFollow.IsScheduled() && (abs(controller.GetLeftX()) > 0.1 || abs(controller.GetLeftY()) > 0.1 || abs(controller.GetRightX()) > 0.1); }};
+  frc2::Trigger moveRoutineCancel{[this]() { return (alignFollow.IsScheduled() || holdPosition.IsScheduled()) && 
+  (abs(controller.GetLeftX()) > 0.1 || abs(controller.GetLeftY()) > 0.1 || abs(controller.GetRightX()) > 0.1); }};
 
   frc2::Trigger alignTrigger{[this]() { return stationAlignActive; }};
+  
+  frc2::Trigger holdingTrigger{[this]() { return positionHoldActive; }};
     
   frc2::Trigger odomTrigger{[this]() { return validTag; }};
 
@@ -128,7 +131,7 @@ class RobotContainer {
     [this](auto initPose) { m_drive.ResetOdometry(initPose); }, // Function used to reset odometry at the beginning of auto
     PIDConstants(0.0, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
     PIDConstants(0.0, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
-    [this](auto speeds) { m_drive.Drive(speeds.vx, speeds.vy, speeds.omega, false); }, // Output function that accepts field relative ChassisSpeeds
+    [this](auto speeds) { m_drive.Drive(speeds.vx, speeds.vy, {speeds.omega}, false); }, // Output function that accepts field relative ChassisSpeeds
     eventMap, // Our event map
     { &m_drive }, // Drive requirements, usually just a single drive subsystem
     true // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
@@ -207,6 +210,9 @@ class RobotContainer {
   frc2::InstantCommand toggleStationAlign{[this] { stationAlignActive = !stationAlignActive; },
   {}};
 
+  frc2::InstantCommand togglePositionHold{[this] { positionHoldActive = !positionHoldActive; },
+  {}};
+
   frc2::InstantCommand incrementStation{[this] { targetStation += targetStation < 8 ? 1 : 0; },
   {}};
 
@@ -252,6 +258,8 @@ class RobotContainer {
 
   frc2::Command* SetBlinkin(int inputMode);
 
+  frc::Pose2d GetTargetPose();
+
   PathPlannerTrajectory currentTraj;
 
   frc2::CommandPtr alignFollow{frc2::cmd::Parallel(     
@@ -259,52 +267,36 @@ class RobotContainer {
       [&]() { 
         m_drive.SetLimiting(false);
         frc::Pose2d current = m_drive.GetPose();
-        units::meter_t targetY = 2.75_m;
-        switch(targetStation) {
-          case 0:
-            targetY = 5.0_m;
-            break;
-          case 1:
-            targetY = 4.42_m;
-            break;
-          case 2:
-            targetY = 3.88_m;
-            break;
-          case 3:
-            targetY = 3.30_m;
-            break;
-          case 4:
-            targetY = 2.75_m;
-            break;
-          case 5:
-            targetY = 2.20_m;
-            break;
-          case 6:
-            targetY = 1.60_m;
-            break;
-          case 7:
-            targetY = 1.05_m;
-            break;
-          case 8:
-            targetY = 0.5_m;
-            break;
-        }
-        double heading = -90.0;
-        if((double)targetY > (double)current.Y()) heading *= -1.0;
+        auto target = GetTargetPose();
+        // bool headingFlipped = -90.0;
+        bool headingFlipped = false;
+        // if((double)target.Y() > (double)current.Y()) heading *= -1.0;
+        if((double)target.Y() > (double)current.Y()) headingFlipped = true;
         SmartDashboard::PutNumber("targetNumber", targetStation);
-        SmartDashboard::PutNumber("targetY", (double)targetY);
+        SmartDashboard::PutNumber("targetY", (double)target.Y());
         currentTraj = PathPlanner::generatePath(
           PathConstraints(2.5_mps, 2_mps_sq), 
-          PathPoint(frc::Translation2d(current.X(), current.Y()), frc::Rotation2d(units::degree_t{heading}), current.Rotation()), // position, heading(direction of travel), holonomic rotation
-          PathPoint(frc::Translation2d(2.00_m, targetY), frc::Rotation2d(units::degree_t{heading}), current.Rotation()) // position, heading(direction of travel) holonomic rotation
+          PathPoint(frc::Translation2d(current.X(), current.Y()), frc::Rotation2d(units::degree_t{headingFlipped ? 90.0 : -90.0}), current.Rotation()), // position, heading(direction of travel), holonomic rotation
+          PathPoint(frc::Translation2d(target.X(), target.Y()), frc::Rotation2d(units::degree_t{headingFlipped ? 90.0 : -90.0}), current.Rotation()) // position, heading(direction of travel) holonomic rotation
         );
       }, {&m_drive}).ToPtr()),
       std::move(autoBuilder.followPath(currentTraj))
-  ).Until([this]() { return stationAlignCancel; }
   ).AndThen(frc2::cmd::RunOnce([this] { 
       m_drive.SetLimiting(true);
       m_drive.Drive(0.0_mps, 0.0_mps, 0.0_deg_per_s, false);
     }, {}))};
+
+  frc2::CommandPtr startHolding{frc2::cmd::RunOnce([this] { 
+    m_drive.SetLimiting(true);
+    m_drive.SetPoseToHold(GetTargetPose());
+    m_drive.StartHolding();
+  }, {&m_drive})};
+
+  frc2::CommandPtr holdPosition{frc2::cmd::Run([this] { 
+      auto speeds = m_drive.CalculateHolding();
+      m_drive.Drive(speeds.vx, speeds.vy, {speeds.omega}, false);
+    }, {&m_drive})};
+
   
   TurnTo turnTo90{3.0, &m_drive};
 
