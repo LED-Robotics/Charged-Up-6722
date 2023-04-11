@@ -41,7 +41,7 @@ frc::SwerveModuleState SwerveModule::Optimize(const frc::SwerveModuleState& desi
     double targetSpeed = (double)desiredState.speed;
     double delta = targetAngle - (double)currentAngle.Degrees();
     if (fabs(delta) > 90.0){
-        targetSpeed = -targetSpeed;
+        targetSpeed *= -1.0;
         targetAngle = delta > 90.0 ? (targetAngle - 180.0) : (targetAngle + 180.0);
     }
     return frc::SwerveModuleState{units::velocity::meters_per_second_t{targetSpeed}, {units::degree_t{targetAngle}}};

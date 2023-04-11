@@ -90,6 +90,8 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   double GetTurnRate();
 
+  frc::Rotation2d GetRotation();
+
   /**
    * Returns the currently-estimated pose of the robot.
    *

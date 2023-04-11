@@ -21,6 +21,10 @@
 
 #include "Constants.h"
 
+frc2::Command* RobotContainer::GetAlignCommand(int target) {
+  return new PathPlannerFollow(target, &m_drive);
+}
+
 frc2::Command* RobotContainer::GetPositionCommand(int position) {
   return new SetPosition(position, &elevator, &arm, &intake);
 }
@@ -50,6 +54,12 @@ RobotContainer::RobotContainer() {
   // Configure the button bindings
   ConfigureButtonBindings();
 
+  for(int i = 0; i < 9; i++) {
+    alignments[i] = GetAlignCommand(i);
+  }
+  
+  currentAlign = alignments[4];
+
   chooser.SetDefaultOption("Low Dock", &lowDock);
   chooser.AddOption("High Dock", &highDock);
   chooser.AddOption("Simple Dock", &dock);
@@ -67,6 +77,8 @@ RobotContainer::RobotContainer() {
   // dpadDown.OnTrue(GetPositionCommand(1));
   // controller.Back().OnTrue(GetPositionCommand(0));
 
+  odomTrigger.WhileTrue(&repeatOdom);
+
   mainDpadUp.OnTrue(HandlePartnerCommands(GetPositionCommand(3), GetEmptyCommand()));
   mainDpadLeft.OnTrue(HandlePartnerCommands(GetPositionCommand(4), GetEmptyCommand()));
   mainDpadRight.OnTrue(HandlePartnerCommands(GetPositionCommand(2), GetEmptyCommand()));
@@ -78,9 +90,15 @@ RobotContainer::RobotContainer() {
   // controller.A().ToggleOnTrue(GetRelativePathCommand({0.0_m, 0.0_m, 0_deg}, {}, {4.0_m, -0.0_m, 0_deg}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}));
 
   // controller.B().ToggleOnTrue(std::move(testAuto));
-  controller.B().ToggleOnTrue(&driveRateTest);
-  controller.X().ToggleOnTrue(std::move(testPath));
-  controller.A().ToggleOnTrue(std::move(testRotate));
+  // controller.B().ToggleOnTrue(&driveRateTest);
+  // controller.X().ToggleOnTrue(std::move(testPath));
+  // controller.A().ToggleOnTrue(std::move(testRotate));
+  controller.A().OnTrue(&toggleStationAlign);
+  controller.B().OnTrue(&incrementStation);
+  controller.X().OnTrue(&decrementStation);
+
+  alignTrigger.OnTrue(currentAlign);
+
   // controller.A().ToggleOnTrue(&driveL);
   // controller.X().ToggleOnTrue(&driveL2);
   // controller.B().ToggleOnTrue(new GyroDock(1.5, &m_drive));
@@ -103,6 +121,7 @@ RobotContainer::RobotContainer() {
   // Set up default drive command
     m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
+            field.SetRobotPose(m_drive.GetPose());
             if(controller.GetYButtonPressed()) fieldCentric = !fieldCentric;
             double x = controller.GetLeftY();
             double y = controller.GetLeftX();
@@ -181,6 +200,20 @@ RobotContainer::RobotContainer() {
           // if(controller.GetBackButton()) arm.SetTargetPosition(ArmConstants::kStartPosition);
       },
       {&arm}));
+
+      armLimelight.SetDefaultCommand(frc2::RunCommand(
+      [this] {
+        frc::SmartDashboard::PutData("field", &field);
+        if(!armLimelight.IsTarget() || armLimelight.GetTargetArea() < 0.65) {
+          validTag = false;
+        } else {
+          validTag = true;
+        }
+          frc::SmartDashboard::PutBoolean("tagDetected", validTag);
+      },
+      {&armLimelight}));
+
+
 }
 
 void RobotContainer::ResetOdometry() {

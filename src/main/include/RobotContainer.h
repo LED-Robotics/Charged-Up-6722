@@ -8,8 +8,11 @@
 #include <frc2/command/button/CommandXboxController.h>
 #include <frc/controller/PIDController.h>
 #include <frc/DriverStation.h>
+#include <frc2/command/button/Trigger.h>
+#include <frc/smartdashboard/Field2d.h>
 #include <frc/smartdashboard/SendableChooser.h>
 #include <frc2/command/Command.h>
+#include <frc2/command/RepeatCommand.h>
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/PIDCommand.h>
 #include <frc2/command/ParallelRaceGroup.h>
@@ -21,6 +24,7 @@
 #include "commands/TurnTo.h"
 #include "commands/TrajectoryRelative.h"
 #include "commands/TrajectoryAbsolute.h"
+#include "commands/PathPlannerFollow.h"
 #include "commands/SetPosition.h"
 #include "commands/WallNoBalance.h"
 #include "commands/LowPlaceThenBreak.h"
@@ -88,11 +92,27 @@ class RobotContainer {
 
   IntakeSubsystem intake{&arm};
 
-  LimelightSubsystem limelight{"limelight", alliance};
+  LimelightSubsystem armLimelight{"limelight-arm", alliance};
+
+  units::degree_t startOffset{180.0};
+
+  int targetStation = 4;
+
+  bool stationCenterActive = false;
   
   bool intakeHold = false;
 
   bool fieldCentric = true;
+
+  bool validTag = false;
+
+  frc2::Trigger alignTrigger{[this]() { return stationCenterActive; }};
+  
+  frc2::Trigger alignCancel{[this]() { return stationCenterActive && (abs(controller.GetLeftX()) > 0.1 || abs(controller.GetLeftY()) > 0.1 || abs(controller.GetRightX()) > 0.1); }};
+  
+  frc2::Trigger odomTrigger{[this]() { return validTag; }};
+
+  frc::Field2d field;
 
   std::unordered_map<std::string, std::shared_ptr<frc2::Command>> eventMap;
   // eventMap.emplace("marker1", std::make_shared<frc2::PrintCommand>("Passed Marker 1"));
@@ -166,9 +186,35 @@ class RobotContainer {
       },
       {&elevator, &arm, &intake}};
 
+  
+
+  frc2::InstantCommand updateOdometry{
+        [this]() { 
+          std::vector<double> pose = armLimelight.GetBotPos();
+          if(pose[0] == 0.0 && pose[1] == 0.0 && pose[5] == 0.0) return;  
+          m_drive.ResetOdometry({units::meter_t{pose[0]}, units::meter_t{pose[1]}, {m_drive.GetRotation().Degrees() + startOffset}});
+        }, {}};
+
+  frc2::RepeatCommand repeatOdom{std::move(updateOdometry)};
+
 
   frc2::InstantCommand toggleFieldCentric{[this] { fieldCentric = !fieldCentric; },
                                         {}};
+
+  frc2::InstantCommand toggleStationAlign{[this] { stationCenterActive = !stationCenterActive; },
+  {}};
+
+  frc2::InstantCommand incrementStation{[this] { 
+    targetStation += targetStation < 8 ? 1 : 0; 
+    currentAlign = alignments[targetStation];
+    },
+  {}};
+
+  frc2::InstantCommand decrementStation{[this] { 
+    targetStation -= targetStation > 0 ? 1 : 0; 
+    currentAlign = alignments[targetStation];
+    },
+  {}};
 
   frc2::InstantCommand rumblePrimaryOn{[this] { controller.SetRumble(GenericHID::kBothRumble, 1.0); },
                                         {}};
@@ -207,6 +253,8 @@ class RobotContainer {
   // frc2::InstantCommand intakeOff{[this] { intake.Off(); },
   //                                       {}};
 
+  frc2::Command* GetAlignCommand(int target);
+
   frc2::Command* GetPositionCommand(int position);
 
   frc2::Command* GetRelativePathCommand(const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
@@ -221,6 +269,10 @@ class RobotContainer {
   // TrajectoryRelative driveForward{{{0.0_m, 0.0_m, 0_deg}, {2.0_m, 0.0_m, 0.0_deg}}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}, &m_drive};
   // TrajectoryRelative driveL{{{0.0_m, 0.0_m, 0_deg}, {2.0_m, 0.0_m, 0.0_deg}, {2.0_m, 2.0_m, 0.0_deg}}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}, &m_drive};
   // TrajectoryRelative driveL2{{{0.0_m, 0.0_m, 0.0_deg}, {2.0_m, 0.0_m, 0.0_deg}}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}, &m_drive};
+
+  frc2::Command* alignments[9];
+  
+  frc2::Command* currentAlign;
 
   TurnTo turnTo90{3.0, &m_drive};
 

@@ -12,7 +12,7 @@
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <pathplanner/lib/auto/SwerveAutoBuilder.h>
+#include <pathplanner/lib/commands/PPSwerveControllerCommand.h>
 #include <pathplanner/lib/PathPlanner.h>
 
 
@@ -27,6 +27,7 @@ using namespace pathplanner;
  * as opposed to the original method of moving all three simultaneously all the time.
  */
 class PathPlannerFollow : public frc2::CommandHelper<frc2::SequentialCommandGroup, PathPlannerFollow> {
- public:
-  explicit PathPlannerFollow(DriveSubsystem* driveRef);
+  public:
+    explicit PathPlannerFollow(int target, DriveSubsystem* driveRef);
+  private:
 };

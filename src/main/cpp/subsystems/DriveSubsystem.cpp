@@ -189,6 +189,10 @@ units::degree_t DriveSubsystem::GetAngle() const {
   return units::degree_t{gyro.GetAngle()};
 }
 
+frc::Rotation2d DriveSubsystem::GetRotation() {
+  return gyro.GetRotation2d();
+}
+
 void DriveSubsystem::ZeroHeading() {
   gyro.Reset();
 }

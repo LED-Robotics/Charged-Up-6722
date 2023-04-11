@@ -27,6 +27,8 @@ void LimelightSubsystem::Periodic() {
     targetArea = table->GetNumber("ta", 0.0);
     targetSkew = table->GetNumber("ts", 0.0);
   }
+  // botPose = table->GetNumberArray("botpose",std::vector<double>(6));
+
   if(alliance == frc::DriverStation::Alliance::kBlue) {
     botPose = table->GetNumberArray("botpose_wpiblue",std::vector<double>(6));
   } else if(alliance == frc::DriverStation::Alliance::kRed) {
