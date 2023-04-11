@@ -1,6 +1,7 @@
 #include "commands/PathPlannerFollow.h"
 
 PathPlannerFollow::PathPlannerFollow(int target, DriveSubsystem *driveRef) {
+  SetName("Path Planner Follow");
   AddRequirements(driveRef);
   auto current = driveRef->GetPose();
   units::meter_t targetY = 5.0_m;

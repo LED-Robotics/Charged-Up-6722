@@ -1,6 +1,7 @@
 #include "commands/PlaceThenBreak.h"
 
 PlaceThenBreak::PlaceThenBreak(DriveSubsystem *drive, ElevatorSubsystem *elev, ArmSubsystem *arm, IntakeSubsystem *intake) {
+  SetName("Place Then Break");
   AddCommands(
     SetIntakePower(0.12, intake),       // set intake to holding power
 

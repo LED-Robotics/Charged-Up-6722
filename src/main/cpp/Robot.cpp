@@ -58,11 +58,13 @@ void Robot::AutonomousInit() {
   // bool doAuton = SmartDashboard::GetBoolean("doAuton", false);
   // if (doAuton) {
   m_autonomousCommand = m_container.GetAutonomousCommand();
-  m_container.SetDriveBrakes(true);
-  m_container.SetSlew(false);
-  m_container.SetDriveReversed(false);
-  // m_container.ResetOdometry();
-  m_autonomousCommand->Schedule();
+  if(m_autonomousCommand != nullptr) {
+    m_container.SetDriveBrakes(true);
+    m_container.SetSlew(false);
+    m_container.SetDriveReversed(false);
+    // m_container.ResetOdometry();
+    m_autonomousCommand->Schedule();
+  }
   // }
 }
 

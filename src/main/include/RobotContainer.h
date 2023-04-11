@@ -11,6 +11,7 @@
 #include <frc2/command/button/Trigger.h>
 #include <frc/smartdashboard/Field2d.h>
 #include <frc/smartdashboard/SendableChooser.h>
+#include <frc2/command/Commands.h>
 #include <frc2/command/Command.h>
 #include <frc2/command/RepeatCommand.h>
 #include <frc2/command/InstantCommand.h>
@@ -98,7 +99,9 @@ class RobotContainer {
 
   int targetStation = 4;
 
-  bool stationCenterActive = false;
+  bool stationAlignActive = false;
+
+  bool stationAlignCancel = false;
   
   bool intakeHold = false;
 
@@ -106,10 +109,10 @@ class RobotContainer {
 
   bool validTag = false;
 
-  frc2::Trigger alignTrigger{[this]() { return stationCenterActive; }};
-  
-  frc2::Trigger alignCancel{[this]() { return stationCenterActive && (abs(controller.GetLeftX()) > 0.1 || abs(controller.GetLeftY()) > 0.1 || abs(controller.GetRightX()) > 0.1); }};
-  
+  frc2::Trigger alignCancelTrigger{[this]() { return alignFollow.IsScheduled() && (abs(controller.GetLeftX()) > 0.1 || abs(controller.GetLeftY()) > 0.1 || abs(controller.GetRightX()) > 0.1); }};
+
+  frc2::Trigger alignTrigger{[this]() { return stationAlignActive; }};
+    
   frc2::Trigger odomTrigger{[this]() { return validTag; }};
 
   frc::Field2d field;
@@ -201,19 +204,13 @@ class RobotContainer {
   frc2::InstantCommand toggleFieldCentric{[this] { fieldCentric = !fieldCentric; },
                                         {}};
 
-  frc2::InstantCommand toggleStationAlign{[this] { stationCenterActive = !stationCenterActive; },
+  frc2::InstantCommand toggleStationAlign{[this] { stationAlignActive = !stationAlignActive; },
   {}};
 
-  frc2::InstantCommand incrementStation{[this] { 
-    targetStation += targetStation < 8 ? 1 : 0; 
-    currentAlign = alignments[targetStation];
-    },
+  frc2::InstantCommand incrementStation{[this] { targetStation += targetStation < 8 ? 1 : 0; },
   {}};
 
-  frc2::InstantCommand decrementStation{[this] { 
-    targetStation -= targetStation > 0 ? 1 : 0; 
-    currentAlign = alignments[targetStation];
-    },
+  frc2::InstantCommand decrementStation{[this] { targetStation -= targetStation > 0 ? 1 : 0; },
   {}};
 
   frc2::InstantCommand rumblePrimaryOn{[this] { controller.SetRumble(GenericHID::kBothRumble, 1.0); },
@@ -244,17 +241,6 @@ class RobotContainer {
     blinkin.Set(.27); /*Fast Heartbeat; Color 2 (Yellow)*/; },
                                         {&arm}};
 
-  // frc2::InstantCommand m_driveFullSpeed{[this] { m_drive.SetMaxOutput(1); },
-  //                                       {}};
-  // frc2::InstantCommand toggleFlywheel{[this] { flywheel.SetFlywheelState(!flywheel.GetFlywheelState()); },
-  //                                       {}};
-  // frc2::InstantCommand intakeFullPower{[this] { intake.On(); },
-  //                                       {}};
-  // frc2::InstantCommand intakeOff{[this] { intake.Off(); },
-  //                                       {}};
-
-  frc2::Command* GetAlignCommand(int target);
-
   frc2::Command* GetPositionCommand(int position);
 
   frc2::Command* GetRelativePathCommand(const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
@@ -266,30 +252,74 @@ class RobotContainer {
 
   frc2::Command* SetBlinkin(int inputMode);
 
-  // TrajectoryRelative driveForward{{{0.0_m, 0.0_m, 0_deg}, {2.0_m, 0.0_m, 0.0_deg}}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}, &m_drive};
-  // TrajectoryRelative driveL{{{0.0_m, 0.0_m, 0_deg}, {2.0_m, 0.0_m, 0.0_deg}, {2.0_m, 2.0_m, 0.0_deg}}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}, &m_drive};
-  // TrajectoryRelative driveL2{{{0.0_m, 0.0_m, 0.0_deg}, {2.0_m, 0.0_m, 0.0_deg}}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}, &m_drive};
+  PathPlannerTrajectory currentTraj;
 
-  frc2::Command* alignments[9];
+  frc2::CommandPtr alignFollow{frc2::cmd::Parallel(     
+      std::move(frc2::InstantCommand(
+      [&]() { 
+        m_drive.SetLimiting(false);
+        frc::Pose2d current = m_drive.GetPose();
+        units::meter_t targetY = 2.75_m;
+        switch(targetStation) {
+          case 0:
+            targetY = 5.0_m;
+            break;
+          case 1:
+            targetY = 4.42_m;
+            break;
+          case 2:
+            targetY = 3.88_m;
+            break;
+          case 3:
+            targetY = 3.30_m;
+            break;
+          case 4:
+            targetY = 2.75_m;
+            break;
+          case 5:
+            targetY = 2.20_m;
+            break;
+          case 6:
+            targetY = 1.60_m;
+            break;
+          case 7:
+            targetY = 1.05_m;
+            break;
+          case 8:
+            targetY = 0.5_m;
+            break;
+        }
+        double heading = -90.0;
+        if((double)targetY > (double)current.Y()) heading *= -1.0;
+        SmartDashboard::PutNumber("targetNumber", targetStation);
+        SmartDashboard::PutNumber("targetY", (double)targetY);
+        currentTraj = PathPlanner::generatePath(
+          PathConstraints(2.5_mps, 2_mps_sq), 
+          PathPoint(frc::Translation2d(current.X(), current.Y()), frc::Rotation2d(units::degree_t{heading}), current.Rotation()), // position, heading(direction of travel), holonomic rotation
+          PathPoint(frc::Translation2d(2.00_m, targetY), frc::Rotation2d(units::degree_t{heading}), current.Rotation()) // position, heading(direction of travel) holonomic rotation
+        );
+      }, {&m_drive}).ToPtr()),
+      std::move(autoBuilder.followPath(currentTraj))
+  ).Until([this]() { return stationAlignCancel; }
+  ).AndThen(frc2::cmd::RunOnce([this] { 
+      m_drive.SetLimiting(true);
+      m_drive.Drive(0.0_mps, 0.0_mps, 0.0_deg_per_s, false);
+    }, {}))};
   
-  frc2::Command* currentAlign;
-
   TurnTo turnTo90{3.0, &m_drive};
 
-  GyroDock dock{1.5, &m_drive};
+  frc2::CommandPtr dock{GyroDock(1.5, &m_drive).WithTimeout(15.0_s)};
 
-  WallNoBalance wallNoBalance{&m_drive, &elevator, &arm, &intake};
+  frc2::CommandPtr wallNoBalance{WallNoBalance(&m_drive, &elevator, &arm, &intake).WithTimeout(15.0_s)};
   
-  LowPlaceThenBreak lowPlaceThenBreak{&m_drive, &elevator, &arm, &intake};
+  frc2::CommandPtr lowPlaceThenBreak{LowPlaceThenBreak(&m_drive, &elevator, &arm, &intake).WithTimeout(15.0_s)};
   
-  PlaceThenBreak placeThenBreak{&m_drive, &elevator, &arm, &intake};
+  frc2::CommandPtr placeThenBreak{PlaceThenBreak(&m_drive, &elevator, &arm, &intake).WithTimeout(15.0_s)};
 
-  HighDock highDock{&m_drive, &elevator, &arm, &intake};
+  frc2::CommandPtr highDock{HighDock(&m_drive, &elevator, &arm, &intake).WithTimeout(15.0_s)};
 
-  LowDock lowDock{&m_drive, &elevator, &arm, &intake};
+  frc2::CommandPtr lowDock{LowDock(&m_drive, &elevator, &arm, &intake).WithTimeout(15.0_s)};
 
   // The chooser for the autonomous routines
   frc::SendableChooser<frc2::Command*> chooser;
-
-  void ConfigureButtonBindings();
 };

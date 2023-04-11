@@ -3,6 +3,7 @@
 GyroDock::GyroDock(double targetSpeed, DriveSubsystem *driveRef) 
 : drive(driveRef) {
   AddRequirements(driveRef);
+  SetName("Gyro Dock");
   speed = -targetSpeed;
   if(targetSpeed < 0.0) backwards = true;
 }

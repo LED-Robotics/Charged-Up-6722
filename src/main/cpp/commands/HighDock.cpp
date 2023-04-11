@@ -1,6 +1,7 @@
 #include "commands/HighDock.h"
 
 HighDock::HighDock(DriveSubsystem *drive, ElevatorSubsystem *elev, ArmSubsystem *arm, IntakeSubsystem *intake) {
+  SetName("High Dock");
   AddCommands(
     SetIntakePower(0.12, intake),       // set intake to holding power
 

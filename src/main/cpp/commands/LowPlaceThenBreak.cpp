@@ -1,6 +1,7 @@
 #include "commands/LowPlaceThenBreak.h"
 
 LowPlaceThenBreak::LowPlaceThenBreak(DriveSubsystem *drive, ElevatorSubsystem *elev, ArmSubsystem *arm, IntakeSubsystem *intake) {
+  SetName("Low Place Then Break");
   AddCommands(
     
     SetIntakePower(0.12, intake),       // set intake to holding power

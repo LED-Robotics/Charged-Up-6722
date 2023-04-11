@@ -1,6 +1,7 @@
 #include "commands/WallNoBalance.h"
 
 WallNoBalance::WallNoBalance(DriveSubsystem *drive, ElevatorSubsystem *elev, ArmSubsystem *arm, IntakeSubsystem *intake) {
+  SetName("Wall No Balance");
   AddCommands(
     SetIntakePower(0.12, intake),       // set intake to holding power
 

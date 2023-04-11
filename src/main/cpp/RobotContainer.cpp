@@ -21,10 +21,6 @@
 
 #include "Constants.h"
 
-frc2::Command* RobotContainer::GetAlignCommand(int target) {
-  return new PathPlannerFollow(target, &m_drive);
-}
-
 frc2::Command* RobotContainer::GetPositionCommand(int position) {
   return new SetPosition(position, &elevator, &arm, &intake);
 }
@@ -51,33 +47,26 @@ frc2::Command* RobotContainer::GetEmptyCommand() {
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
-  // Configure the button bindings
-  ConfigureButtonBindings();
-
-  for(int i = 0; i < 9; i++) {
-    alignments[i] = GetAlignCommand(i);
-  }
-  
-  currentAlign = alignments[4];
-
-  chooser.SetDefaultOption("Low Dock", &lowDock);
-  chooser.AddOption("High Dock", &highDock);
-  chooser.AddOption("Simple Dock", &dock);
-  chooser.AddOption("Low Place Then Break", &lowPlaceThenBreak);
-  chooser.AddOption("Place Then Break", &placeThenBreak);
-  chooser.AddOption("Wall No Balance", &wallNoBalance);
+  chooser.SetDefaultOption("Low Dock", lowDock.get());
+  chooser.AddOption("High Dock", highDock.get());
+  chooser.AddOption("Simple Dock", dock.get());
+  chooser.AddOption("Low Place Then Break", lowPlaceThenBreak.get());
+  chooser.AddOption("Place Then Break", placeThenBreak.get());
+  chooser.AddOption("Wall No Balance", wallNoBalance.get());
   chooser.AddOption("None", GetEmptyCommand());
 
   blinkin.Set(.41);
 
   SmartDashboard::PutData(&chooser);
 
-  // dpadUp.OnTrue(GetPositionCommand(3));
-  // dpadRight.OnTrue(GetPositionCommand(2));
-  // dpadDown.OnTrue(GetPositionCommand(1));
-  // controller.Back().OnTrue(GetPositionCommand(0));
-
   odomTrigger.WhileTrue(&repeatOdom);
+
+  alignCancelTrigger.OnTrue(frc2::cmd::RunOnce([this] { 
+    stationAlignCancel = true;
+  }, {})
+  ).OnFalse(frc2::cmd::RunOnce([this] { 
+    stationAlignCancel = false;
+  }, {}));
 
   mainDpadUp.OnTrue(HandlePartnerCommands(GetPositionCommand(3), GetEmptyCommand()));
   mainDpadLeft.OnTrue(HandlePartnerCommands(GetPositionCommand(4), GetEmptyCommand()));
@@ -94,10 +83,10 @@ RobotContainer::RobotContainer() {
   // controller.X().ToggleOnTrue(std::move(testPath));
   // controller.A().ToggleOnTrue(std::move(testRotate));
   controller.A().OnTrue(&toggleStationAlign);
-  controller.B().OnTrue(&incrementStation);
-  controller.X().OnTrue(&decrementStation);
+  controller.B().OnTrue(&decrementStation);
+  controller.X().OnTrue(&incrementStation);
 
-  alignTrigger.OnTrue(currentAlign);
+  alignTrigger.OnTrue(std::move(alignFollow));
 
   // controller.A().ToggleOnTrue(&driveL);
   // controller.X().ToggleOnTrue(&driveL2);
@@ -155,49 +144,13 @@ RobotContainer::RobotContainer() {
 
     elevator.SetDefaultCommand(frc2::RunCommand(
       [this] {
-            // elevator.SetTargetPosition(controller.GetLeftTriggerAxis() * 30000);
-            // int state = elevator.GetState();
-            // if(controller.GetAButtonPressed()) {
-            //   if(state == ElevatorConstants::kPositionMode) elevator.SetState(ElevatorConstants::kOff);
-            //   else if(state == ElevatorConstants::kOff) elevator.SetState(ElevatorConstants::kPositionMode);
-            // }
-            // elevator.SetState(ElevatorConstants::kPositionMode);
-            // elevator.SetTargetPosition(SmartDashboard::GetNumber("elevatorPos", 0));
             elevator.SetState(ElevatorConstants::kPositionMode);
-          //   int pov = controller.GetPOV();
-          //   switch(pov) {
-          //   case 0: 
-          //     elevator.SetTargetPosition(ElevatorConstants::kHighDropoffPosition);
-          //     break;
-          //   case 90:
-          //     elevator.SetTargetPosition(ElevatorConstants::kMidDropoffPosition);
-          //     break;
-          //   case 180:
-          //     elevator.SetTargetPosition(ElevatorConstants::kFloorPickupPosition);
-          //     break;
-          // }
-
-          // if(controller.GetBackButton()) elevator.SetTargetPosition(ElevatorConstants::kStartPosition);
       },
       {&elevator}));
 
       arm.SetDefaultCommand(frc2::RunCommand(
       [this] {
             arm.SetState(ArmConstants::kPositionMode);
-          //   int pov = controller.GetPOV();
-          //   switch(pov) {
-          //   case 0: 
-          //     arm.SetTargetPosition(ArmConstants::kHighDropoffPosition);
-          //     break;
-          //   case 90:
-          //     arm.SetTargetPosition(ArmConstants::kMidDropoffPosition);
-          //     break;
-          //   case 180:
-          //     arm.SetTargetPosition(ArmConstants::kFloorPickupPosition);
-          //     break;
-          // }
-
-          // if(controller.GetBackButton()) arm.SetTargetPosition(ArmConstants::kStartPosition);
       },
       {&arm}));
 
@@ -227,18 +180,6 @@ void RobotContainer::SetDriveBrakes(bool state) {
         intake.SetBrakeMode(state);
 }
 
-void RobotContainer::ConfigureButtonBindings() {
-  // Configure your button bindings here
-
-  // While holding the shoulder button, drive at half speed
-//   frc2::JoystickButton(&controller, 5)
-//       .WhenPressed(&m_driveHalfSpeed)
-//       .WhenReleased(&m_driveFullSpeed);
-  
-//   frc2::JoystickButton(&controller, 1)
-//       .WhenPressed(&toggleFlywheel);
-}
-
 void RobotContainer::HandleIntake() {
   intake.SetState(IntakeConstants::kPowerMode);
   double speed = controller.GetRightTriggerAxis() - controller.GetLeftTriggerAxis();
@@ -264,81 +205,10 @@ void RobotContainer::SetDriveReversed(bool reversed) {
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
-  // Set up config for trajectory
-  
-  // frc::TrajectoryConfig config(AutoConstants::kMaxSpeed,
-  //                              AutoConstants::kMaxAcceleration);
-  // // Add kinematics to ensure max speed is actually obeyed
-  // config.SetKinematics(m_drive.kDriveKinematics);
-
-  // // An example trajectory to follow.  All units in meters.
-  // auto moveFromLink = frc::TrajectoryGenerator::GenerateTrajectory(
-    
-  //     // Start at the origin facing the +X direction
-  //     {frc::Pose2d{0.0_m, 0.0_m, 0.0_deg},
-  //     // End 3 meters straight ahead of where we started, facing forward
-  //     frc::Pose2d{-0.5_m, 0.0_m, 0.0_deg},
-  //     },
-  //     // Pass the config
-  //     config);
-
-  // auto moveToLink = frc::TrajectoryGenerator::GenerateTrajectory(
-    
-  //     // Start at the origin facing the +X direction
-  //     {frc::Pose2d{-0.5_m, 0.0_m, 0.0_deg},
-  //     // End 3 meters straight ahead of where we started, facing forward
-  //     frc::Pose2d{0.0_m, 0.0_m, 0.0_deg},
-  //     },
-  //     // Pass the config
-  //     config);
-
-  // frc::ProfiledPIDController<units::radians> thetaController{
-  //     AutoConstants::kPThetaController, 0, 0,
-  //     AutoConstants::kThetaControllerConstraints};
-
-  // thetaController.EnableContinuousInput(units::radian_t{-std::numbers::pi},
-  //                                       units::radian_t{std::numbers::pi});
-  // frc2::SwerveControllerCommand<4> commandMoveFromLink(
-  //     moveFromLink, [this]() { return m_drive.GetPose(); },
-
-  //     m_drive.kDriveKinematics,
-
-  //     frc2::PIDController{AutoConstants::kPXController, 0, 0},
-  //     frc2::PIDController{AutoConstants::kPYController, 0, 0}, thetaController,
-
-  //     [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
-
-  //     {&m_drive});
-
-  // frc2::SwerveControllerCommand<4> commandMoveToLink(
-  //     moveToLink, [this]() { return m_drive.GetPose(); },
-
-  //     m_drive.kDriveKinematics,
-
-  //     frc2::PIDController{AutoConstants::kPXController, 0, 0},
-  //     frc2::PIDController{AutoConstants::kPYController, 0, 0}, thetaController,
-
-  //     [this](auto moduleStates) { m_drive.SetModuleStates(moduleStates); },
-
-  //     {&m_drive});
-
-  // Reset odometry to the starting pose of the trajectory.
-  // m_drive.ResetOdometry(moveFromLink.InitialPose());
-
-  // return new frc2::SequentialCommandGroup(
-  //     HighDock(&m_drive, &elevator, &arm, &intake),
-  //     frc2::InstantCommand(
-  //         [this]() { m_drive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
-  //         }, {}));
-  // return new frc2::SequentialCommandGroup(
-  //     GyroDock(1.5, &m_drive),
-  //     frc2::InstantCommand(
-  //         [this]() { m_drive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
-  //         }, {}));
-    // return new HighDock(&m_drive, &elevator, &arm, &intake);
-    frc2::Command* selected = chooser.GetSelected();
-    if(selected == &dock) {
+    auto selected = chooser.GetSelected();
+    if(selected->GetName() == dock.get()->GetName()) {
       // flip odometry so that field centric works correctly
+      startOffset = 0_deg;
       m_drive.ResetOdometry(frc::Pose2d{{0.0_m, 0.0_m}, {0_deg}});
     }
     return selected;
