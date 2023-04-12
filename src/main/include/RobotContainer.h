@@ -80,8 +80,6 @@ class RobotContainer {
   //Blinkin
   Spark blinkin{BlinkinConstants::kBlinkinPort};
   
-  frc::DriverStation::Alliance alliance{frc::DriverStation::GetAlliance()};
-
   // The robot's subsystems and commands are defined here...
 
   // The robot's subsystems
@@ -93,13 +91,11 @@ class RobotContainer {
 
   IntakeSubsystem intake{&arm};
 
-  LimelightSubsystem armLimelight{"limelight-arm", alliance};
+  LimelightSubsystem armLimelight{"limelight-arm"};
 
   units::degree_t startOffset{180.0};
 
   int targetStation = 4;
-
-  bool stationAlignActive = false;
 
   bool positionHoldActive = false;
   
@@ -109,10 +105,8 @@ class RobotContainer {
 
   bool validTag = false;
 
-  frc2::Trigger moveRoutineCancel{[this]() { return (alignFollow.IsScheduled() || holdPosition.IsScheduled()) && 
+  frc2::Trigger moveRoutineCancel{[this]() { return positionHoldActive && 
   (abs(controller.GetLeftX()) > 0.1 || abs(controller.GetLeftY()) > 0.1 || abs(controller.GetRightX()) > 0.1); }};
-
-  frc2::Trigger alignTrigger{[this]() { return stationAlignActive; }};
   
   frc2::Trigger holdingTrigger{[this]() { return positionHoldActive; }};
     
@@ -207,9 +201,6 @@ class RobotContainer {
   frc2::InstantCommand toggleFieldCentric{[this] { fieldCentric = !fieldCentric; },
                                         {}};
 
-  frc2::InstantCommand toggleStationAlign{[this] { stationAlignActive = !stationAlignActive; },
-  {}};
-
   frc2::InstantCommand togglePositionHold{[this] { positionHoldActive = !positionHoldActive; },
   {}};
 
@@ -265,6 +256,10 @@ class RobotContainer {
     blinkin.Set(.27); /*Fast Heartbeat; Color 2 (Yellow)*/; },
                                         {&arm}};
 
+  bool IsBlue();
+
+  int GetClosestPosition();
+
   frc2::Command* GetPositionCommand(int position);
 
   frc2::Command* GetRelativePathCommand(const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
@@ -278,33 +273,9 @@ class RobotContainer {
 
   frc::Pose2d GetTargetPose();
 
-  PathPlannerTrajectory currentTraj;
-
-  frc2::CommandPtr alignFollow{frc2::cmd::Sequence(
-      std::move(frc2::cmd::RunOnce(
-      [&]() { 
-        m_drive.SetLimiting(false);
-        frc::Pose2d current = m_drive.GetPose();
-        auto target = GetTargetPose();
-        // bool headingFlipped = -90.0;
-        bool headingFlipped = false;
-        // if((double)target.Y() > (double)current.Y()) heading *= -1.0;
-        if((double)target.Y() > (double)current.Y()) headingFlipped = true;
-        currentTraj = PathPlanner::generatePath(
-          PathConstraints(2.5_mps, 2_mps_sq),
-          PathPoint(frc::Translation2d(current.X(), current.Y()), frc::Rotation2d(units::degree_t{headingFlipped ? 90.0 : -90.0}), current.Rotation()), // position, heading(direction of travel), holonomic rotation
-          PathPoint(frc::Translation2d(target.X(), target.Y()), frc::Rotation2d(units::degree_t{headingFlipped ? 90.0 : -90.0}), current.Rotation()) // position, heading(direction of travel) holonomic rotation
-        );
-        SmartDashboard::PutNumber("targetNumber", targetStation);
-        SmartDashboard::PutNumber("targetY", (double)target.Y());
-      }, {&m_drive})),
-      std::move(autoBuilder.followPath(currentTraj))
-  ).AndThen(frc2::cmd::RunOnce([this] { 
-      m_drive.SetLimiting(true);
-      m_drive.Drive(0.0_mps, 0.0_mps, 0.0_deg_per_s, false);
-    }, {}))};
-
   frc2::CommandPtr startHolding{frc2::cmd::RunOnce([this] { 
+    targetStation = GetClosestPosition();
+    if(targetStation == -1) positionHoldActive = false;
     m_drive.SetLimiting(false);
     m_drive.SetPoseToHold(GetTargetPose());
     m_drive.StartHolding();
@@ -332,11 +303,11 @@ class RobotContainer {
     SetPosition(0, &elevator, &arm, &intake)).ToPtr()
   };
 
-  // frc2::CommandPtr cancelMoves{frc2::cmd::RunOnce([this] { 
-  //   stationAlignActive = false;
-  //   positionHoldActive = false;
-  // }, {})};
+  frc2::CommandPtr cancelMoves{frc2::cmd::RunOnce([this] { 
+    positionHoldActive = false;
+  }, {})};
 
+  const frc::Translation2d HoldPositions[10]{{2.10_m, 5.0_m}, {2.10_m, 4.42_m}, {2.10_m, 3.88_m}, {2.10_m, 3.30_m}, {2.10_m, 2.75_m}, {2.10_m, 2.20_m}, {2.10_m, 1.60_m}, {2.10_m, 1.05_m}, {2.10_m, 0.5_m}, {14.25_m, 7.5_m}};
   
   TurnTo turnTo90{3.0, &m_drive};
 

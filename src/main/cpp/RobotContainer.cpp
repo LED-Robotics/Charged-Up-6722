@@ -21,6 +21,29 @@
 
 #include "Constants.h"
 
+bool RobotContainer::IsBlue() {
+  return frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kBlue;
+}
+
+int RobotContainer::GetClosestPosition() {
+  bool coneMode = arm.GetConeMode();
+  frc::Pose2d current = m_drive.GetPose();
+  int pos = -1;
+  double currentYDif = 1000.0;
+  for(int i = 0; i < 10; i++) {
+    if(coneMode && (i == 1 || i == 4 || i == 7)) continue;
+    else if(!coneMode && (i == 0 || i == 2 || i == 3 || i == 5 || i == 6 || i == 8)) continue;
+    double deltaX = abs((double)current.X() - (double)HoldPositions[i].X());
+    if(deltaX > 3.0) continue;
+    double deltaY = abs((double)current.Y() - (double)HoldPositions[i].Y());
+    if(deltaY < currentYDif) {
+      pos = i;
+      currentYDif = deltaY;
+    }
+  }
+  return pos;
+}
+
 frc2::Command* RobotContainer::GetPositionCommand(int position) {
   return new SetPosition(position, &elevator, &arm, &intake);
 }
@@ -46,36 +69,37 @@ frc2::Command* RobotContainer::GetEmptyCommand() {
 
 frc::Pose2d RobotContainer::GetTargetPose() {
   frc::Pose2d target{};
+  bool isBlue = IsBlue();
   switch(targetStation) {
       case 0:
-        return {2.10_m, 5.0_m, {alliance == frc::DriverStation::Alliance::kBlue ? 180_deg : 0_deg}};
+        return {HoldPositions[0], {isBlue ? 180_deg : 0_deg}};
         break;
       case 1:
-        return {2.10_m, 4.42_m, {alliance == frc::DriverStation::Alliance::kBlue ? 180_deg : 0_deg}};
+        return {HoldPositions[1], {isBlue ? 180_deg : 0_deg}};
         break;
       case 2:
-        return {2.10_m, 3.88_m, {alliance == frc::DriverStation::Alliance::kBlue ? 180_deg : 0_deg}};
+        return {HoldPositions[2], {isBlue ? 180_deg : 0_deg}};
         break;
       case 3:
-        return {2.10_m, 3.30_m, {alliance == frc::DriverStation::Alliance::kBlue ? 180_deg : 0_deg}};
+        return {HoldPositions[3], {isBlue ? 180_deg : 0_deg}};
         break;
       case 4:
-        return {2.10_m, 2.75_m, {alliance == frc::DriverStation::Alliance::kBlue ? 180_deg : 0_deg}};
+        return {HoldPositions[4], {isBlue ? 180_deg : 0_deg}};
         break;
       case 5:
-        return {2.10_m, 2.20_m, {alliance == frc::DriverStation::Alliance::kBlue ? 180_deg : 0_deg}};
+        return {HoldPositions[5], {isBlue ? 180_deg : 0_deg}};
         break;
       case 6:
-        return {2.10_m, 1.60_m, {alliance == frc::DriverStation::Alliance::kBlue ? 180_deg : 0_deg}};
+        return {HoldPositions[6], {isBlue ? 180_deg : 0_deg}};
         break;
       case 7:
-        return {2.10_m, 1.05_m, {alliance == frc::DriverStation::Alliance::kBlue ? 180_deg : 0_deg}};
+        return {HoldPositions[7], {isBlue ? 180_deg : 0_deg}};
         break;
       case 8:
-        return {2.10_m, 0.5_m, {alliance == frc::DriverStation::Alliance::kBlue ? 180_deg : 0_deg}};
+        return {HoldPositions[8], {isBlue ? 180_deg : 0_deg}};
         break;
       case 9:
-        return {14.25_m, 7.5_m, {alliance == frc::DriverStation::Alliance::kBlue ? 90_deg : -90_deg}};
+        return {HoldPositions[9], {isBlue ? 90_deg : -90_deg}};
         break;
     }
     return target;
@@ -98,7 +122,7 @@ RobotContainer::RobotContainer() {
 
   odomTrigger.WhileTrue(&repeatOdom);
 
-  // moveRoutineCancel.OnTrue(std::move(cancelMoves));
+  moveRoutineCancel.OnTrue(std::move(cancelMoves));
 
   mainDpadUp.OnTrue(HandlePartnerCommands(GetPositionCommand(3), GetEmptyCommand()));
   mainDpadLeft.OnTrue(HandlePartnerCommands(GetPositionCommand(4), GetEmptyCommand()));
@@ -115,15 +139,11 @@ RobotContainer::RobotContainer() {
   // controller.X().ToggleOnTrue(std::move(testPath));
   // controller.A().ToggleOnTrue(std::move(testRotate));
 
-  // controller.A().OnTrue(&toggleStationAlign);
   controller.LeftStick().OnTrue(std::move(punchObject));
   controller.RightStick().OnTrue(&setToSubstation);
   controller.A().OnTrue(&togglePositionHold);
   controller.B().OnTrue(&incrementStation);
   controller.X().OnTrue(&decrementStation);
-
-  alignTrigger.WhileTrue(std::move(alignFollow));
-  // alignTrigger.OnTrue(std::move(alignFollow.AndThen()));
 
   // holdingTrigger.OnTrue();
   holdingTrigger.WhileTrue(std::move(startHolding).AndThen(std::move(holdPosition)).FinallyDo(std::move(endHolding)));

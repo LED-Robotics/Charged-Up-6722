@@ -18,7 +18,7 @@ using namespace frc;
 
 class LimelightSubsystem : public frc2::SubsystemBase {
  public:
-  LimelightSubsystem(std::string_view targetTable, frc::DriverStation::Alliance current);
+  LimelightSubsystem(std::string_view targetTable);
 
   /**
    * Will be called periodically whenever the CommandScheduler runs.
@@ -95,7 +95,6 @@ class LimelightSubsystem : public frc2::SubsystemBase {
   double targetSkew;
   bool targetFound;
   std::vector<double> botPose{6};
-  frc::DriverStation::Alliance alliance;
   std::string_view tableName;
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.

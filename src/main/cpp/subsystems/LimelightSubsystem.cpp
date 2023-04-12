@@ -9,9 +9,8 @@
 using namespace LimelightConstants;
 using namespace frc;
 
-LimelightSubsystem::LimelightSubsystem(std::string_view targetTable, frc::DriverStation::Alliance current) {
+LimelightSubsystem::LimelightSubsystem(std::string_view targetTable) {
   // Implementation of subsystem constructor goes here
-  alliance = current;
   tableName = targetTable;
   table = nt::NetworkTableInstance::GetDefault().GetTable(tableName);
   SetLED(kUsePipeline);
@@ -29,6 +28,7 @@ void LimelightSubsystem::Periodic() {
   }
   // botPose = table->GetNumberArray("botpose",std::vector<double>(6));
 
+  frc::DriverStation::Alliance alliance = frc::DriverStation::GetAlliance();
   if(alliance == frc::DriverStation::Alliance::kBlue) {
     botPose = table->GetNumberArray("botpose_wpiblue",std::vector<double>(6));
   } else if(alliance == frc::DriverStation::Alliance::kRed) {
