@@ -79,7 +79,7 @@ namespace DriveConstants {
 
     constexpr double kDriveDeadzone = 0.05;
     constexpr double kDriveCurveExtent = 0.6;
-    constexpr auto kDriveTranslationLimit = 4.3_mps_sq;
+    constexpr auto kDriveTranslationLimit = 5.0_mps_sq;
     // Example value only - as above, this must be tuned for your drive!
     constexpr double kPDriveVel = 1.0;
     constexpr double kPTurnVel = 0.001;

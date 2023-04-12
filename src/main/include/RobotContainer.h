@@ -213,10 +213,28 @@ class RobotContainer {
   frc2::InstantCommand togglePositionHold{[this] { positionHoldActive = !positionHoldActive; },
   {}};
 
-  frc2::InstantCommand incrementStation{[this] { targetStation += targetStation < 8 ? 1 : 0; },
+  frc2::InstantCommand incrementStation{[this] { 
+    targetStation += targetStation < 8 ? 1 : 0; 
+    m_drive.SetLimiting(false);
+    m_drive.SetPoseToHold(GetTargetPose());
+    m_drive.StartHolding();
+    },
   {}};
 
-  frc2::InstantCommand decrementStation{[this] { targetStation -= targetStation > 0 ? 1 : 0; },
+  frc2::InstantCommand decrementStation{[this] { 
+    targetStation -= targetStation > 0 ? 1 : 0; 
+    m_drive.SetLimiting(false);
+    m_drive.SetPoseToHold(GetTargetPose());
+    m_drive.StartHolding();
+    },
+  {}};
+
+  frc2::InstantCommand setToSubstation{[this] { 
+    targetStation = 9;
+    m_drive.SetLimiting(false);
+    m_drive.SetPoseToHold(GetTargetPose());
+    m_drive.StartHolding();
+    },
   {}};
 
   frc2::InstantCommand rumblePrimaryOn{[this] { controller.SetRumble(GenericHID::kBothRumble, 1.0); },
@@ -262,8 +280,8 @@ class RobotContainer {
 
   PathPlannerTrajectory currentTraj;
 
-  frc2::CommandPtr alignFollow{frc2::cmd::Parallel(     
-      std::move(frc2::InstantCommand(
+  frc2::CommandPtr alignFollow{frc2::cmd::Sequence(
+      std::move(frc2::cmd::RunOnce(
       [&]() { 
         m_drive.SetLimiting(false);
         frc::Pose2d current = m_drive.GetPose();
@@ -272,14 +290,14 @@ class RobotContainer {
         bool headingFlipped = false;
         // if((double)target.Y() > (double)current.Y()) heading *= -1.0;
         if((double)target.Y() > (double)current.Y()) headingFlipped = true;
-        SmartDashboard::PutNumber("targetNumber", targetStation);
-        SmartDashboard::PutNumber("targetY", (double)target.Y());
         currentTraj = PathPlanner::generatePath(
-          PathConstraints(2.5_mps, 2_mps_sq), 
+          PathConstraints(2.5_mps, 2_mps_sq),
           PathPoint(frc::Translation2d(current.X(), current.Y()), frc::Rotation2d(units::degree_t{headingFlipped ? 90.0 : -90.0}), current.Rotation()), // position, heading(direction of travel), holonomic rotation
           PathPoint(frc::Translation2d(target.X(), target.Y()), frc::Rotation2d(units::degree_t{headingFlipped ? 90.0 : -90.0}), current.Rotation()) // position, heading(direction of travel) holonomic rotation
         );
-      }, {&m_drive}).ToPtr()),
+        SmartDashboard::PutNumber("targetNumber", targetStation);
+        SmartDashboard::PutNumber("targetY", (double)target.Y());
+      }, {&m_drive})),
       std::move(autoBuilder.followPath(currentTraj))
   ).AndThen(frc2::cmd::RunOnce([this] { 
       m_drive.SetLimiting(true);
@@ -287,15 +305,37 @@ class RobotContainer {
     }, {}))};
 
   frc2::CommandPtr startHolding{frc2::cmd::RunOnce([this] { 
-    m_drive.SetLimiting(true);
+    m_drive.SetLimiting(false);
     m_drive.SetPoseToHold(GetTargetPose());
     m_drive.StartHolding();
   }, {&m_drive})};
 
   frc2::CommandPtr holdPosition{frc2::cmd::Run([this] { 
       auto speeds = m_drive.CalculateHolding();
-      m_drive.Drive(speeds.vx, speeds.vy, {speeds.omega}, false);
+      m_drive.Drive(speeds.vx, speeds.vy, {speeds.omega}, true);
     }, {&m_drive})};
+
+  // frc2::CommandPtr endHolding{frc2::InstantCommand().ToPtr()};
+  std::function<void(bool)> endHolding {[this](bool interrupted) { 
+    m_drive.SetLimiting(true);
+  }};
+
+  frc2::CommandPtr punchObject{frc2::SequentialCommandGroup(
+    frc2::InstantCommand([this] { 
+      intake.SetPower(-1.0);
+    }, {&intake}),
+    frc2::WaitCommand(0.15_s),
+    SetPosition(2, &elevator, &arm, &intake),
+    frc2::InstantCommand([this] { 
+      intake.SetPower(0.0);
+    }, {&intake}),
+    SetPosition(0, &elevator, &arm, &intake)).ToPtr()
+  };
+
+  // frc2::CommandPtr cancelMoves{frc2::cmd::RunOnce([this] { 
+  //   stationAlignActive = false;
+  //   positionHoldActive = false;
+  // }, {})};
 
   
   TurnTo turnTo90{3.0, &m_drive};

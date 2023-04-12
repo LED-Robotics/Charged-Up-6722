@@ -121,7 +121,7 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
         xSpeed, ySpeed, rot, GetPose().Rotation())
       : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
-  kDriveKinematics.DesaturateWheelSpeeds(&states, AutoConstants::kMaxSpeed);
+  kDriveKinematics.DesaturateWheelSpeeds(&states, 3.5_mps);
 
   // std::cout << "X Target: " << (double)xSpeed << '\n';
   // std::cout << "Y Target: " << (double)ySpeed << '\n';
@@ -131,8 +131,7 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
 
 void DriveSubsystem::SetModuleStates(
   wpi::array<frc::SwerveModuleState, 4> desiredStates) {
-    kDriveKinematics.DesaturateWheelSpeeds(&desiredStates,
-                                          AutoConstants::kMaxSpeed);
+    kDriveKinematics.DesaturateWheelSpeeds(&desiredStates, 3.5_mps);
     // std::cout << "FL Speed: " << (double)desiredStates[0].speed << " FL Angle: " << (double)desiredStates[0].angle.Degrees() << '\n';
     s_frontLeft.SetDesiredState(desiredStates[0]);
     // std::cout << "FR Speed: " << (double)desiredStates[1].speed << " FR Angle: " << (double)desiredStates[1].angle.Degrees() << '\n';
@@ -274,12 +273,16 @@ void DriveSubsystem::StartHolding() {
 
   xHoldController.SetSetpoint((double)poseToHold.X());
   yHoldController.SetSetpoint((double)poseToHold.Y());
-  thetaHoldController.SetSetpoint((double)poseToHold.Rotation().Radians());
+  thetaHoldController.SetSetpoint((double)poseToHold.Rotation().Degrees());
 }
 
 frc::ChassisSpeeds DriveSubsystem::CalculateHolding() {
   auto current = odometry.GetPose();
+  double angle = (double)current.Rotation().Degrees();
+  double currentAngle = SwerveModule::PlaceInAppropriate0To360Scope(thetaHoldController.GetSetpoint(), angle);
+  SmartDashboard::PutNumber("angleTarget", thetaHoldController.GetSetpoint());
+  SmartDashboard::PutNumber("currentHoldAngle", currentAngle);
   return frc::ChassisSpeeds{units::meters_per_second_t{xHoldController.Calculate((double)current.X())}, 
   units::meters_per_second_t{yHoldController.Calculate((double)current.Y())}, 
-  units::radians_per_second_t{thetaHoldController.Calculate((double)current.Rotation().Radians())}};
+  units::radians_per_second_t{thetaHoldController.Calculate(currentAngle)}};
 }

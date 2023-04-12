@@ -168,9 +168,9 @@ class DriveSubsystem : public frc2::SubsystemBase {
   double initialPitch = 0.0;
 
   frc::Pose2d poseToHold{};
-  frc2::PIDController xHoldController{0.1, 0.0, 0.0};
-  frc2::PIDController yHoldController{0.1, 0.0, 0.0};
-  frc2::PIDController thetaHoldController{0.1, 0.0, 0.0};
+  frc2::PIDController xHoldController{2.5, 0.0, 0.0};
+  frc2::PIDController yHoldController{2.5, 0.0, 0.0};
+  frc2::PIDController thetaHoldController{-0.05, 0.0, 0.0};
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 
