@@ -57,6 +57,7 @@ void Robot::DisabledPeriodic() {}
 void Robot::AutonomousInit() {
   // bool doAuton = SmartDashboard::GetBoolean("doAuton", false);
   // if (doAuton) {
+  m_container.DisableTagTracking();
   m_autonomousCommand = m_container.GetAutonomousCommand();
   if(m_autonomousCommand != nullptr) {
     m_container.SetDriveBrakes(true);
@@ -71,6 +72,7 @@ void Robot::AutonomousInit() {
 void Robot::AutonomousPeriodic() {}
 
 void Robot::TeleopInit() {
+  m_container.EnableTagTracking();
   m_container.SetDriveBrakes(true);
   m_container.SetSlew(true);
   m_container.SetDriveReversed(false);

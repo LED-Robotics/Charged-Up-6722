@@ -129,7 +129,7 @@ namespace ArmConstants {
     constexpr double kFloorStandingPickupAngle = 50.0;
     constexpr int kMidDropoffPosition = 74500;
     constexpr double kMidDropoffAngle = 136.7;
-    constexpr double kMidCubeAngle = 87.0;
+    constexpr double kMidCubeAngle = 92.0;
     constexpr int kHighDropoffPosition = 74500;
     constexpr double kHighDropoffAngle = 136.7;
     constexpr double kHighCubeAngle = 135.0;
@@ -164,7 +164,7 @@ namespace IntakeConstants {
     // constexpr int kFloorPickupPosition = 20600;
     constexpr int kFloorPickupPosition = 22700;
     constexpr int kFloorStandingPickupPosition = 25417;
-    constexpr int kMidCubePosition = 24500;
+    constexpr int kMidCubePosition = 23750;
     constexpr int kMidDropoffPosition = 40713;
     constexpr int kHighCubePosition = 32400;
     constexpr int kHighDropoffPosition = 37900;

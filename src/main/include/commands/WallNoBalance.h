@@ -5,6 +5,7 @@
 #include "commands/SetPosition.h"
 #include "commands/SetIntakePower.h"
 #include "commands/TrajectoryRelative.h"
+#include "commands/ToPoint.h"
 #include "commands/TurnTo.h"
 #include "commands/WaitDrive.h"
 #include "commands/GyroDock.h"

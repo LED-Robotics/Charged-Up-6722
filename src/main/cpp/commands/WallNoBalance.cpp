@@ -3,54 +3,69 @@
 WallNoBalance::WallNoBalance(DriveSubsystem *drive, ElevatorSubsystem *elev, ArmSubsystem *arm, IntakeSubsystem *intake) {
   SetName("Wall No Balance");
   AddCommands(
+
+    frc2::InstantCommand(             // stop the drive
+      [=]() { 
+        arm->SetCubeMode();
+    }, {arm}),
+    
+    frc2::InstantCommand(             // stop the drive
+      [=]() { 
+        drive->ResetOdometry({0.0_m, 0.0_m, {180.0_deg}});
+    }, {drive}),
+
+    frc2::InstantCommand(             // stop the drive
+      [=]() { 
+        drive->ResetOdometry({0.0_m, 0.0_m, {180.0_deg}});
+    }, {drive}),
+
+    frc2::InstantCommand(             // stop the drive
+      [=]() { 
+        drive->ResetOdometry({0.0_m, 0.0_m, {180.0_deg}});
+    }, {drive}),
+
     SetIntakePower(0.12, intake),       // set intake to holding power
 
-    // frc2::ParallelCommandGroup(   // perform simultaneously
-    //   WaitDrive(0.5_m, 0.8_mps, drive),   // drive back from link station
-
-    //   SetPosition(2, elev, arm, intake)  // extent to mid
-    // ),
-    // TrajectoryRelative({0.0_m, 0.0_m, 0.0_deg}, {}, {0.25_m, 0.0_m, 0.0_deg}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}, drive),
-    // WaitDrive(0.25_m, 0.6_mps, drive),   // drive back from link station
     SetPosition(3, elev, arm, intake),  // extent to mid
-
-    // TrajectoryRelative({frc::Pose2d{0.0_m, 0.0_m, 0.0_deg}, frc::Pose2d{0.5_m, 0.0_m, 0.0_deg}}, 
-    // {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}, drive),   test line for Trajectory code
-
-    // WaitDrive(0.5_m, -0.8_mps, drive),  // drive to link station
-    
-    // SetPosition(3, elev, arm, intake),  // extent to high
         
     SetIntakePower(-1.0, intake),       // intake full reverse to spit out cone
     
-    frc2::WaitCommand(0.5_s),           // wait until cone is out
+    frc2::WaitCommand(0.3_s),           // wait until cone is out
     
     SetIntakePower(0.0, intake),        // turn off intake
     
-    SetPosition(2, elev, arm, intake),  // retract elevator to mid
+    frc2::ParallelCommandGroup(
+      SetPosition(1, elev, arm, intake),  // retract elevator to ground
+      ToPoint({3.25_m, 0.5_m, {180.0_deg}}, drive)
+    ),    
+        
+    SetIntakePower(1.0, intake),       // intake full speed to pick up cube
 
-    WaitDrive(0.2_m, 0.8_mps, drive),   // drive back from link station
+    ToPoint({3.9_m, 1.7_m, {-45.0_deg}}, drive),
     
-    frc2::ParallelCommandGroup(   // perform simultaneously
-      WaitDrive(0.2_m, 0.8_mps, drive),   // drive back from link station
-      SetPosition(0, elev, arm, intake)  // retract back to stored
-    ),
+    ToPoint({6.6_m, 0.50_m, {-45.0_deg}}, drive),
+    
+    SetIntakePower(0.12, intake),       // intake holding
 
-    TurnTo(3.0, drive),
+    ToPoint({6.15_m, 0.585_m, {180.0_deg}}, drive),
+    
+    SetPosition(2, elev, arm, intake),  // cube mid
 
-    SetPosition(1, elev, arm, intake),  // retract back to stored
+    // ToPoint({0.7_m, 0.14_m, {180.0_deg}}, drive),
+    // ToPoint({3.25_m, 0.5_m, {180.0_deg}}, drive),
+    
+    ToPoint({1.0_m, 0.0_m, {180.0_deg}}, drive),
 
-    SetIntakePower(1.0, intake),       // intake full reverse to spit out cone
+    SetIntakePower(-1.0, intake),       // intake full reverse to spit out cone
+    
+    frc2::WaitCommand(0.3_s),           // wait until cone is out
 
-    TrajectoryRelative({0.0_m, 0.0_m, 0_deg}, {}, {5.5_m, 0.0_m, 0_deg}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}, drive),
+    SetIntakePower(0.0, intake),       // intake full reverse to spit out cone
 
-    SetIntakePower(0.12, intake),
-
-    SetPosition(0, elev, arm, intake),
-
-    TurnTo(180.0, drive),
-
-    TrajectoryRelative({0.0_m, 0.0_m, 0_deg}, {}, {-4.3_m, -0.15_m, 0_deg}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}, drive)
-
+    frc2::ParallelCommandGroup(
+      SetPosition(0, elev, arm, intake),  // arm stored
+      ToPoint({3.25_m, 0.5_m, {0.0_deg}}, drive)
+      // ToPoint({1.15_m, -1.6_m, {180.0_deg}}, drive)
+    )
   );
 }

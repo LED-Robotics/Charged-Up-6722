@@ -86,12 +86,12 @@ void DriveSubsystem::Periodic() {
                   s_backLeft.GetPosition(), s_backRight.GetPosition()});
   // SmartDashboard::PutNumber("odomGyro", (double)odometry.GetPose().Rotation().Degrees());
   SmartDashboard::PutNumber("navxGyro", (double)gyro.GetRotation2d().Degrees());
-  SmartDashboard::PutNumber("turnRate", (double)GetTurnRate());
+  // SmartDashboard::PutNumber("turnRate", (double)GetTurnRate());
   auto pose = odometry.GetPose();
   SmartDashboard::PutNumber("poseX", (double)pose.X());
   SmartDashboard::PutNumber("poseY", (double)pose.Y());
   SmartDashboard::PutNumber("poseAngle", (double)pose.Rotation().Degrees());
-  // SmartDashboard::PutNumber("gyroPitch", gyro.GetPitch());
+  SmartDashboard::PutNumber("gyroPitch", gyro.GetPitch());
   // SmartDashboard::PutNumber("frontLeftVel", (double)s_frontLeft.GetState().speed);
   // SmartDashboard::PutNumber("frontRightVel", (double)s_frontRight.GetState().speed);
 
@@ -280,8 +280,8 @@ frc::ChassisSpeeds DriveSubsystem::CalculateHolding() {
   auto current = odometry.GetPose();
   double angle = (double)current.Rotation().Degrees();
   double currentAngle = SwerveModule::PlaceInAppropriate0To360Scope(thetaHoldController.GetSetpoint(), angle);
-  SmartDashboard::PutNumber("angleTarget", thetaHoldController.GetSetpoint());
-  SmartDashboard::PutNumber("currentHoldAngle", currentAngle);
+  // SmartDashboard::PutNumber("angleTarget", thetaHoldController.GetSetpoint());
+  // SmartDashboard::PutNumber("currentHoldAngle", currentAngle);
   return frc::ChassisSpeeds{units::meters_per_second_t{xHoldController.Calculate((double)current.X())}, 
   units::meters_per_second_t{yHoldController.Calculate((double)current.Y())}, 
   units::radians_per_second_t{thetaHoldController.Calculate(currentAngle)}};

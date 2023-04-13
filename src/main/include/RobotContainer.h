@@ -22,6 +22,7 @@
 #include <ctre\Phoenix.h>
 
 #include "Constants.h"
+#include "commands/ToPoint.h"
 #include "commands/TurnTo.h"
 #include "commands/TrajectoryRelative.h"
 #include "commands/TrajectoryAbsolute.h"
@@ -58,6 +59,10 @@ class RobotContainer {
   RobotContainer();
 
   frc2::Command* GetAutonomousCommand();
+
+  void EnableTagTracking();
+
+  void DisableTagTracking();
 
   void SetDriveBrakes(bool state);
 
@@ -103,6 +108,8 @@ class RobotContainer {
 
   bool fieldCentric = true;
 
+  bool tagOverrideDisable = false;
+
   bool validTag = false;
 
   frc2::Trigger moveRoutineCancel{[this]() { return positionHoldActive && 
@@ -123,9 +130,9 @@ class RobotContainer {
   SwerveAutoBuilder autoBuilder{
     [this]() { return m_drive.GetPose(); }, // Function to supply current robot pose
     [this](auto initPose) { m_drive.ResetOdometry(initPose); }, // Function used to reset odometry at the beginning of auto
-    PIDConstants(0.0, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
-    PIDConstants(0.0, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
-    [this](auto speeds) { m_drive.Drive(speeds.vx, speeds.vy, {speeds.omega}, false); }, // Output function that accepts field relative ChassisSpeeds
+    PIDConstants(-0.2, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
+    PIDConstants(0.15, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
+    [this](auto speeds) { m_drive.Drive(speeds.vx, speeds.vy, {speeds.omega * -1.0}, false); }, // Output function that accepts field relative ChassisSpeeds
     eventMap, // Our event map
     { &m_drive }, // Drive requirements, usually just a single drive subsystem
     true // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
@@ -190,9 +197,11 @@ class RobotContainer {
 
   frc2::InstantCommand updateOdometry{
         [this]() { 
-          std::vector<double> pose = armLimelight.GetBotPos();
-          if(pose[0] == 0.0 && pose[1] == 0.0 && pose[5] == 0.0) return;  
-          m_drive.ResetOdometry({units::meter_t{pose[0]}, units::meter_t{pose[1]}, {m_drive.GetRotation().Degrees() + startOffset}});
+          if(!tagOverrideDisable) {
+            std::vector<double> pose = armLimelight.GetBotPos();
+            if(pose[0] == 0.0 && pose[1] == 0.0 && pose[5] == 0.0) return;  
+            m_drive.ResetOdometry({units::meter_t{pose[0]}, units::meter_t{pose[1]}, {m_drive.GetRotation().Degrees() + startOffset}});
+          }
         }, {}};
 
   frc2::RepeatCommand repeatOdom{std::move(updateOdometry)};
@@ -311,7 +320,9 @@ class RobotContainer {
   
   TurnTo turnTo90{3.0, &m_drive};
 
-  frc2::CommandPtr dock{GyroDock(1.5, &m_drive).WithTimeout(15.0_s)};
+  frc2::CommandPtr toFive{ToPoint({5.0_m, 5.0_m, {90_deg}}, &m_drive).WithTimeout(15.0_s)};
+
+  frc2::CommandPtr dock{GyroDock(-1.5, &m_drive).WithTimeout(15.0_s)};
 
   frc2::CommandPtr wallNoBalance{WallNoBalance(&m_drive, &elevator, &arm, &intake).WithTimeout(15.0_s)};
   

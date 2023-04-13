@@ -108,12 +108,12 @@ frc::Pose2d RobotContainer::GetTargetPose() {
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
-  chooser.SetDefaultOption("Low Dock", lowDock.get());
+  chooser.SetDefaultOption("Wall No Balance", wallNoBalance.get());
   chooser.AddOption("High Dock", highDock.get());
-  chooser.AddOption("Simple Dock", dock.get());
-  chooser.AddOption("Low Place Then Break", lowPlaceThenBreak.get());
   chooser.AddOption("Place Then Break", placeThenBreak.get());
-  chooser.AddOption("Wall No Balance", wallNoBalance.get());
+  chooser.AddOption("Low Dock", lowDock.get());
+  chooser.AddOption("Low Place Then Break", lowPlaceThenBreak.get());
+  chooser.AddOption("Simple Dock", dock.get());
   chooser.AddOption("None", GetEmptyCommand());
 
   blinkin.Set(.41);
@@ -139,11 +139,12 @@ RobotContainer::RobotContainer() {
   // controller.X().ToggleOnTrue(std::move(testPath));
   // controller.A().ToggleOnTrue(std::move(testRotate));
 
+  controller.B().OnTrue(std::move(toFive));
   controller.LeftStick().OnTrue(std::move(punchObject));
-  controller.RightStick().OnTrue(&setToSubstation);
-  controller.A().OnTrue(&togglePositionHold);
-  controller.B().OnTrue(&incrementStation);
-  controller.X().OnTrue(&decrementStation);
+  // controller.RightStick().OnTrue(&setToSubstation);
+  // controller.A().OnTrue(&togglePositionHold);
+  // controller.B().OnTrue(&incrementStation);
+  // controller.X().OnTrue(&decrementStation);
 
   // holdingTrigger.OnTrue();
   holdingTrigger.WhileTrue(std::move(startHolding).AndThen(std::move(holdPosition)).FinallyDo(std::move(endHolding)));
@@ -233,6 +234,14 @@ void RobotContainer::ResetOdometry() {
         // m_drive.ResetOdometry({});
 }
 
+void RobotContainer::EnableTagTracking() {
+  tagOverrideDisable = false;
+}
+
+void RobotContainer::DisableTagTracking() {
+  tagOverrideDisable = true;
+}
+
 void RobotContainer::SetDriveBrakes(bool state) {
         m_drive.SetBrakeMode(state);
         elevator.SetBrakeMode(state);
@@ -269,7 +278,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
     if(selected->GetName() == dock.get()->GetName()) {
       // flip odometry so that field centric works correctly
       startOffset = 0_deg;
-      m_drive.ResetOdometry(frc::Pose2d{{0.0_m, 0.0_m}, {0_deg}});
+      // m_drive.ResetOdometry(frc::Pose2d{{0.0_m, 0.0_m}, {0_deg}});
     }
     return selected;
 }
