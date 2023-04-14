@@ -15,7 +15,7 @@ void GyroDock::Initialize() {
 void GyroDock::Execute() {
   double current = drive->GetPitch();
   if(!initialApproachCompleted) {
-    if(!backwards) {
+    if(backwards) {
       if(current > initialPitch - range) {
         drive->Drive(units::meters_per_second_t{speed}, 0_mps, 0_deg_per_s, false);
       } else {
@@ -33,7 +33,7 @@ void GyroDock::Execute() {
     
   } else {
     double error = (initialPitch - current) / range * kP;
-    if(current > initialPitch && !backwards) tippedForward = true;
+    if(current < initialPitch && !backwards) tippedForward = true;
     else if(current > initialPitch && backwards) tippedForward = true;
     // std::cout << "Timer Time: " << (double)successTimer.Get() << '\n';
     if(current > initialPitch + (changeThreshold / 2) && current < initialPitch - (changeThreshold / 2)) {

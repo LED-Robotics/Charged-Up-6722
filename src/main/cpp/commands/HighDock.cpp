@@ -47,12 +47,12 @@ HighDock::HighDock(DriveSubsystem *drive, ElevatorSubsystem *elev, ArmSubsystem 
     
     SetIntakePower(0.0, intake),        // turn off intake
 
-    SetPosition(2, elev, arm, intake),  // retract elevator to mid    
+    // SetPosition(2, elev, arm, intake),  // retract elevator to mid    
     
-    frc2::ParallelCommandGroup(   // perform simultaneously
-      ToPoint({1.0_m, 0.0_m, {180.0_deg}}, drive),   // drive back from link station
-      SetPosition(0, elev, arm, intake)  // retract back to stored
-    ),
+    ToPoint({1.0_m, 0.0_m, {180.0_deg}}, drive),   // drive back from link station
+    // frc2::ParallelCommandGroup(   // perform simultaneously
+    // ),
+    SetPosition(0, elev, arm, intake),  // retract back to stored
 
     frc2::FunctionalCommand(            // drive until robot hits charge station
       [=] { ; },
@@ -64,11 +64,13 @@ HighDock::HighDock(DriveSubsystem *drive, ElevatorSubsystem *elev, ArmSubsystem 
     frc2::FunctionalCommand(            // drive until robot tips down and then slow down
       [=] { ; },
       [=] { drive->Drive(-1.3_mps, 0_mps, 0_deg_per_s, false); },
-      [=] (bool interrupted) { drive->Drive(0.4_mps, 0_mps, 0_deg_per_s, false); },
+      [=] (bool interrupted) { drive->Drive(0.0_mps, 0_mps, 0_deg_per_s, false); },
       [=] { return drive->GetPitch() < -6.0; },
       {drive}),
-    
-    frc2::WaitCommand(5.1_s),         // drive for another extra bit to make sure we break the auto line
+
+    ToPoint({5.5_m, 0.0_m, {180.0_deg}}, drive),   // drive back from link station
+
+    frc2::WaitCommand(0.5_s),         // drive for another extra bit to make sure we break the auto line
     
     frc2::InstantCommand(             // stop the drive
       [=]() { 

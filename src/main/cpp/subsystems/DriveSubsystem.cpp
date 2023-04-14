@@ -112,9 +112,9 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
     // std::cout << "Slew Rate Limiter Is Off!\n";
   }
 
-  SmartDashboard::PutNumber("targetXVel", (double)xSpeed);
-  SmartDashboard::PutNumber("targetYVel", (double)ySpeed);
-  SmartDashboard::PutNumber("targetOmega", (double)rot);
+  // SmartDashboard::PutNumber("targetXVel", (double)xSpeed);
+  // SmartDashboard::PutNumber("targetYVel", (double)ySpeed);
+  // SmartDashboard::PutNumber("targetOmega", (double)rot);
   SmartDashboard::PutBoolean("fieldCentric", fieldRelative);
   auto states = kDriveKinematics.ToSwerveModuleStates(
     fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(

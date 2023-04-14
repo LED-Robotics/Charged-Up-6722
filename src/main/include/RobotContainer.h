@@ -119,7 +119,7 @@ class RobotContainer {
     
   frc2::Trigger odomTrigger{[this]() { return validTag; }};
 
-  frc::Field2d field;
+  // frc::Field2d field;
 
   std::unordered_map<std::string, std::shared_ptr<frc2::Command>> eventMap;
   // eventMap.emplace("marker1", std::make_shared<frc2::PrintCommand>("Passed Marker 1"));
@@ -218,6 +218,7 @@ class RobotContainer {
     m_drive.SetLimiting(false);
     m_drive.SetPoseToHold(GetTargetPose());
     m_drive.StartHolding();
+    UpdateStationUI();
     },
   {}};
 
@@ -226,6 +227,7 @@ class RobotContainer {
     m_drive.SetLimiting(false);
     m_drive.SetPoseToHold(GetTargetPose());
     m_drive.StartHolding();
+    UpdateStationUI();
     },
   {}};
 
@@ -234,6 +236,7 @@ class RobotContainer {
     m_drive.SetLimiting(false);
     m_drive.SetPoseToHold(GetTargetPose());
     m_drive.StartHolding();
+    UpdateStationUI();
     },
   {}};
 
@@ -267,6 +270,8 @@ class RobotContainer {
 
   bool IsBlue();
 
+  void UpdateStationUI();
+
   int GetClosestPosition();
 
   frc2::Command* GetPositionCommand(int position);
@@ -288,6 +293,7 @@ class RobotContainer {
     m_drive.SetLimiting(false);
     m_drive.SetPoseToHold(GetTargetPose());
     m_drive.StartHolding();
+    UpdateStationUI();
   }, {&m_drive})};
 
   frc2::CommandPtr holdPosition{frc2::cmd::Run([this] { 
@@ -322,7 +328,7 @@ class RobotContainer {
 
   frc2::CommandPtr toFive{ToPoint({5.0_m, 5.0_m, {90_deg}}, &m_drive).WithTimeout(15.0_s)};
 
-  frc2::CommandPtr dock{GyroDock(-1.5, &m_drive).WithTimeout(15.0_s)};
+  frc2::CommandPtr dock{GyroDock(1.5, &m_drive).WithTimeout(15.0_s)};
 
   frc2::CommandPtr wallNoBalance{WallNoBalance(&m_drive, &elevator, &arm, &intake).WithTimeout(15.0_s)};
   

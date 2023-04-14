@@ -17,19 +17,21 @@ LowDock::LowDock(DriveSubsystem *drive, ElevatorSubsystem *elev, ArmSubsystem *a
 
     frc2::FunctionalCommand(            // drive until robot hits charge station
       [=] { ; },
-      [=] { drive->Drive(2.0_mps, 0_mps, 0_deg_per_s, false); },
+      [=] { drive->Drive(-2.0_mps, 0_mps, 0_deg_per_s, false); },
       [=] (bool interrupted) { ; },
       [=] { return drive->GetPitch() > 6.0; },
       {drive}),
 
     frc2::FunctionalCommand(            // drive until robot tips down and then slow down
       [=] { ; },
-      [=] { drive->Drive(1.3_mps, 0_mps, 0_deg_per_s, false); },
-      [=] (bool interrupted) { drive->Drive(0.4_mps, 0_mps, 0_deg_per_s, false); },
-      [=] { return drive->GetPitch() < -3.0; },
+      [=] { drive->Drive(-1.3_mps, 0_mps, 0_deg_per_s, false); },
+      [=] (bool interrupted) { drive->Drive(0.0_mps, 0_mps, 0_deg_per_s, false); },
+      [=] { return drive->GetPitch() < -6.0; },
       {drive}),
-    
-    frc2::WaitCommand(2.4_s),         // drive for another extra bit to make sure we break the auto line
+
+    ToPoint({5.5_m, 0.0_m, {180.0_deg}}, drive),   // drive back from link station
+
+    frc2::WaitCommand(0.5_s),         // drive for another extra bit to make sure we break the auto line
     
     frc2::InstantCommand(             // stop the drive
       [=]() { 
@@ -46,6 +48,6 @@ LowDock::LowDock(DriveSubsystem *drive, ElevatorSubsystem *elev, ArmSubsystem *a
     //   [=] { return abs(180.0 - (double)drive->GetPose().Rotation().Degrees()) < 10.0; },
     //   {drive}),
     
-    GyroDock(1.8, drive)              // dock on charge station
+    GyroDock(-1.8, drive)              // dock on charge station
   );
 }

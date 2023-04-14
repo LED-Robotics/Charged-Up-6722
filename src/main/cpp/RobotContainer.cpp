@@ -25,6 +25,19 @@ bool RobotContainer::IsBlue() {
   return frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kBlue;
 }
 
+void RobotContainer::UpdateStationUI() {
+  frc::SmartDashboard::PutBoolean("station0", targetStation == 0);
+  frc::SmartDashboard::PutBoolean("station1", targetStation == 1);
+  frc::SmartDashboard::PutBoolean("station2", targetStation == 2);
+  frc::SmartDashboard::PutBoolean("station3", targetStation == 3);
+  frc::SmartDashboard::PutBoolean("station4", targetStation == 4);
+  frc::SmartDashboard::PutBoolean("station5", targetStation == 5);
+  frc::SmartDashboard::PutBoolean("station6", targetStation == 6);
+  frc::SmartDashboard::PutBoolean("station7", targetStation == 7);
+  frc::SmartDashboard::PutBoolean("station8", targetStation == 8);
+  frc::SmartDashboard::PutBoolean("station9", targetStation == 9);
+}
+
 int RobotContainer::GetClosestPosition() {
   bool coneMode = arm.GetConeMode();
   frc::Pose2d current = m_drive.GetPose();
@@ -139,12 +152,12 @@ RobotContainer::RobotContainer() {
   // controller.X().ToggleOnTrue(std::move(testPath));
   // controller.A().ToggleOnTrue(std::move(testRotate));
 
-  controller.B().OnTrue(std::move(toFive));
+  // controller.B().OnTrue(std::move(toFive));
   controller.LeftStick().OnTrue(std::move(punchObject));
-  // controller.RightStick().OnTrue(&setToSubstation);
-  // controller.A().OnTrue(&togglePositionHold);
-  // controller.B().OnTrue(&incrementStation);
-  // controller.X().OnTrue(&decrementStation);
+  controller.RightStick().OnTrue(&setToSubstation);
+  controller.A().OnTrue(&togglePositionHold);
+  controller.B().OnTrue(&incrementStation);
+  controller.X().OnTrue(&decrementStation);
 
   // holdingTrigger.OnTrue();
   holdingTrigger.WhileTrue(std::move(startHolding).AndThen(std::move(holdPosition)).FinallyDo(std::move(endHolding)));
@@ -171,7 +184,7 @@ RobotContainer::RobotContainer() {
   // Set up default drive command
     m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
-            field.SetRobotPose(m_drive.GetPose());
+            // field.SetRobotPose(m_drive.GetPose());
             if(controller.GetYButtonPressed()) fieldCentric = !fieldCentric;
             double x = controller.GetLeftY();
             double y = controller.GetLeftX();
@@ -217,7 +230,7 @@ RobotContainer::RobotContainer() {
 
       armLimelight.SetDefaultCommand(frc2::RunCommand(
       [this] {
-        frc::SmartDashboard::PutData("field", &field);
+        // frc::SmartDashboard::PutData("field", &field);
         if(!armLimelight.IsTarget() || armLimelight.GetTargetArea() < 0.65) {
           validTag = false;
         } else {
