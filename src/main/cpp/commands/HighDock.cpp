@@ -68,9 +68,9 @@ HighDock::HighDock(DriveSubsystem *drive, ElevatorSubsystem *elev, ArmSubsystem 
       [=] { return drive->GetPitch() < -6.0; },
       {drive}),
 
-    ToPoint({5.5_m, 0.0_m, {180.0_deg}}, drive),   // drive back from link station
+    ToPoint({5.1_m, 0.0_m, {180.0_deg}}, drive),   // drive back from link station
 
-    frc2::WaitCommand(0.5_s),         // drive for another extra bit to make sure we break the auto line
+    frc2::WaitCommand(0.25_s),         // drive for another extra bit to make sure we break the auto line
     
     frc2::InstantCommand(             // stop the drive
       [=]() { 

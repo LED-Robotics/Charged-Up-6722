@@ -9,6 +9,7 @@ GyroDock::GyroDock(double targetSpeed, DriveSubsystem *driveRef)
 }
 
 void GyroDock::Initialize() {
+  drive->SetLimiting(false);
   initialPitch = drive->GetPitch();
 }
 
@@ -45,7 +46,7 @@ void GyroDock::Execute() {
         successTimer.Stop();
         successTimer.Reset();
       }
-      drive->Drive(units::meters_per_second_t{(tippedForward ? speed*0.50 : speed) * error}, 0_mps, 0_deg_per_s, false);
+      drive->Drive(units::meters_per_second_t{(tippedForward ? speed*0.43 : speed) * error}, 0_mps, 0_deg_per_s, false);
     }
   }
 }

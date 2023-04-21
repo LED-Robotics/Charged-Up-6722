@@ -43,12 +43,14 @@ int RobotContainer::GetClosestPosition() {
   frc::Pose2d current = m_drive.GetPose();
   int pos = -1;
   double currentYDif = 1000.0;
+  bool isBlue = IsBlue();
   for(int i = 0; i < 10; i++) {
+  frc::Translation2d position = isBlue ? BlueHoldPositions[i] : RedHoldPositions[i];
     if(coneMode && (i == 1 || i == 4 || i == 7)) continue;
     else if(!coneMode && (i == 0 || i == 2 || i == 3 || i == 5 || i == 6 || i == 8)) continue;
-    double deltaX = abs((double)current.X() - (double)HoldPositions[i].X());
+    double deltaX = abs((double)current.X() - (double)position.X());
     if(deltaX > 3.0) continue;
-    double deltaY = abs((double)current.Y() - (double)HoldPositions[i].Y());
+    double deltaY = abs((double)current.Y() - (double)position.Y());
     if(deltaY < currentYDif) {
       pos = i;
       currentYDif = deltaY;
@@ -59,11 +61,6 @@ int RobotContainer::GetClosestPosition() {
 
 frc2::Command* RobotContainer::GetPositionCommand(int position) {
   return new SetPosition(position, &elevator, &arm, &intake);
-}
-
-frc2::Command* RobotContainer::GetRelativePathCommand(const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
-    const Pose2d& end, const TrajectoryConfig& config) {
-  return new TrajectoryRelative(start, interiorWaypoints, end, config, &m_drive);
 }
 
 frc2::Command* RobotContainer::HandlePartnerCommands(frc2::Command* solo, frc2::Command* partner) {
@@ -85,34 +82,34 @@ frc::Pose2d RobotContainer::GetTargetPose() {
   bool isBlue = IsBlue();
   switch(targetStation) {
       case 0:
-        return {HoldPositions[0], {isBlue ? 180_deg : 0_deg}};
+        return {isBlue ? BlueHoldPositions[0] : RedHoldPositions[0], {isBlue ? 180_deg : 0_deg}};
         break;
       case 1:
-        return {HoldPositions[1], {isBlue ? 180_deg : 0_deg}};
+        return {isBlue ? BlueHoldPositions[1] : RedHoldPositions[1], {isBlue ? 180_deg : 0_deg}};
         break;
       case 2:
-        return {HoldPositions[2], {isBlue ? 180_deg : 0_deg}};
+        return {isBlue ? BlueHoldPositions[2] : RedHoldPositions[2], {isBlue ? 180_deg : 0_deg}};
         break;
       case 3:
-        return {HoldPositions[3], {isBlue ? 180_deg : 0_deg}};
+        return {isBlue ? BlueHoldPositions[3] : RedHoldPositions[3], {isBlue ? 180_deg : 0_deg}};
         break;
       case 4:
-        return {HoldPositions[4], {isBlue ? 180_deg : 0_deg}};
+        return {isBlue ? BlueHoldPositions[4] : RedHoldPositions[4], {isBlue ? 180_deg : 0_deg}};
         break;
       case 5:
-        return {HoldPositions[5], {isBlue ? 180_deg : 0_deg}};
+        return {isBlue ? BlueHoldPositions[5] : RedHoldPositions[5], {isBlue ? 180_deg : 0_deg}};
         break;
       case 6:
-        return {HoldPositions[6], {isBlue ? 180_deg : 0_deg}};
+        return {isBlue ? BlueHoldPositions[6] : RedHoldPositions[6], {isBlue ? 180_deg : 0_deg}};
         break;
       case 7:
-        return {HoldPositions[7], {isBlue ? 180_deg : 0_deg}};
+        return {isBlue ? BlueHoldPositions[7] : RedHoldPositions[7], {isBlue ? 180_deg : 0_deg}};
         break;
       case 8:
-        return {HoldPositions[8], {isBlue ? 180_deg : 0_deg}};
+        return {isBlue ? BlueHoldPositions[8] : RedHoldPositions[8], {isBlue ? 180_deg : 0_deg}};
         break;
       case 9:
-        return {HoldPositions[9], {isBlue ? 90_deg : -90_deg}};
+        return {isBlue ? BlueHoldPositions[9] : RedHoldPositions[9], {isBlue ? 90_deg : -90_deg}};
         break;
     }
     return target;
@@ -121,8 +118,9 @@ frc::Pose2d RobotContainer::GetTargetPose() {
 RobotContainer::RobotContainer() {
   // Initialize all of your commands and subsystems here
 
-  chooser.SetDefaultOption("Wall No Balance", wallNoBalance.get());
-  chooser.AddOption("High Dock", highDock.get());
+  chooser.SetDefaultOption("High Dock", highDock.get());
+  chooser.AddOption("Wall No Balance Blue", wallNoBalance.get());
+  chooser.AddOption("Wall No Balance Red", wallNoBalanceRed.get());
   chooser.AddOption("Place Then Break", placeThenBreak.get());
   chooser.AddOption("Low Dock", lowDock.get());
   chooser.AddOption("Low Place Then Break", lowPlaceThenBreak.get());
@@ -155,12 +153,23 @@ RobotContainer::RobotContainer() {
   // controller.B().OnTrue(std::move(toFive));
   controller.LeftStick().OnTrue(std::move(punchObject));
   controller.RightStick().OnTrue(&setToSubstation);
-  controller.A().OnTrue(&togglePositionHold);
-  controller.B().OnTrue(&incrementStation);
-  controller.X().OnTrue(&decrementStation);
+  // controller.B().OnTrue(&toggleDocking);
+  // controller.A().OnTrue(&toggleMaintain);
+  // controller.B().OnTrue(&holdDocking);
+
+  // controller.A().OnTrue(&togglePositionHold);
+  // controller.B().OnTrue(&incrementStation);
+  // controller.X().OnTrue(&decrementStation);
 
   // holdingTrigger.OnTrue();
-  holdingTrigger.WhileTrue(std::move(startHolding).AndThen(std::move(holdPosition)).FinallyDo(std::move(endHolding)));
+  // holdingTrigger.OnTrue(std::move(startHolding));
+  // holdingTrigger.OnFalse(std::move(endHolding));
+  // holdingTrigger.WhileTrue(std::move(holdPosition));
+  
+  // dockTrigger.WhileTrue(std::move(teleDock).FinallyDo(std::move(endDocking)));
+
+  // maintainTrigger.OnFalse(endDocking);
+  // maintainTrigger.WhileTrue(std::move(maintainEngage));
 
   // controller.A().ToggleOnTrue(&driveL);
   // controller.X().ToggleOnTrue(&driveL2);
@@ -288,10 +297,8 @@ void RobotContainer::SetDriveReversed(bool reversed) {
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
     auto selected = chooser.GetSelected();
-    if(selected->GetName() == dock.get()->GetName()) {
-      // flip odometry so that field centric works correctly
-      startOffset = 0_deg;
-      // m_drive.ResetOdometry(frc::Pose2d{{0.0_m, 0.0_m}, {0_deg}});
-    }
+    // if(selected->GetName() == "WallNoBalance" && !IsBlue()) {
+    //   return wallNoBalanceRed.get();
+    // }
     return selected;
 }

@@ -25,7 +25,7 @@
  * This command controls the order in which the subsystems move based on the target position,
  * as opposed to the original method of moving all three simultaneously all the time.
  */
-class WallNoBalance : public frc2::CommandHelper<frc2::SequentialCommandGroup, WallNoBalance> {
+class WallNoBalanceRed : public frc2::CommandHelper<frc2::SequentialCommandGroup, WallNoBalanceRed> {
  public:
-    WallNoBalance(DriveSubsystem *driveRef, ElevatorSubsystem* elevRef, ArmSubsystem* armRef, IntakeSubsystem* intakeRef);
+    WallNoBalanceRed(DriveSubsystem *driveRef, ElevatorSubsystem* elevRef, ArmSubsystem* armRef, IntakeSubsystem* intakeRef);
 };

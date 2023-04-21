@@ -24,11 +24,9 @@
 #include "Constants.h"
 #include "commands/ToPoint.h"
 #include "commands/TurnTo.h"
-#include "commands/TrajectoryRelative.h"
-#include "commands/TrajectoryAbsolute.h"
-#include "commands/PathPlannerFollow.h"
 #include "commands/SetPosition.h"
 #include "commands/WallNoBalance.h"
+#include "commands/WallNoBalanceRed.h"
 #include "commands/LowPlaceThenBreak.h"
 #include "commands/PlaceThenBreak.h"
 #include "commands/HighDock.h"
@@ -102,6 +100,10 @@ class RobotContainer {
 
   int targetStation = 4;
 
+  bool dockActive = false;
+
+  bool maintainActive = false;
+  
   bool positionHoldActive = false;
   
   bool intakeHold = false;
@@ -112,10 +114,14 @@ class RobotContainer {
 
   bool validTag = false;
 
-  frc2::Trigger moveRoutineCancel{[this]() { return positionHoldActive && 
+  frc2::Trigger moveRoutineCancel{[this]() { return (positionHoldActive || dockActive || maintainActive) && 
   (abs(controller.GetLeftX()) > 0.1 || abs(controller.GetLeftY()) > 0.1 || abs(controller.GetRightX()) > 0.1); }};
   
   frc2::Trigger holdingTrigger{[this]() { return positionHoldActive; }};
+
+  frc2::Trigger dockTrigger{[this]() { return dockActive; }};
+  
+  frc2::Trigger maintainTrigger{[this]() { return maintainActive; }};
     
   frc2::Trigger odomTrigger{[this]() { return validTag; }};
 
@@ -193,6 +199,22 @@ class RobotContainer {
       },
       {&elevator, &arm, &intake}};
 
+  frc2::CommandPtr maintainEngage{frc2::cmd::Run(
+      [this] {
+        m_drive.SetLimiting(false);
+        double current = m_drive.GetPitch();
+        double range = 20.0;
+        double kP = 0.35;
+        double error = (0.0 - current) / range * kP;
+        double changeThreshold = 3.0;
+        if(current > 0.0 + (changeThreshold / 2) && current < 0.0 - (changeThreshold / 2)) {
+          m_drive.Drive(0_mps, 0_mps, 0_deg_per_s, false);
+        } else {
+          m_drive.Drive(units::meters_per_second_t{(-1.8 * 0.43) * error}, 0_mps, 0_deg_per_s, false);
+        }
+      },
+      {&m_drive})};
+
   
 
   frc2::InstantCommand updateOdometry{
@@ -211,6 +233,12 @@ class RobotContainer {
                                         {}};
 
   frc2::InstantCommand togglePositionHold{[this] { positionHoldActive = !positionHoldActive; },
+  {}};
+
+  frc2::InstantCommand toggleDocking{[this] { dockActive = !dockActive; },
+  {}};
+
+  frc2::InstantCommand toggleMaintain{[this] { maintainActive = !maintainActive; },
   {}};
 
   frc2::InstantCommand incrementStation{[this] { 
@@ -276,9 +304,6 @@ class RobotContainer {
 
   frc2::Command* GetPositionCommand(int position);
 
-  frc2::Command* GetRelativePathCommand(const Pose2d& start, const std::vector<Translation2d>& interiorWaypoints,
-    const Pose2d& end, const TrajectoryConfig& config);
-
   frc2::Command* HandlePartnerCommands(frc2::Command* solo, frc2::Command* partner);
 
   frc2::Command* GetEmptyCommand();
@@ -306,6 +331,10 @@ class RobotContainer {
     m_drive.SetLimiting(true);
   }};
 
+  std::function<void(bool)> endDocking {[this](bool interrupted) { 
+    m_drive.SetLimiting(true);
+  }};
+
   frc2::CommandPtr punchObject{frc2::SequentialCommandGroup(
     frc2::InstantCommand([this] { 
       intake.SetPower(-1.0);
@@ -320,17 +349,26 @@ class RobotContainer {
 
   frc2::CommandPtr cancelMoves{frc2::cmd::RunOnce([this] { 
     positionHoldActive = false;
+    dockActive = false;
+    maintainActive = false;
   }, {})};
 
-  const frc::Translation2d HoldPositions[10]{{2.10_m, 5.0_m}, {2.10_m, 4.42_m}, {2.10_m, 3.88_m}, {2.10_m, 3.30_m}, {2.10_m, 2.75_m}, {2.10_m, 2.20_m}, {2.10_m, 1.60_m}, {2.10_m, 1.05_m}, {2.10_m, 0.5_m}, {14.25_m, 7.5_m}};
+  // const frc::Translation2d OldHoldPositions[10]{{2.10_m, 5.0_m}, {2.10_m, 4.42_m}, {2.10_m, 3.88_m}, {2.10_m, 3.30_m}, {2.10_m, 2.75_m}, {2.10_m, 2.20_m}, {2.10_m, 1.60_m}, {2.10_m, 1.05_m}, {2.10_m, 0.5_m}, {14.25_m, 7.5_m}};
+  
+  const frc::Translation2d BlueHoldPositions[10]{{-6.14_m, -3.47_m}, {-6.14_m, -2.84_m}, {-6.14_m, -2.23_m}, {-6.14_m, -1.65_m}, {-6.14_m, -1.15_m}, {-6.14_m, -0.49_m}, {-6.14_m, -0.12_m}, {-6.14_m, 0.4_m}, {14.25_m, 1.0_m}, {14.25_m, 7.5_m}};
+  const frc::Translation2d RedHoldPositions[10]{{5.91_m, -3.45_m}, {5.91_m, -3.32_m}, {5.91_m, -2.38_m}, {5.91_m, -1.63_m}, {5.91_m, -1.29_m}, {5.91_m, -1.44_m}, {5.91_m, -1.74_m}, {5.91_m, -2.04_m}, {5.91_m, -2.34_m}, {2.3_m, 7.5_m}};
   
   TurnTo turnTo90{3.0, &m_drive};
 
   frc2::CommandPtr toFive{ToPoint({5.0_m, 5.0_m, {90_deg}}, &m_drive).WithTimeout(15.0_s)};
 
+  frc2::CommandPtr teleDock{GyroDock(-1.8, &m_drive)};
+  
   frc2::CommandPtr dock{GyroDock(1.5, &m_drive).WithTimeout(15.0_s)};
 
   frc2::CommandPtr wallNoBalance{WallNoBalance(&m_drive, &elevator, &arm, &intake).WithTimeout(15.0_s)};
+
+  frc2::CommandPtr wallNoBalanceRed{WallNoBalanceRed(&m_drive, &elevator, &arm, &intake).WithTimeout(15.0_s)};
   
   frc2::CommandPtr lowPlaceThenBreak{LowPlaceThenBreak(&m_drive, &elevator, &arm, &intake).WithTimeout(15.0_s)};
   
