@@ -39,10 +39,7 @@
 #include "subsystems/LimelightSubsystem.h"
 #include "iostream"
 #include "frc/motorcontrol/Spark.h"
-#include <pathplanner/lib/auto/SwerveAutoBuilder.h>
-#include <pathplanner/lib/PathPlanner.h>
 
-using namespace pathplanner;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since
@@ -126,27 +123,6 @@ class RobotContainer {
   frc2::Trigger odomTrigger{[this]() { return validTag; }};
 
   // frc::Field2d field;
-
-  std::unordered_map<std::string, std::shared_ptr<frc2::Command>> eventMap;
-  // eventMap.emplace("marker1", std::make_shared<frc2::PrintCommand>("Passed Marker 1"));
-  // eventMap.emplace("intakeDown", std::make_shared<frc2::PrintCommand>("Passed Marker 2"));
-
-  // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this could be in RobotContainer along with your subsystems
-
-  SwerveAutoBuilder autoBuilder{
-    [this]() { return m_drive.GetPose(); }, // Function to supply current robot pose
-    [this](auto initPose) { m_drive.ResetOdometry(initPose); }, // Function used to reset odometry at the beginning of auto
-    PIDConstants(-0.2, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)
-    PIDConstants(0.15, 0.0, 0.0), // PID constants to correct for rotation error (used to create the rotation controller)
-    [this](auto speeds) { m_drive.Drive(speeds.vx, speeds.vy, {speeds.omega * -1.0}, false); }, // Output function that accepts field relative ChassisSpeeds
-    eventMap, // Our event map
-    { &m_drive }, // Drive requirements, usually just a single drive subsystem
-    true // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
-  };
-
-  frc2::CommandPtr testAuto{autoBuilder.fullAuto(PathPlanner::loadPath("AutoPath", {PathConstraints(AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration)}))};
-  frc2::CommandPtr testPath{autoBuilder.fullAuto(PathPlanner::loadPath("TestPath", {PathConstraints(AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration)}))};
-  frc2::CommandPtr testRotate{autoBuilder.fullAuto(PathPlanner::loadPath("TestRotate", {PathConstraints(AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration)}))};
 
   frc2::SequentialCommandGroup turnRateTest{    
       frc2::InstantCommand(
