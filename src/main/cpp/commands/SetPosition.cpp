@@ -37,6 +37,10 @@ void SetPosition::Initialize() {
     } else if(target == 5) {
       elevator->SetTargetPosition(300);
       arm->SetTargetAngle(ArmConstants::kAutonStart);
+    } else if(target == 6) {
+      arm->SetTargetAngle(ArmConstants::kDoubleStation);
+      intake->SetWristState(IntakeConstants::kPositionMode);
+      intake->SetTargetPosition(IntakeConstants::kDoubleStation);
     }
 }
 
@@ -51,6 +55,8 @@ void SetPosition::Execute() {
   } else if(target == 5 && elevator->IsAtTarget() && arm->IsAtTarget()) {
     intake->SetWristState(IntakeConstants::kPositionMode);
     intake->SetTargetPosition(IntakeConstants::kAutonStart);
+  } else if(target == 6 && arm->IsAtTarget() && intake->IsAtTarget()) {
+    elevator->SetTargetPosition(ElevatorConstants::kDoubleStation);
   }
 }
 

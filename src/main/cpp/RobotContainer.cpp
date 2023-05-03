@@ -179,6 +179,7 @@ RobotContainer::RobotContainer() {
   partnerDpadLeft.OnTrue(GetPositionCommand(4));
   partnerDpadRight.OnTrue(GetPositionCommand(2));
   partnerDpadDown.OnTrue(GetPositionCommand(1));
+  controller2.Y().OnTrue(GetPositionCommand(6));
   controller2.B().OnTrue(GetPositionCommand(0));
   controller2.A().OnTrue(&SetBlinkinAButton);
   controller2.X().ToggleOnTrue(&verticalPickup);

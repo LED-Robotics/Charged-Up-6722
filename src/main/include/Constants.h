@@ -101,6 +101,8 @@ namespace ElevatorConstants {
     constexpr int kFloorStandingPickupPosition = 100;
     constexpr int kMidDropoffPosition = 22000;
     constexpr int kHighDropoffPosition = 90000;
+    // constexpr int kDoubleStation = 40000;
+    constexpr int kDoubleStation = 24000;
     constexpr int kCubePosition = 600;
     constexpr int kPositionDeadzone = 3000;
     constexpr int kP = 0.1;
@@ -133,6 +135,7 @@ namespace ArmConstants {
     constexpr int kHighDropoffPosition = 74500;
     constexpr double kHighDropoffAngle = 136.7;
     constexpr double kHighCubeAngle = 135.0;
+    constexpr double kDoubleStation = 136.7;
     constexpr double kAutonStart = 275.0;
     constexpr int kPositionDeadzone = 15000;
     constexpr int kP = 0.012;
@@ -168,6 +171,7 @@ namespace IntakeConstants {
     constexpr int kMidDropoffPosition = 40713;
     constexpr int kHighCubePosition = 32400;
     constexpr int kHighDropoffPosition = 37900;
+    constexpr int kDoubleStation = 37900;
     constexpr int kAutonStart = 53900;
     constexpr int kPositionDeadzone = 6666;
     constexpr int kP = 0.03;
