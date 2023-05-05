@@ -5,6 +5,7 @@
 #include "commands/SetPosition.h"
 #include "commands/SetIntakePower.h"
 #include "commands/WaitDrive.h"
+#include "commands/ToPoint.h"
 #include "commands/GyroDock.h"
 #include <frc2/command/CommandBase.h>
 #include <frc2/command/ParallelCommandGroup.h>

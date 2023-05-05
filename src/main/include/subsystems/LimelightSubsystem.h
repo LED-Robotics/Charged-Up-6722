@@ -10,6 +10,7 @@
 #include "networktables/NetworkTableInstance.h"
 #include "networktables/NetworkTableEntry.h"
 #include "networktables/NetworkTableValue.h"
+#include <frc/DriverStation.h>
 
 #include "Constants.h"
 
@@ -17,7 +18,7 @@ using namespace frc;
 
 class LimelightSubsystem : public frc2::SubsystemBase {
  public:
-  LimelightSubsystem();
+  LimelightSubsystem(std::string_view targetTable);
 
   /**
    * Will be called periodically whenever the CommandScheduler runs.
@@ -79,6 +80,13 @@ class LimelightSubsystem : public frc2::SubsystemBase {
    * @return The target's skew
    */
   double GetTargetSkew();
+
+  /**
+   * Returns the robot's position as tracked using AprilTags.
+   *
+   * @return The bot's position array
+   */
+  std::vector<double> GetBotPos();
     
  private:
   double targetXOffset;
@@ -86,6 +94,8 @@ class LimelightSubsystem : public frc2::SubsystemBase {
   double targetArea;
   double targetSkew;
   bool targetFound;
+  std::vector<double> botPose{6};
+  std::string_view tableName;
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
   std::shared_ptr<nt::NetworkTable> table;

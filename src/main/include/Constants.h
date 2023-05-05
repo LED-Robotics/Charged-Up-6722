@@ -79,7 +79,7 @@ namespace DriveConstants {
 
     constexpr double kDriveDeadzone = 0.05;
     constexpr double kDriveCurveExtent = 0.6;
-    constexpr auto kDriveTranslationLimit = 4.3_mps_sq;
+    constexpr auto kDriveTranslationLimit = 5.0_mps_sq;
     // Example value only - as above, this must be tuned for your drive!
     constexpr double kPDriveVel = 1.0;
     constexpr double kPTurnVel = 0.001;
@@ -101,6 +101,9 @@ namespace ElevatorConstants {
     constexpr int kFloorStandingPickupPosition = 100;
     constexpr int kMidDropoffPosition = 22000;
     constexpr int kHighDropoffPosition = 90000;
+    // constexpr int kDoubleStation = 40000;
+    constexpr int kDoubleStation = 24000;
+    constexpr int kCubePosition = 600;
     constexpr int kPositionDeadzone = 3000;
     constexpr int kP = 0.1;
 }
@@ -128,8 +131,12 @@ namespace ArmConstants {
     constexpr double kFloorStandingPickupAngle = 50.0;
     constexpr int kMidDropoffPosition = 74500;
     constexpr double kMidDropoffAngle = 136.7;
+    constexpr double kMidCubeAngle = 92.0;
     constexpr int kHighDropoffPosition = 74500;
     constexpr double kHighDropoffAngle = 136.7;
+    constexpr double kHighCubeAngle = 135.0;
+    constexpr double kDoubleStation = 136.7;
+    constexpr double kAutonStart = 275.0;
     constexpr int kPositionDeadzone = 15000;
     constexpr int kP = 0.012;
 }
@@ -160,8 +167,12 @@ namespace IntakeConstants {
     // constexpr int kFloorPickupPosition = 20600;
     constexpr int kFloorPickupPosition = 22700;
     constexpr int kFloorStandingPickupPosition = 25417;
+    constexpr int kMidCubePosition = 23750;
     constexpr int kMidDropoffPosition = 40713;
+    constexpr int kHighCubePosition = 32400;
     constexpr int kHighDropoffPosition = 37900;
+    constexpr int kDoubleStation = 37900;
+    constexpr int kAutonStart = 53900;
     constexpr int kPositionDeadzone = 6666;
     constexpr int kP = 0.03;
 }
@@ -174,13 +185,13 @@ namespace LimelightConstants {
 }
 
 namespace AutoConstants {
-        constexpr auto kMaxSpeed = 3.5_mps;
-        constexpr auto kMaxAcceleration = 6_mps_sq;
+        constexpr auto kMaxSpeed = 2.5_mps;
+        constexpr auto kMaxAcceleration = 2_mps_sq;
         constexpr auto kAngularSpeed = 180_deg_per_s;
         constexpr auto kMaxAngularAcceleration = 180_deg_per_s_sq;
 
-        constexpr double kPXController = 0.0;
-        constexpr double kPYController = 0.0;
+        constexpr double kPXController = 0.4;
+        constexpr double kPYController = 0.4;
         constexpr double kPThetaController = 0.0;
 
         extern const frc::TrapezoidProfile<units::radians>::Constraints

@@ -9,15 +9,16 @@
 using namespace LimelightConstants;
 using namespace frc;
 
-LimelightSubsystem::LimelightSubsystem() {
+LimelightSubsystem::LimelightSubsystem(std::string_view targetTable) {
   // Implementation of subsystem constructor goes here
-  table = nt::NetworkTableInstance::GetDefault().GetTable("limelight");
+  tableName = targetTable;
+  table = nt::NetworkTableInstance::GetDefault().GetTable(tableName);
   SetLED(kUsePipeline);
 }
 
 void LimelightSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here
-  table = nt::NetworkTableInstance::GetDefault().GetTable("limelight");
+  table = nt::NetworkTableInstance::GetDefault().GetTable(tableName);
   targetFound = !(table->GetNumber("tv", 0.0) < 1.0);
   if(targetFound) {
     targetXOffset = table->GetNumber("tx", 0.0);
@@ -25,6 +26,14 @@ void LimelightSubsystem::Periodic() {
     targetArea = table->GetNumber("ta", 0.0);
     targetSkew = table->GetNumber("ts", 0.0);
   }
+  botPose = table->GetNumberArray("botpose",std::vector<double>(6));
+
+  // frc::DriverStation::Alliance alliance = frc::DriverStation::GetAlliance();
+  // if(alliance == frc::DriverStation::Alliance::kBlue) {
+  //   botPose = table->GetNumberArray("botpose_wpiblue",std::vector<double>(6));
+  // } else if(alliance == frc::DriverStation::Alliance::kRed) {
+  //   botPose = table->GetNumberArray("botpose_wpired",std::vector<double>(6));
+  // }
 }
 
 double LimelightSubsystem::GetPipeline() {
@@ -70,4 +79,8 @@ double LimelightSubsystem::GetTargetArea() {
 
 double LimelightSubsystem::GetTargetSkew() {
   return targetSkew;
+}
+
+std::vector<double> LimelightSubsystem::GetBotPos() {
+  return botPose;
 }

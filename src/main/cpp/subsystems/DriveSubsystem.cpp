@@ -7,6 +7,7 @@
 #include <iostream>
 #include <cmath>
 #include <frc/geometry/Rotation2d.h>
+#include <frc/smartdashboard/Field2d.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
 using namespace DriveConstants;
@@ -45,15 +46,25 @@ DriveSubsystem::DriveSubsystem()
       
       xLimiter{kDriveTranslationLimit},
       yLimiter{kDriveTranslationLimit} {
+        ResetEncoders();
         ZeroSwervePosition();
-        gyro.Reset();
-        initialPitch = gyro.GetPitch();
+        // gyro.Reset();
+        // backLeft.SetInverted(true);
+        // frontLeft.SetInverted(true);
+        // backRight.SetInverted(true);
+        // frontRight.SetInverted(true);
+
+        backLeftTheta.SetInverted(true);
+        frontLeftTheta.SetInverted(true);
+        backRightTheta.SetInverted(true);
+        frontRightTheta.SetInverted(true);
         // gyro.Calibrate();
         // backRightTheta.SetSelectedSensorPosition(0);
         // ConfigMotors();
 
         // ResetEncoders();
-        ResetOdometry(frc::Pose2d{{0.0_m, 0.0_m}, {180_deg}});
+        // ResetOdometry(frc::Pose2d{{0.0_m, 0.0_m}, {180_deg}});
+        // ResetOdometry(frc::Pose2d{{0.0_m, 0.0_m}, {90_deg}});
       }
 
 void DriveSubsystem::Periodic() {
@@ -74,12 +85,13 @@ void DriveSubsystem::Periodic() {
                   {s_frontLeft.GetPosition(), s_frontRight.GetPosition(),
                   s_backLeft.GetPosition(), s_backRight.GetPosition()});
   // SmartDashboard::PutNumber("odomGyro", (double)odometry.GetPose().Rotation().Degrees());
-  // SmartDashboard::PutNumber("navxGyro", (double)GetAngle());
+  SmartDashboard::PutNumber("navxGyro", (double)gyro.GetRotation2d().Degrees());
+  // SmartDashboard::PutNumber("turnRate", (double)GetTurnRate());
   auto pose = odometry.GetPose();
-  // SmartDashboard::PutNumber("poseX", (double)pose.X());
-  // SmartDashboard::PutNumber("poseY", (double)pose.Y());
-  // SmartDashboard::PutNumber("poseAngle", (double)pose.Rotation().Degrees());
-  // SmartDashboard::PutNumber("gyroPitch", gyro.GetPitch());
+  SmartDashboard::PutNumber("poseX", (double)pose.X());
+  SmartDashboard::PutNumber("poseY", (double)pose.Y());
+  SmartDashboard::PutNumber("poseAngle", (double)pose.Rotation().Degrees());
+  SmartDashboard::PutNumber("gyroPitch", gyro.GetPitch());
   // SmartDashboard::PutNumber("frontLeftVel", (double)s_frontLeft.GetState().speed);
   // SmartDashboard::PutNumber("frontRightVel", (double)s_frontRight.GetState().speed);
 
@@ -89,6 +101,9 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
                           units::meters_per_second_t ySpeed,
                           units::degrees_per_second_t rot,
                           bool fieldRelative) {
+  rot *= 0.5747;
+  xSpeed *= -1.0;
+  ySpeed *= -1.0;
   if(enableLimiting) {
     // std::cout << "Slew Rate Limiter Is On!\n";
     xSpeed = xLimiter.Calculate(xSpeed);
@@ -99,13 +114,14 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
 
   // SmartDashboard::PutNumber("targetXVel", (double)xSpeed);
   // SmartDashboard::PutNumber("targetYVel", (double)ySpeed);
-  SmartDashboard::PutNumber("fieldCentric", fieldRelative);
+  // SmartDashboard::PutNumber("targetOmega", (double)rot);
+  SmartDashboard::PutBoolean("fieldCentric", fieldRelative);
   auto states = kDriveKinematics.ToSwerveModuleStates(
     fieldRelative ? frc::ChassisSpeeds::FromFieldRelativeSpeeds(
-        xSpeed, ySpeed, rot, GetPose().Rotation() * -1)
+        xSpeed, ySpeed, rot, GetPose().Rotation())
       : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
-  kDriveKinematics.DesaturateWheelSpeeds(&states, AutoConstants::kMaxSpeed);
+  kDriveKinematics.DesaturateWheelSpeeds(&states, 3.5_mps);
 
   // std::cout << "X Target: " << (double)xSpeed << '\n';
   // std::cout << "Y Target: " << (double)ySpeed << '\n';
@@ -115,8 +131,7 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
 
 void DriveSubsystem::SetModuleStates(
   wpi::array<frc::SwerveModuleState, 4> desiredStates) {
-    kDriveKinematics.DesaturateWheelSpeeds(&desiredStates,
-                                          AutoConstants::kMaxSpeed);
+    kDriveKinematics.DesaturateWheelSpeeds(&desiredStates, 3.5_mps);
     // std::cout << "FL Speed: " << (double)desiredStates[0].speed << " FL Angle: " << (double)desiredStates[0].angle.Degrees() << '\n';
     s_frontLeft.SetDesiredState(desiredStates[0]);
     // std::cout << "FR Speed: " << (double)desiredStates[1].speed << " FR Angle: " << (double)desiredStates[1].angle.Degrees() << '\n';
@@ -155,67 +170,6 @@ bool DriveSubsystem::ZeroSwervePosition() {
   return true;
 }
 
-void DriveSubsystem::driveDistance(units::meter_t distance, units::meters_per_second_t speed) {
-  speed *= -1.0;
-  while(true) {
-      auto pose = odometry.GetPose();
-      double current = (double)pose.X();
-      Drive(speed, 0_mps, 0_deg_per_s, false);
-      if((double)distance - current < 0.0) break;
-    }
-    Drive(0_mps, 0_mps, 0_deg_per_s, false);
-}
-
-void DriveSubsystem::driveDistance(units::meter_t distance) {
-  frc::SwerveModuleState forward{0_mps, frc::Rotation2d()};
-  SetModuleStates({forward, forward, forward, forward});
-  WPI_TalonFX *motors[4] = {&backLeft, &frontLeft, &backRight, &frontRight};
-  double initial[4];
-  double delta = (double)distance / kDriveEncoderDistancePerPulse;
-  delta *= -1.0;
-  for(int i = 0; i < 4; i++) {
-    initial[i] = motors[i]->GetSelectedSensorPosition();
-    motors[i]->SelectProfileSlot(1, 0);
-    motors[i]->ConfigSelectedFeedbackSensor(ctre::phoenix::motorcontrol::FeedbackDevice::IntegratedSensor, 1);
-    motors[i]->Set(TalonFXControlMode::Position, initial[i] + delta);
-  }
-  bool complete = false;
-  while(true) {
-    for(int i = 0; i < 4; i++) {
-      if(abs(motors[i]->GetSelectedSensorPosition() - initial[i]) > 500) break;
-      if(i == 3) complete = true;
-    }
-    if(complete) break;
-  }
-  motors[0]->SelectProfileSlot(0, 0);
-  motors[1]->SelectProfileSlot(0, 0);
-  motors[2]->SelectProfileSlot(0, 0);
-  motors[3]->SelectProfileSlot(0, 0);
-  motors[0]->ConfigSelectedFeedbackSensor(ctre::phoenix::motorcontrol::FeedbackDevice::IntegratedSensor, 0);
-  motors[1]->ConfigSelectedFeedbackSensor(ctre::phoenix::motorcontrol::FeedbackDevice::IntegratedSensor, 0);
-  motors[2]->ConfigSelectedFeedbackSensor(ctre::phoenix::motorcontrol::FeedbackDevice::IntegratedSensor, 0);
-  motors[3]->ConfigSelectedFeedbackSensor(ctre::phoenix::motorcontrol::FeedbackDevice::IntegratedSensor, 0);
-
-}
-
-void DriveSubsystem::strafeDistance(units::meter_t distance, units::meters_per_second_t speed) {
-
-}
-
-void DriveSubsystem::strafeDistance(units::meter_t distance) {
-
-}
-
-// void DriveSubsystem::turnToDegrees(units::degree_t angle, units::degrees_per_second_t speed) {
-//   while(true) {
-//     double current = (double)odometry.GetPose().Rotation().Degrees();
-//     Drive(0_mps, 0_mps, speed);
-//     if(abs(current - (double)angle) < 10.0) break;
-//     Wait(20_ms);
-//   }
-//   Drive(0_mps, 0_mps, 0_deg_per_s);
-// }
-
 void DriveSubsystem::ResetEncoders() {
   s_frontLeft.ResetEncoders();
   s_backLeft.ResetEncoders();
@@ -234,6 +188,10 @@ units::degree_t DriveSubsystem::GetAngle() const {
   return units::degree_t{gyro.GetAngle()};
 }
 
+frc::Rotation2d DriveSubsystem::GetRotation() {
+  return gyro.GetRotation2d();
+}
+
 void DriveSubsystem::ZeroHeading() {
   gyro.Reset();
 }
@@ -247,6 +205,13 @@ frc::Pose2d DriveSubsystem::GetPose() {
 }
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
+  // std::cout << "Auton X: " << (double)pose.X() << '\n';
+  // std::cout << "Auton Y: " << (double)pose.Y() << '\n';
+  // std::cout << "Auton Rotation: " << (double)pose.Rotation().Degrees() << '\n';
+  backLeft.SetSelectedSensorPosition(0);
+  frontLeft.SetSelectedSensorPosition(0);
+  backRight.SetSelectedSensorPosition(0);
+  frontRight.SetSelectedSensorPosition(0);
   odometry.ResetPosition(
     gyro.GetRotation2d(),
     {s_frontLeft.GetPosition(), s_frontRight.GetPosition(),
@@ -291,4 +256,33 @@ void DriveSubsystem::ConfigMotors() {
 
 double DriveSubsystem::GetPitch() {
   return gyro.GetPitch();
+}
+
+void DriveSubsystem::SetPoseToHold(frc::Pose2d target) {
+  poseToHold = target;
+}
+
+frc::Pose2d DriveSubsystem::GetPoseToHold() {
+  return poseToHold;
+}
+
+void DriveSubsystem::StartHolding() {
+  xHoldController.Reset();
+  yHoldController.Reset();
+  thetaHoldController.Reset();
+
+  xHoldController.SetSetpoint((double)poseToHold.X());
+  yHoldController.SetSetpoint((double)poseToHold.Y());
+  thetaHoldController.SetSetpoint((double)poseToHold.Rotation().Degrees());
+}
+
+frc::ChassisSpeeds DriveSubsystem::CalculateHolding() {
+  auto current = odometry.GetPose();
+  double angle = (double)current.Rotation().Degrees();
+  double currentAngle = SwerveModule::PlaceInAppropriate0To360Scope(thetaHoldController.GetSetpoint(), angle);
+  // SmartDashboard::PutNumber("angleTarget", thetaHoldController.GetSetpoint());
+  // SmartDashboard::PutNumber("currentHoldAngle", currentAngle);
+  return frc::ChassisSpeeds{units::meters_per_second_t{xHoldController.Calculate((double)current.X())}, 
+  units::meters_per_second_t{yHoldController.Calculate((double)current.Y())}, 
+  units::radians_per_second_t{thetaHoldController.Calculate(currentAngle)}};
 }

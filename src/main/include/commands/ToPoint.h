@@ -12,27 +12,27 @@
  * This command controls the order in which the subsystems move based on the target position,
  * as opposed to the original method of moving all three simultaneously all the time.
  */
-class GyroDock : public frc2::CommandHelper<frc2::CommandBase, GyroDock> {
+class ToPoint : public frc2::CommandHelper<frc2::CommandBase, ToPoint> {
  public:
-  explicit GyroDock(double targetSpeed, DriveSubsystem* driveRef);
+  explicit ToPoint(frc::Pose2d target, DriveSubsystem* driveRef);
 
   void Initialize() override;
 
   void Execute() override;
+  
+  void End(bool interrupted) override;
 
   bool IsFinished() override;
 
  private:
-    double speed = 1.5;
-    double initialPitch = 0.0;
-    double changeThreshold = 3.0;
-    double range = 15.0;
-    const double kP = 0.35;
-    bool initialApproachCompleted = false;
-    bool sustained = false;
-    bool tippedForward = false;
-    bool backwards = false;
-    Timer successTimer;
-    units::second_t successTime = 2_s;
+    frc::Pose2d targetPose;
     DriveSubsystem *drive;
+    double targetX;
+    double targetY;
+    double targetDeg;
+    double translationDeadzone = 0.2;
+    double rotationDeadzone = 14.0;
+    double currentX = 0.0;
+    double currentY = 0.0;
+    double currentDeg = 0.0;
 };

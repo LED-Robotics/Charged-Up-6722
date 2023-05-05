@@ -13,7 +13,7 @@
 void Robot::RobotInit() {
   m_container.SetDriveBrakes(false);
   m_container.ResetOdometry();
-  // SmartDashboard::PutNumber("autoP", 0.3);
+  // SmartDashboard::PutNumber("autoP", 0.1);
   // SmartDashboard::PutNumber("armPos", 0.0);
   // SmartDashboard::PutNumber("armPower", 0.0);
   // SmartDashboard::PutNumber("wristPos", 4000);
@@ -57,18 +57,22 @@ void Robot::DisabledPeriodic() {}
 void Robot::AutonomousInit() {
   // bool doAuton = SmartDashboard::GetBoolean("doAuton", false);
   // if (doAuton) {
+  m_container.DisableTagTracking();
   m_autonomousCommand = m_container.GetAutonomousCommand();
-  m_container.SetDriveBrakes(true);
-  m_container.SetSlew(false);
-  m_container.SetDriveReversed(false);
-  // m_container.ResetOdometry();
-  m_autonomousCommand->Schedule();
+  if(m_autonomousCommand != nullptr) {
+    m_container.SetDriveBrakes(true);
+    m_container.SetSlew(false);
+    m_container.SetDriveReversed(false);
+    // m_container.ResetOdometry();
+    m_autonomousCommand->Schedule();
+  }
   // }
 }
 
 void Robot::AutonomousPeriodic() {}
 
 void Robot::TeleopInit() {
+  m_container.EnableTagTracking();
   m_container.SetDriveBrakes(true);
   m_container.SetSlew(true);
   m_container.SetDriveReversed(false);

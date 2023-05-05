@@ -5,6 +5,7 @@
 #include "commands/SetPosition.h"
 #include "commands/SetIntakePower.h"
 #include "commands/ToPoint.h"
+#include "commands/TurnTo.h"
 #include "commands/WaitDrive.h"
 #include "commands/GyroDock.h"
 #include <frc2/command/CommandBase.h>
@@ -24,7 +25,7 @@
  * This command controls the order in which the subsystems move based on the target position,
  * as opposed to the original method of moving all three simultaneously all the time.
  */
-class LowDock : public frc2::CommandHelper<frc2::SequentialCommandGroup, LowDock> {
+class WallNoBalanceRed : public frc2::CommandHelper<frc2::SequentialCommandGroup, WallNoBalanceRed> {
  public:
-    LowDock(DriveSubsystem *driveRef, ElevatorSubsystem* elevRef, ArmSubsystem* armRef, IntakeSubsystem* intakeRef);
+    WallNoBalanceRed(DriveSubsystem *driveRef, ElevatorSubsystem* elevRef, ArmSubsystem* armRef, IntakeSubsystem* intakeRef);
 };

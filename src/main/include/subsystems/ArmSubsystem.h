@@ -99,8 +99,13 @@ class ArmSubsystem : public frc2::SubsystemBase {
   /**
    * Initially configure onboard TalonFX settings for motors.
    */
-   void ConfigMotors();
-  
+  void ConfigMotors();
+
+  void SetConeMode();
+
+  void SetCubeMode();
+
+  bool GetConeMode();
     
  private:
 //  while the state is kOn the Arm will run at the current power setting
@@ -108,6 +113,7 @@ class ArmSubsystem : public frc2::SubsystemBase {
   double power = ArmConstants::kDefaultPower;
   double position = ArmConstants::kStartPosition;
   double angle = 11.5;
+  bool isCone = true;
 
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
