@@ -40,8 +40,6 @@ void RobotContainer::UpdateStationUI() {
   frc::SmartDashboard::PutBoolean("station9", targetStation == 9);
 }
 
-// iterate through each station position and find the closest target based on cone/cube mode
-// if no position is within 3.0_m on the x axis this will return -1
 int RobotContainer::GetClosestPosition() {
   bool coneMode = arm.GetConeMode();
   frc::Pose2d current = m_drive.GetPose();
@@ -63,12 +61,10 @@ int RobotContainer::GetClosestPosition() {
   return pos;
 }
 
-// utility function to return the appropriate SetPosition command
 frc2::Command* RobotContainer::GetPositionCommand(int position) {
   return new SetPosition(position, &elevator, &arm, &intake);
 }
 
-// function passed to controller command bindings to allow different control schemes for solo/partner driving 
 frc2::Command* RobotContainer::HandlePartnerCommands(frc2::Command* solo, frc2::Command* partner) {
   return new frc2::InstantCommand(
     [this, solo, partner]() { 
@@ -77,14 +73,12 @@ frc2::Command* RobotContainer::HandlePartnerCommands(frc2::Command* solo, frc2::
       }, {});
 }
 
-// returns dummy command
 frc2::Command* RobotContainer::GetEmptyCommand() {
   return new frc2::InstantCommand(
           [this]() { 
            }, {});
 }
 
-// return a Pose2d object with the current station target pose based on user selection and current alliance
 frc::Pose2d RobotContainer::GetTargetPose() {
   frc::Pose2d target{};
   bool isBlue = IsBlue();
