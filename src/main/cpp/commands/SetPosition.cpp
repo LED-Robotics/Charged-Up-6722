@@ -10,7 +10,8 @@ intake(intakeRef) {
 
 void SetPosition::Initialize() {
     // SmartDashboard::PutBoolean("coneInSet", isCone);  // print to Shuffleboard
-    isCone = arm->GetConeMode();
+    isCone = arm->GetConeMode();  // check cone or cube mode
+    // set subsystems that start moving first to their targets
     if(target == 0) {
       elevator->SetTargetPosition(ElevatorConstants::kStartPosition);
       intake->SetWristState(IntakeConstants::kPositionMode);
@@ -45,6 +46,7 @@ void SetPosition::Initialize() {
 }
 
 void SetPosition::Execute() {
+  // set subsystems that require other subsystems to be at their target to move
   if(target == 0 && elevator->IsAtTarget()) {
     arm->SetTargetAngle(ArmConstants::kStartAngle);
   } else if(target == 1 && elevator->IsAtTarget() && intake->IsAtTarget()) {
@@ -61,5 +63,6 @@ void SetPosition::Execute() {
 }
 
 bool SetPosition::IsFinished() {
+  // end when all three subsystems are at their target setpoint 
   return elevator->IsAtTarget() && arm->IsAtTarget() && intake->IsAtTarget();
 }

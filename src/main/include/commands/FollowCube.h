@@ -10,9 +10,7 @@
 #include "subsystems/LimelightSubsystem.h"
 
 /**
- * A command that sets the position of the elevator, intake, and arm subsystems. 
- * This command controls the order in which the subsystems move based on the target position,
- * as opposed to the original method of moving all three simultaneously all the time.
+ * A Command meant to follow and intake a cube using the Limelight
  */
 class FollowCube : public frc2::CommandHelper<frc2::CommandBase, FollowCube> {
  public:

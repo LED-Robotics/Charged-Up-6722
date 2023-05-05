@@ -3,55 +3,39 @@
 HighDock::HighDock(DriveSubsystem *drive, ElevatorSubsystem *elev, ArmSubsystem *arm, IntakeSubsystem *intake) {
   SetName("High Dock");
   AddCommands(
-    frc2::InstantCommand(             // stop the drive
+    frc2::InstantCommand(             // set to cube placement mode
       [=]() { 
         arm->SetCubeMode();
     }, {arm}),
 
-    frc2::InstantCommand(             // stop the drive
+    frc2::InstantCommand(             // reset odometry. This doesn't always work do it three times
       [=]() { 
         drive->ResetOdometry({0.0_m, 0.0_m, {180.0_deg}});
     }, {drive}),
 
-    frc2::InstantCommand(             // stop the drive
+    frc2::InstantCommand(             // reset odometry.
       [=]() { 
         drive->ResetOdometry({0.0_m, 0.0_m, {180.0_deg}});
     }, {drive}),
 
-    frc2::InstantCommand(             // stop the drive
+    frc2::InstantCommand(             // reset odometry.
       [=]() { 
         drive->ResetOdometry({0.0_m, 0.0_m, {180.0_deg}});
     }, {drive}),
 
     SetIntakePower(0.12, intake),       // set intake to holding power
 
-    // frc2::ParallelCommandGroup(   // perform simultaneously
-    //   WaitDrive(0.5_m, 0.8_mps, drive),   // drive back from link station
-
-    //   SetPosition(2, elev, arm, intake)  // extent to mid
-    // ),
-    // TrajectoryRelative({0.0_m, 0.0_m, 0.0_deg}, {}, {0.25_m, 0.0_m, 0.0_deg}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}, drive),
-    // WaitDrive(0.25_m, 0.6_mps, drive),   // drive back from link station
     SetPosition(3, elev, arm, intake),  // extent to mid
-
-    // TrajectoryRelative({frc::Pose2d{0.0_m, 0.0_m, 0.0_deg}, frc::Pose2d{0.5_m, 0.0_m, 0.0_deg}}, 
-    // {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}, drive),   test line for Trajectory code
-
-    // WaitDrive(0.5_m, -0.8_mps, drive),  // drive to link station
-    
-    // SetPosition(3, elev, arm, intake),  // extent to high
         
-    SetIntakePower(-1.0, intake),       // intake full reverse to spit out cone
+    SetIntakePower(-1.0, intake),       // intake full reverse to spit out cube
     
-    frc2::WaitCommand(0.5_s),           // wait until cone is out
+    frc2::WaitCommand(0.5_s),           // wait until cube is out
     
     SetIntakePower(0.0, intake),        // turn off intake
 
-    // SetPosition(2, elev, arm, intake),  // retract elevator to mid    
     
-    ToPoint({1.0_m, 0.0_m, {180.0_deg}}, drive),   // drive back from link station
-    // frc2::ParallelCommandGroup(   // perform simultaneously
-    // ),
+    ToPoint({1.0_m, 0.0_m, {180.0_deg}}, drive),   // drive back from station
+
     SetPosition(0, elev, arm, intake),  // retract back to stored
 
     frc2::FunctionalCommand(            // drive until robot hits charge station
@@ -70,22 +54,12 @@ HighDock::HighDock(DriveSubsystem *drive, ElevatorSubsystem *elev, ArmSubsystem 
 
     ToPoint({5.1_m, 0.0_m, {180.0_deg}}, drive),   // drive back from link station
 
-    frc2::WaitCommand(0.25_s),         // drive for another extra bit to make sure we break the auto line
+    frc2::WaitCommand(0.25_s),         // wait for charge station to stop teetering
     
     frc2::InstantCommand(             // stop the drive
       [=]() { 
         drive->Drive(0.0_mps, 0_mps, 0_deg_per_s, false);
       }, {drive}),
-
-    // frc2::FunctionalCommand(            // center the robot
-    //   [=] { ; },
-    //   [=] {
-    //     double delta = 180.0 - (double)drive->GetPose().Rotation().Degrees(); 
-    //     drive->Drive(0.0_mps, 0.0_mps, units::degrees_per_second_t{20.0 + delta * 0.2}, false); 
-    //     },
-    //   [=] (bool interrupted) { drive->Drive(0.0_mps, 0_mps, 0_deg_per_s, false); },
-    //   [=] { return abs(180.0 - (double)drive->GetPose().Rotation().Degrees()) < 10.0; },
-    //   {drive}),
     
     GyroDock(-1.8, drive)              // dock on charge station
   );

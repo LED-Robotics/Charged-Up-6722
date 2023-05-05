@@ -11,12 +11,14 @@ targetDeg{(double)target.Rotation().Degrees()} {
 }
 
 void ToPoint::Initialize() {
+  // configure DriveSubsystem to hold at target Pose2d
   drive->SetLimiting(false);
   drive->SetPoseToHold(targetPose);
   drive->StartHolding();
 }
 
 void ToPoint::Execute() {
+  // move drivetrain according to its CalculateHolding method
   frc::Pose2d current = drive->GetPose();
   currentX = (double)current.X();
   currentY = (double)current.Y();
@@ -27,10 +29,12 @@ void ToPoint::Execute() {
 }
 
 void ToPoint::End(bool interrupted) {
+  // stop moving
   drive->Drive(0_mps, 0_mps, 0_deg_per_s, false);
 }
 
 bool ToPoint::IsFinished() {
+  // end when drivetrain is within deadzones on all three Pose2d components
   bool xMet = currentX > targetX - (translationDeadzone / 2) && currentX < targetX + (translationDeadzone / 2);
   bool yMet = currentY > targetY - (translationDeadzone / 2) && currentY < targetY + (translationDeadzone / 2);
   bool degMet = currentDeg > targetDeg - (rotationDeadzone / 2) && currentDeg < targetDeg + (rotationDeadzone / 2);

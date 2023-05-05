@@ -57,19 +57,30 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   void ResetEncoders();
 
+  /**
+   * Sets invert status of the drive motors.
+   */
   void SetInverted(bool inverted);
+
+  /**
+   * Sets the swerve modules to a SwerveModuleState.
+   */
+  void SetModuleStates(wpi::array<frc::SwerveModuleState, 4> desiredStates);
 
   /**
    * Sets the drive MotorControllers to a power from -1 to 1.
    */
-  void SetModuleStates(wpi::array<frc::SwerveModuleState, 4> desiredStates);
-
   void SetDrivePower(double power);
 
+  /**
+   * Sets the theta MotorControllers to a power from -1 to 1.
+   */
   void SetTurnPower(double power);
 
-  bool ZeroSwervePosition();
-
+  /**
+   * Reset theta motor encoders to match the respective mag encoder value.
+   */
+  void ZeroSwervePosition();
 
   /**
    * Returns the degrees of the robot.
@@ -136,41 +147,47 @@ class DriveSubsystem : public frc2::SubsystemBase {
    * @return the robot's pitch, from -180 to 180
    */
   double GetPitch();
-
+  
+  /**
+   * Give DriveSubsystem a position to hold at.
+   */
   void SetPoseToHold(frc::Pose2d target);
 
+  /**
+   * Returns the current Pose2d the robot is holding at.
+   *
+   * @return the Pose2d the robot is set to hold to
+   */
   frc::Pose2d GetPoseToHold();
 
+  /**
+   * Configure DriveSubsystem to hold at the current target Pose2d.
+   */
   void StartHolding();
 
   frc::ChassisSpeeds CalculateHolding();
 
-  // CURRENT WORKING CONFIG
-  // frc::Translation2d frontLeftLocation{-0.449072_m, 0.449072_m};
-  // frc::Translation2d frontRightLocation{-0.449072_m, -0.449072_m};
-  // frc::Translation2d backLeftLocation{0.449072_m, 0.449072_m};
-  // frc::Translation2d backRightLocation{0.449072_m, -0.449072_m};
-
+  // Positions of the SwerveModules relative to the center of the robot.
+  // X+ is towards the front of the bot, Y+ is towards the left of the robot.
+  // The coordinates are weird because of the field coordinate system, I don't make the rules.
+  // Florida, France, Bland, Brazil
   frc::Translation2d frontLeftLocation{0.449072_m, 0.449072_m};
   frc::Translation2d frontRightLocation{0.449072_m, -0.449072_m};
   frc::Translation2d backLeftLocation{-0.449072_m, 0.449072_m};
   frc::Translation2d backRightLocation{-0.449072_m, -0.449072_m};
 
-  //Bland, Florida, Brazil, France
-  // frc::Translation2d backLeftLocation{-0.449072_m, 0.449072_m};
-  // frc::Translation2d frontLeftLocation{0.449072_m, 0.449072_m};
-  // frc::Translation2d backRightLocation{-0.449072_m, -0.449072_m};
-  // frc::Translation2d frontRightLocation{0.449072_m, -0.449072_m};
+  // Kinematics to generate swerve module states. The order the locations goes in is the order they come out from other functions.
   frc::SwerveDriveKinematics<4> kDriveKinematics{frontLeftLocation, frontRightLocation, backLeftLocation, backRightLocation};
 
  private:
-  bool enableLimiting = false;
-  double initialPitch = 0.0;
+  bool enableLimiting = false;  // flag for SlewRateLimiters
 
-  frc::Pose2d poseToHold{};
+  frc::Pose2d poseToHold{}; // var to contain target pose
+  // PID controllers for position holding
   frc2::PIDController xHoldController{2.5, 0.0, 0.0};
   frc2::PIDController yHoldController{2.5, 0.0, 0.0};
   frc2::PIDController thetaHoldController{-0.07, 0.0, 0.0};
+
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 
@@ -205,6 +222,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
   // Odometry class for tracking robot pose
   frc::SwerveDriveOdometry<4> odometry;
 
+  // SlewRateLimiters for driving. They limit the max accel/decel of the drivetrain.
   SlewRateLimiter<units::meters_per_second> xLimiter;
   SlewRateLimiter<units::meters_per_second> yLimiter;
 };

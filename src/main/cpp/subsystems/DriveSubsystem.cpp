@@ -101,15 +101,14 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
                           units::meters_per_second_t ySpeed,
                           units::degrees_per_second_t rot,
                           bool fieldRelative) {
+  // arbitrary speed component adjustments
   rot *= 0.5747;
   xSpeed *= -1.0;
   ySpeed *= -1.0;
   if(enableLimiting) {
-    // std::cout << "Slew Rate Limiter Is On!\n";
     xSpeed = xLimiter.Calculate(xSpeed);
     ySpeed = yLimiter.Calculate(ySpeed);
   } else {
-    // std::cout << "Slew Rate Limiter Is Off!\n";
   }
 
   // SmartDashboard::PutNumber("targetXVel", (double)xSpeed);
@@ -123,22 +122,15 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
 
   kDriveKinematics.DesaturateWheelSpeeds(&states, 3.5_mps);
 
-  // std::cout << "X Target: " << (double)xSpeed << '\n';
-  // std::cout << "Y Target: " << (double)ySpeed << '\n';
-  // std::cout << "Angle Target: " << (double)rot << '\n';
   SetModuleStates(states);
 }
 
 void DriveSubsystem::SetModuleStates(
   wpi::array<frc::SwerveModuleState, 4> desiredStates) {
     kDriveKinematics.DesaturateWheelSpeeds(&desiredStates, 3.5_mps);
-    // std::cout << "FL Speed: " << (double)desiredStates[0].speed << " FL Angle: " << (double)desiredStates[0].angle.Degrees() << '\n';
     s_frontLeft.SetDesiredState(desiredStates[0]);
-    // std::cout << "FR Speed: " << (double)desiredStates[1].speed << " FR Angle: " << (double)desiredStates[1].angle.Degrees() << '\n';
     s_frontRight.SetDesiredState(desiredStates[1]);
-    // std::cout << "BL Speed: " << (double)desiredStates[2].speed << " BL Angle: " << (double)desiredStates[2].angle.Degrees() << '\n';
     s_backLeft.SetDesiredState(desiredStates[2]);
-    // std::cout << "BR Speed: " << (double)desiredStates[3].speed << " BR Angle: " << (double)desiredStates[3].angle.Degrees() << '\n';
     s_backRight.SetDesiredState(desiredStates[3]);
 }
 
@@ -158,16 +150,16 @@ void DriveSubsystem::SetTurnPower(double power) {
   s_backRight.SetTurnPower(power);
 }
 
-bool DriveSubsystem::ZeroSwervePosition() {
-  WPI_TalonFX *turnMotors[4] = {&backLeftTheta, &frontLeftTheta, &backRightTheta, &frontRightTheta};
-  WPI_TalonSRX *talons[4] = {&backLeftTalon, &frontLeftTalon, &backRightTalon, &frontRightTalon};
-  double poses[4] = {kBLeftMagPos, kFLeftMagPos, kBRightMagPos, kFRightMagPos};
+void DriveSubsystem::ZeroSwervePosition() {
+  WPI_TalonFX *turnMotors[4] = {&backLeftTheta, &frontLeftTheta, &backRightTheta, &frontRightTheta}; // turn motor ref arr
+  WPI_TalonSRX *talons[4] = {&backLeftTalon, &frontLeftTalon, &backRightTalon, &frontRightTalon}; // mag encoder TalonSRX ref arr
+  double poses[4] = {kBLeftMagPos, kFLeftMagPos, kBRightMagPos, kFRightMagPos}; // arr of correct swerve mag poses
+  // iterate through each swerve module and offset theta motors so that they match the absolute mag encoder positions
   for(int i = 0; i < 4; i++) {
     auto sensor = talons[i]->GetSensorCollection();
-    double pos = sensor.GetPulseWidthPosition() / 2;
+    double pos = sensor.GetPulseWidthPosition() / 2;  // divid mag pos by 2
     turnMotors[i]->SetSelectedSensorPosition(((poses[i] / 2) / kTurnRatio) - (pos / kTurnRatio));
   }
-  return true;
 }
 
 void DriveSubsystem::ResetEncoders() {
@@ -205,9 +197,6 @@ frc::Pose2d DriveSubsystem::GetPose() {
 }
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
-  // std::cout << "Auton X: " << (double)pose.X() << '\n';
-  // std::cout << "Auton Y: " << (double)pose.Y() << '\n';
-  // std::cout << "Auton Rotation: " << (double)pose.Rotation().Degrees() << '\n';
   backLeft.SetSelectedSensorPosition(0);
   frontLeft.SetSelectedSensorPosition(0);
   backRight.SetSelectedSensorPosition(0);
@@ -238,6 +227,7 @@ void DriveSubsystem::SetBrakeMode(bool state) {
 }
 
 void DriveSubsystem::ConfigMotors() {
+  // haven't gotten this to work
   backLeft.Config_kP(0, driveKp, 100);
   frontLeft.Config_kP(0, driveKp, 100);
   backRight.Config_kP(0, driveKp, 100);
@@ -267,21 +257,24 @@ frc::Pose2d DriveSubsystem::GetPoseToHold() {
 }
 
 void DriveSubsystem::StartHolding() {
+  // reset PID controllers
   xHoldController.Reset();
   yHoldController.Reset();
   thetaHoldController.Reset();
 
+  // set PID setpoints to target components
   xHoldController.SetSetpoint((double)poseToHold.X());
   yHoldController.SetSetpoint((double)poseToHold.Y());
   thetaHoldController.SetSetpoint((double)poseToHold.Rotation().Degrees());
 }
 
 frc::ChassisSpeeds DriveSubsystem::CalculateHolding() {
-  auto current = odometry.GetPose();
-  double angle = (double)current.Rotation().Degrees();
-  double currentAngle = SwerveModule::PlaceInAppropriate0To360Scope(thetaHoldController.GetSetpoint(), angle);
+  auto current = odometry.GetPose();  // current robot pose
+  double angle = (double)current.Rotation().Degrees();  // current robot angle
+  double currentAngle = SwerveModule::PlaceInAppropriate0To360Scope(thetaHoldController.GetSetpoint(), angle);  // angle with corrected range
   // SmartDashboard::PutNumber("angleTarget", thetaHoldController.GetSetpoint());
   // SmartDashboard::PutNumber("currentHoldAngle", currentAngle);
+  // return ChassisSpeeds needed to hold position correctly
   return frc::ChassisSpeeds{units::meters_per_second_t{xHoldController.Calculate((double)current.X())}, 
   units::meters_per_second_t{yHoldController.Calculate((double)current.Y())}, 
   units::radians_per_second_t{thetaHoldController.Calculate(currentAngle)}};

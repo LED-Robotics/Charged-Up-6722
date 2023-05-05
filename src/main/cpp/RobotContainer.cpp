@@ -21,10 +21,12 @@
 
 #include "Constants.h"
 
+// return current Alliance from either FMS or Driver Station
 bool RobotContainer::IsBlue() {
   return frc::DriverStation::GetAlliance() == frc::DriverStation::Alliance::kBlue;
 }
 
+// update SmartDashboard display of the currently selected station
 void RobotContainer::UpdateStationUI() {
   frc::SmartDashboard::PutBoolean("station0", targetStation == 0);
   frc::SmartDashboard::PutBoolean("station1", targetStation == 1);
@@ -38,6 +40,8 @@ void RobotContainer::UpdateStationUI() {
   frc::SmartDashboard::PutBoolean("station9", targetStation == 9);
 }
 
+// iterate through each station position and find the closest target based on cone/cube mode
+// if no position is within 3.0_m on the x axis this will return -1
 int RobotContainer::GetClosestPosition() {
   bool coneMode = arm.GetConeMode();
   frc::Pose2d current = m_drive.GetPose();
@@ -59,10 +63,12 @@ int RobotContainer::GetClosestPosition() {
   return pos;
 }
 
+// utility function to return the appropriate SetPosition command
 frc2::Command* RobotContainer::GetPositionCommand(int position) {
   return new SetPosition(position, &elevator, &arm, &intake);
 }
 
+// function passed to controller command bindings to allow different control schemes for solo/partner driving 
 frc2::Command* RobotContainer::HandlePartnerCommands(frc2::Command* solo, frc2::Command* partner) {
   return new frc2::InstantCommand(
     [this, solo, partner]() { 
@@ -71,12 +77,14 @@ frc2::Command* RobotContainer::HandlePartnerCommands(frc2::Command* solo, frc2::
       }, {});
 }
 
+// returns dummy command
 frc2::Command* RobotContainer::GetEmptyCommand() {
   return new frc2::InstantCommand(
           [this]() { 
            }, {});
 }
 
+// return a Pose2d object with the current station target pose based on user selection and current alliance
 frc::Pose2d RobotContainer::GetTargetPose() {
   frc::Pose2d target{};
   bool isBlue = IsBlue();
@@ -116,8 +124,9 @@ frc::Pose2d RobotContainer::GetTargetPose() {
 }
 
 RobotContainer::RobotContainer() {
-  // Initialize all of your commands and subsystems here
 
+  // Autonomous selector configuration
+  
   chooser.SetDefaultOption("High Dock", highDock.get());
   chooser.AddOption("Wall No Balance Blue", wallNoBalance.get());
   chooser.AddOption("Wall No Balance Red", wallNoBalanceRed.get());
@@ -127,75 +136,81 @@ RobotContainer::RobotContainer() {
   chooser.AddOption("Simple Dock", dock.get());
   chooser.AddOption("None", GetEmptyCommand());
 
-  blinkin.Set(.41);
+  blinkin.Set(.41); // set LEDs to idle on startup when enabled
 
-  SmartDashboard::PutData(&chooser);
+  SmartDashboard::PutData(&chooser);  // send auton selector to Shuffleboard
 
-  odomTrigger.WhileTrue(&repeatOdom);
+  odomTrigger.WhileTrue(&repeatOdom); // trigger to handle odom updates from AprilTags
 
-  moveRoutineCancel.OnTrue(std::move(cancelMoves));
+  moveRoutineCancel.OnTrue(std::move(cancelMoves)); // run cancel command when driver interrupts auton subroutine in teleop
 
+  // bindings for main driver elev, arm, intake positional control
+  // main driver loses these controls if the partner is connected
   mainDpadUp.OnTrue(HandlePartnerCommands(GetPositionCommand(3), GetEmptyCommand()));
   mainDpadLeft.OnTrue(HandlePartnerCommands(GetPositionCommand(4), GetEmptyCommand()));
   mainDpadRight.OnTrue(HandlePartnerCommands(GetPositionCommand(2), GetEmptyCommand()));
   mainDpadDown.OnTrue(HandlePartnerCommands(GetPositionCommand(1), GetEmptyCommand()));
   controller.Back().OnTrue(HandlePartnerCommands(GetPositionCommand(0), GetEmptyCommand()));
   controller.Start().OnTrue(HandlePartnerCommands(GetPositionCommand(5), GetEmptyCommand()));
-  // controller.B().ToggleOnTrue(GetRelativePathCommand({0.0_m, 0.0_m, 0_deg}, {}, {-4.0_m, -0.05_m, 0_deg}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}));
-  // controller.X().ToggleOnTrue(&turnTo90);
-  // controller.A().ToggleOnTrue(GetRelativePathCommand({0.0_m, 0.0_m, 0_deg}, {}, {4.0_m, -0.0_m, 0_deg}, {AutoConstants::kMaxSpeed, AutoConstants::kMaxAcceleration}));
 
-  // controller.B().ToggleOnTrue(std::move(testAuto));
-  // controller.B().ToggleOnTrue(&driveRateTest);
-  // controller.X().ToggleOnTrue(std::move(testPath));
-  // controller.A().ToggleOnTrue(std::move(testRotate));
-
-  // controller.B().OnTrue(std::move(toFive));
-  controller.LeftStick().OnTrue(std::move(punchObject));
-  controller.RightStick().OnTrue(&setToSubstation);
-  // controller.B().OnTrue(&toggleDocking);
-  // controller.A().OnTrue(&toggleMaintain);
-  // controller.B().OnTrue(&holdDocking);
-
-  // controller.A().OnTrue(&togglePositionHold);
-  // controller.B().OnTrue(&incrementStation);
-  // controller.X().OnTrue(&decrementStation);
-
-  // holdingTrigger.OnTrue();
-  // holdingTrigger.OnTrue(std::move(startHolding));
-  // holdingTrigger.OnFalse(std::move(endHolding));
-  // holdingTrigger.WhileTrue(std::move(holdPosition));
-  
-  // dockTrigger.WhileTrue(std::move(teleDock).FinallyDo(std::move(endDocking)));
-
-  // maintainTrigger.OnFalse(endDocking);
-  // maintainTrigger.WhileTrue(std::move(maintainEngage));
-
-  // controller.A().ToggleOnTrue(&driveL);
-  // controller.X().ToggleOnTrue(&driveL2);
-  // controller.B().ToggleOnTrue(new GyroDock(1.5, &m_drive));
-
+  // bindings for partner elev, arm, intake positional control
   partnerDpadUp.OnTrue(GetPositionCommand(3));
   partnerDpadLeft.OnTrue(GetPositionCommand(4));
   partnerDpadRight.OnTrue(GetPositionCommand(2));
   partnerDpadDown.OnTrue(GetPositionCommand(1));
   controller2.Y().OnTrue(GetPositionCommand(6));
   controller2.B().OnTrue(GetPositionCommand(0));
+
+  // game element PUNCH binding! Very funny. 
+  controller.LeftStick().OnTrue(std::move(punchObject));
+
+  /* Triggers for auto-alignment selection Commands
+
+  // controller.A().OnTrue(&togglePositionHold);
+  // controller.B().OnTrue(&incrementStation);
+  // controller.X().OnTrue(&decrementStation);
+  // controller.RightStick().OnTrue(&setToSubstation);
+
+  // Triggers for functional auto-alignment Commands
+  
+  // holdingTrigger.OnTrue(std::move(startHolding));
+  // holdingTrigger.OnFalse(std::move(endHolding));
+  // holdingTrigger.WhileTrue(std::move(holdPosition));
+  */
+
+  /* Triggers for enabling auto-docking Commands
+  
+  // controller.B().OnTrue(&toggleDocking);
+  // controller.A().OnTrue(&toggleMaintain);
+  // controller.B().OnTrue(&holdDocking);
+  
+  // Triggers for functional auto-docking Commands
+  
+  // dockTrigger.WhileTrue(std::move(teleDock));
+
+  // maintainTrigger.OnFalse(endDocking);
+  // maintainTrigger.WhileTrue(std::move(maintainEngage));
+  */
+
+  // partner LED control bindings
   controller2.A().OnTrue(&SetBlinkinAButton);
   controller2.X().ToggleOnTrue(&verticalPickup);
   controller2.LeftBumper().OnTrue(&SetBlinkinLeftBumper);
   controller2.RightBumper().OnTrue(&SetBlinkinRightBumper);
 
-  controller.Start().OnTrue(&rumbleSecondaryOn);
-  controller2.Start().OnTrue(&rumblePrimaryOn);
+  // funny rumble command bindings. These might not work. 
+  controller.Start().WhileTrue(&rumbleSecondaryOn);
+  controller2.Start().WhileTrue(&rumblePrimaryOn);
   controller.Start().OnFalse(&rumbleSecondaryOff);
   controller2.Start().OnFalse(&rumblePrimaryOff);
 
   // Set up default drive command
     m_drive.SetDefaultCommand(frc2::RunCommand(
       [this] {
-            // field.SetRobotPose(m_drive.GetPose());
+            // lazy non-command implementation of a field-centric drive toggle
             if(controller.GetYButtonPressed()) fieldCentric = !fieldCentric;
+
+            // store control inputs for driving
             double x = controller.GetLeftY();
             double y = controller.GetLeftX();
             double turnX = controller.GetRightX();
@@ -212,6 +227,8 @@ RobotContainer::RobotContainer() {
             float xSpeed = DriveConstants::kDriveCurveExtent * pow(x, 3) + (1 - DriveConstants::kDriveCurveExtent) * x;
             float ySpeed = DriveConstants::kDriveCurveExtent * pow(y, 3) + (1 - DriveConstants::kDriveCurveExtent) * y;
             float turn = 0.95 * pow(turnX, 3) + (1 - 0.95) * turnX;
+            // pass filtered inputs to Drive function
+            // inputs will be between -1.0 to 1.0, multiply by intended speed range in mps/deg_per_s when passing
             m_drive.Drive(
               units::meters_per_second_t{xSpeed * -3.5},
               units::meters_per_second_t{ySpeed * -3.5},
@@ -220,41 +237,40 @@ RobotContainer::RobotContainer() {
       },
       {&m_drive}));
     
+    // function to handle intake logic. Should probably be a command
     intake.SetDefaultCommand(frc2::RunCommand(
       [this] {
           HandleIntake();
       },
       {&intake}));
 
+    // Ensure elevator is running in position mode during normal operation
     elevator.SetDefaultCommand(frc2::RunCommand(
       [this] {
             elevator.SetState(ElevatorConstants::kPositionMode);
       },
       {&elevator}));
 
+    // Ensure arm is running in position mode during normal operation
       arm.SetDefaultCommand(frc2::RunCommand(
       [this] {
             arm.SetState(ArmConstants::kPositionMode);
       },
       {&arm}));
 
+      // command to trigger odom updates from limelight AprilTag data
       armLimelight.SetDefaultCommand(frc2::RunCommand(
       [this] {
-        // frc::SmartDashboard::PutData("field", &field);
         if(!armLimelight.IsTarget() || armLimelight.GetTargetArea() < 0.65) {
-          validTag = false;
+          validTag = false; // if there is no tag detected or the tag is very small don't update odom!
         } else {
-          validTag = true;
+          validTag = true;  // positional data most likely good. Update odom! 
         }
-          frc::SmartDashboard::PutBoolean("tagDetected", validTag);
+          frc::SmartDashboard::PutBoolean("tagDetected", validTag); // flashes green to tell drivers odom has been updated
       },
       {&armLimelight}));
 
 
-}
-
-void RobotContainer::ResetOdometry() {
-        // m_drive.ResetOdometry({});
 }
 
 void RobotContainer::EnableTagTracking() {
@@ -292,14 +308,8 @@ void RobotContainer::SetSlew(bool state) {
   m_drive.SetLimiting(state);
 }
 
-void RobotContainer::SetDriveReversed(bool reversed) {
-  m_drive.SetInverted(reversed);
-}
-
+// return selected auton routine from Shuffleboard
 frc2::Command* RobotContainer::GetAutonomousCommand() {
     auto selected = chooser.GetSelected();
-    // if(selected->GetName() == "WallNoBalance" && !IsBlue()) {
-    //   return wallNoBalanceRed.get();
-    // }
     return selected;
 }

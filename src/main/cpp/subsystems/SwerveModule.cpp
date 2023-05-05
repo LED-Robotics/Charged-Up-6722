@@ -80,6 +80,7 @@ void SwerveModule::SetDesiredState(
     
     turnMotor->Set(TalonFXControlMode::Position, (double)state.angle.Degrees() / DriveConstants::kTurnEncoderDegreesPerPulse);
 
+    // TalonFX returns velocity per 100ms so the speed needs to be divided by 10
     driveMotor->Set(TalonFXControlMode::Velocity, ((double)state.speed / 10.0) / DriveConstants::kDriveEncoderDistancePerPulse);    
 }
 

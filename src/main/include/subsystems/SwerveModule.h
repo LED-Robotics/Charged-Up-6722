@@ -47,17 +47,49 @@ class SwerveModule {
          * @return the encoder distance
          */
         units::meters_per_second_t GetDriveEncoderRate() const;
-        // frc::SwerveModuleState& GetTarget() const;
+        /**
+         * Gets the current state of the swerve module.
+         *
+         * @return a SwerveModuleState representing the module
+         */
         frc::SwerveModuleState GetState() const;
+        /**
+         * Gets the current position of the swerve module.
+         *
+         * @return a SwerveModulePosition representing the module
+         */
         frc::SwerveModulePosition GetPosition() const;
+        /**
+         * Corrects an angle with a non-continuous range and sets it to 0-360.
+         *
+         * @return the angle in its corrected range
+         */
         static double PlaceInAppropriate0To360Scope(double scopeReference, double newAngle);
+        /**
+         * Optimize swerve module target to minimize unnecessary movement.
+         *
+         * @return the optimized SwerveModuleState
+         */
         static frc::SwerveModuleState Optimize(const frc::SwerveModuleState& desiredState, frc::Rotation2d currentAngle);
+        /**
+         * Sets the state of the swerve module.
+         */
         void SetDesiredState(const frc::SwerveModuleState& state);
+        /**
+         * Debug function to set swerve drive motor using power.
+         */
         void SetDrivePower(double power);
+        /**
+         * Debug function to set swerve turn motor using power.
+         */
         void SetTurnPower(double power);
+        /**
+         * Resets the module motors' encoders.
+         */
         void ResetEncoders();
 
     private:
+        // motor references
         WPI_TalonFX *driveMotor;
         WPI_TalonFX *turnMotor;
 };

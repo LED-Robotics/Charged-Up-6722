@@ -13,35 +13,20 @@ using namespace ElevatorConstants;
 using namespace frc;
 
 ElevatorSubsystem::ElevatorSubsystem()
-    : leftStopSensor{kLeftStopPort},
-    rightStopSensor{kRightStopPort},
-    left{kLeftMotorPort},
+    : left{kLeftMotorPort},
     right{kRightMotorPort} {
       right.SetInverted(true);
-      // left.SetSelectedSensorPosition(0);
-      // right.SetSelectedSensorPosition(0);
-      // ConfigMotors();
 }
 
 void ElevatorSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here
-  // std::cout << "Left Current Position: " << GetLeftPosition() << '\n';
-  // SmartDashboard::PutNumber("leftPos", GetLeftPosition());
-  // SmartDashboard::PutNumber("rightPos", GetRightPosition());
-  // SmartDashboard::PutNumber("targetPos", position);
-  // std::cout << "Right Current Position: " << GetRightPosition() << '\n';
   if(state == kOff) {
     left.Set(0.0);
     right.Set(0.0);
   } else if(state == kPowerMode) {
-    // left.Set(leftStopSensor.Get() ? 0.0 : power);
-    // right.Set(rightStopSensor.Get() ? 0.0 : power);
     left.Set(power);
     right.Set(power);
   } else if(state == kPositionMode) {
-      // std::cout << "Position mode: " << position << '\n';
-      // if(leftStopSensor.Get()) left.Set(0.0);
-      // else left.Set(ctre::phoenix::motorcontrol::ControlMode::MotionMagic, position);
       double leftPos = GetLeftPosition();
       double rightPos = GetRightPosition();
       // SmartDashboard::PutNumber("elevPos", leftPos);  // print to Shuffleboard

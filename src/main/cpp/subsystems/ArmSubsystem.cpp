@@ -16,9 +16,6 @@ ArmSubsystem::ArmSubsystem()
     : left{kLeftMotorPort},
     right{kRightMotorPort} {
       left.SetInverted(true);
-      // left.SetSelectedSensorPosition(0);
-      // right.SetSelectedSensorPosition(0);
-      // ConfigMotors();
 }
 
 void ArmSubsystem::Periodic() {
@@ -30,16 +27,7 @@ void ArmSubsystem::Periodic() {
     left.Set(power);
     right.Set(power);
   } else if(state == kPositionMode) {
-    // std::cout << "Arm Position mode: " << position << '\n';
     // feed forwards should be a changing constant that increases as the arm moves further. It should be a static amount of power to overcome gravity.
-    
-    // double leftAngle = (GetLeftPosition() / kCountsPerDegree) * (M_PI/180);
-    // double rightAngle = (GetRightPosition() / kCountsPerDegree) * (M_PI/180);
-    // double leftFeedForward = sin(leftAngle) * kMaxFeedForward;
-    // double rightFeedForward = sin(rightAngle) * kMaxFeedForward;
-    // SmartDashboard::PutNumber("armAngle", ((GetLeftPosition() / kCountsPerDegree) + (GetRightPosition() / kCountsPerDegree)) / 2);  // print to Shuffleboard
-    // left.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, leftFeedForward);
-    // right.Set(ctre::phoenix::motorcontrol::TalonFXControlMode::Position, position, ctre::phoenix::motorcontrol::DemandType::DemandType_ArbitraryFeedForward, rightFeedForward);
 
     double leftAngle = (GetLeftPosition() / kCountsPerDegree) * (M_PI/180);
     double rightAngle = (GetRightPosition() / kCountsPerDegree) * (M_PI/180);
@@ -70,10 +58,6 @@ void ArmSubsystem::SetState(int newState) {
 
 int ArmSubsystem::GetState() {
   return state;
-}
-
-void ArmSubsystem::SetTargetPosition(double newPosition) {
-  position = newPosition;
 }
 
 double ArmSubsystem::GetLeftPosition() {

@@ -8,11 +8,9 @@
 
 #include <frc/smartdashboard/SmartDashboard.h>
 #include <frc2/command/CommandScheduler.h>
-#include "cameraserver/CameraServer.h"
 
 void Robot::RobotInit() {
   m_container.SetDriveBrakes(false);
-  m_container.ResetOdometry();
   // SmartDashboard::PutNumber("autoP", 0.1);
   // SmartDashboard::PutNumber("armPos", 0.0);
   // SmartDashboard::PutNumber("armPower", 0.0);
@@ -22,9 +20,6 @@ void Robot::RobotInit() {
   // SmartDashboard::PutNumber("wristAngle", 0.0);
   // SmartDashboard::PutNumber("elevatorPos", 0);
   // SmartDashboard::PutBoolean("doAuton", true);
-
-  CameraServer::StartAutomaticCapture();
-  CameraServer::SetSize(CameraServer::kSize160x120);
 }
 
 /**
@@ -32,7 +27,7 @@ void Robot::RobotInit() {
  * this for items like diagnostics that you want to run during disabled,
  * autonomous, teleoperated and test.
  *
- * <p> This runs after the mode specific periodic functions, but before
+ * This runs after the mode specific periodic functions, but before
  * LiveWindow and SmartDashboard integrated updating.
  */
 void Robot::RobotPeriodic() {
@@ -51,36 +46,27 @@ void Robot::DisabledInit() {
 void Robot::DisabledPeriodic() {}
 
 /**
- * This autonomous runs the autonomous command selected by your {@link
- * RobotContainer} class.
+ * This autonomous runs the autonomous command selected by your
+ * RobotContainer class.
  */
 void Robot::AutonomousInit() {
-  // bool doAuton = SmartDashboard::GetBoolean("doAuton", false);
-  // if (doAuton) {
-  m_container.DisableTagTracking();
+  m_container.DisableTagTracking();   // auton uses odom relative to start, not based on AprilTags
   m_autonomousCommand = m_container.GetAutonomousCommand();
   if(m_autonomousCommand != nullptr) {
     m_container.SetDriveBrakes(true);
     m_container.SetSlew(false);
-    m_container.SetDriveReversed(false);
-    // m_container.ResetOdometry();
     m_autonomousCommand->Schedule();
   }
-  // }
 }
 
 void Robot::AutonomousPeriodic() {}
 
 void Robot::TeleopInit() {
-  m_container.EnableTagTracking();
+  m_container.EnableTagTracking();  // station auto-align uses AprilTag tracking 
   m_container.SetDriveBrakes(true);
   m_container.SetSlew(true);
-  m_container.SetDriveReversed(false);
-  // m_container.ResetOdometry();
   // This makes sure that the autonomous stops running when
-  // teleop starts running. If you want the autonomous to
-  // continue until interrupted by another command, remove
-  // this line or comment it out.
+  // teleop starts running.
   if (m_autonomousCommand != nullptr) {
     m_autonomousCommand->Cancel();
     m_autonomousCommand = nullptr;

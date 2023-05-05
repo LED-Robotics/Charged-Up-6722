@@ -101,10 +101,6 @@ class ElevatorSubsystem : public frc2::SubsystemBase {
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 
-  // limit switches at the bottom elevator position
-  DigitalInput leftStopSensor;
-  DigitalInput rightStopSensor;
-
   // The motor controllers
   // WPI_TalonSRX left;
   WPI_TalonFX left;
