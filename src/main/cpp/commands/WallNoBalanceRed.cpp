@@ -57,7 +57,7 @@ WallNoBalanceRed::WallNoBalanceRed(DriveSubsystem *drive, ElevatorSubsystem *ele
     
     frc2::WaitCommand(0.3_s),           // wait until cube is out
 
-    SetIntakePower(0.0, intake)       // intake full reverse to spit out cube
+    SetIntakePower(0.0, intake),       // intake full reverse to spit out cube
 
     frc2::ParallelCommandGroup(
       SetPosition(0, elev, arm, intake),  // arm stored
