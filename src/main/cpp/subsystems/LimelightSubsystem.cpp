@@ -19,6 +19,7 @@ LimelightSubsystem::LimelightSubsystem(std::string_view targetTable) {
 void LimelightSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here
   table = nt::NetworkTableInstance::GetDefault().GetTable(tableName);
+  // Store Limelight network table values in the Subsystem
   targetFound = !(table->GetNumber("tv", 0.0) < 1.0);
   if(targetFound) {
     targetXOffset = table->GetNumber("tx", 0.0);
@@ -28,6 +29,7 @@ void LimelightSubsystem::Periodic() {
   }
   botPose = table->GetNumberArray("botpose",std::vector<double>(6));
 
+  // Old code to use botpose translated based on alliance
   // frc::DriverStation::Alliance alliance = frc::DriverStation::GetAlliance();
   // if(alliance == frc::DriverStation::Alliance::kBlue) {
   //   botPose = table->GetNumberArray("botpose_wpiblue",std::vector<double>(6));

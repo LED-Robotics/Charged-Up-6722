@@ -12,8 +12,8 @@
 
 
 /**
- * A command that sets the position of the elevator, intake, and arm subsystems. 
- * This command controls the order in which the subsystems move based on the target position,
+ * Command that sets the position of the elevator, intake, and arm subsystems. 
+ * This Command controls the order in which the subsystems move based on the target position,
  * as opposed to the original method of moving all three simultaneously all the time.
  */
 class SetPosition : public frc2::CommandHelper<frc2::CommandBase, SetPosition> {

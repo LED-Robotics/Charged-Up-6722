@@ -58,12 +58,7 @@ class ArmSubsystem : public frc2::SubsystemBase {
    * Sets the current state of the Arm.
    */
   void SetState(int newState);
-
-  /**
-   * Returns the current position of the left Arm's Falon500.
-   */
-  void SetTargetPosition(double newPosition);
-
+  
   /**
    * Returns the current position of the left Arm's Falon500.
    */
@@ -101,19 +96,29 @@ class ArmSubsystem : public frc2::SubsystemBase {
    */
   void ConfigMotors();
 
+  /**
+   * Set arm to cone placement mode.
+   */
   void SetConeMode();
 
+  /**
+   * Set arm to cube placement mode.
+   */
   void SetCubeMode();
-
+  /**
+   * Returns whether the robot is in cone placement mode.
+   *
+   * @return cone mode state
+   */
   bool GetConeMode();
     
  private:
 //  while the state is kOn the Arm will run at the current power setting
   int state = ArmConstants::kPositionMode;
   double power = ArmConstants::kDefaultPower;
-  double position = ArmConstants::kStartPosition;
   double angle = 11.5;
-  bool isCone = true;
+
+  bool isCone = true; // flag for cone/cube mode
 
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.

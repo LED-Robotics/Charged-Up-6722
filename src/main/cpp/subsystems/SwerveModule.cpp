@@ -36,6 +36,7 @@ frc::SwerveModulePosition SwerveModule::GetPosition() const {
             GetTurnEncoderAngle()};
 }
 
+// adapted from team 364s BaseFalconSwerve example
 frc::SwerveModuleState SwerveModule::Optimize(const frc::SwerveModuleState& desiredState, frc::Rotation2d currentAngle) {
     double targetAngle = PlaceInAppropriate0To360Scope((double)currentAngle.Degrees(), (double)desiredState.angle.Degrees());
     double targetSpeed = (double)desiredState.speed;
@@ -47,6 +48,7 @@ frc::SwerveModuleState SwerveModule::Optimize(const frc::SwerveModuleState& desi
     return frc::SwerveModuleState{units::velocity::meters_per_second_t{targetSpeed}, {units::degree_t{targetAngle}}};
 }
 
+// adapted from team 364s BaseFalconSwerve example
 double SwerveModule::PlaceInAppropriate0To360Scope(double scopeReference, double newAngle) {
     double lowerBound;
     double upperBound;
@@ -80,9 +82,11 @@ void SwerveModule::SetDesiredState(
     
     turnMotor->Set(TalonFXControlMode::Position, (double)state.angle.Degrees() / DriveConstants::kTurnEncoderDegreesPerPulse);
 
+    // TalonFX returns velocity per 100ms so the speed needs to be divided by 10
     driveMotor->Set(TalonFXControlMode::Velocity, ((double)state.speed / 10.0) / DriveConstants::kDriveEncoderDistancePerPulse);    
 }
 
+// debug
 void SwerveModule::SetDrivePower(double power) {
     driveMotor->Set(power);
 }

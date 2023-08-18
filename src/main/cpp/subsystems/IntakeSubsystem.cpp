@@ -12,12 +12,10 @@ using namespace IntakeConstants;
 using namespace frc;
 
 IntakeSubsystem::IntakeSubsystem(ArmSubsystem *reference)
-    : intakeMotor{kIntakePort},
-    wristMotor{kWristPort} {
+    : intakeMotor{kIntakePort, "canUknot"},
+    wristMotor{kWristPort, "canUknot"} {
       arm = reference;
       intakeMotor.SetInverted(true);
-      // wristMotor.SetSelectedSensorPosition(0);
-      // ConfigMotors();
 }
 
 void IntakeSubsystem::Periodic() {
@@ -26,15 +24,13 @@ void IntakeSubsystem::Periodic() {
   if(state == kOff) {
     intakeMotor.Set(0.0);
   } else if(state == kPowerMode) {
+    // power limiting to prevent cube popping
     // if(intakeMotor.GetOutputCurrent() < kCurrentLimit && power > 0.0) intakeMotor.Set(power);
     intakeMotor.Set(power);
     // else intakeMotor.Set(0.0);
   }
 
   // Wrist position control
-  // double armAngle = arm->GetAngle();
-  // std::cout << "Arm Angle: " << armAngle << '\n';
-  // std::cout << "Wrist Pos: " << wristMotor.GetSelectedSensorPosition() << '\n';
   // feed forward should be a changing constant that increases as the wrist moves further. It should be a static amount of power to overcome gravity.
   double wristAngle = GetCurrentAngle() * (M_PI/180);
   // double feedForward = 0.0;
@@ -112,8 +108,8 @@ double IntakeSubsystem::GetTargetAngle() {
 }
 
 double IntakeSubsystem::GetCurrentAngle() {
+  // offset wrist angle by angle of the arm
   return kStartAngle - arm->GetAngle() + (GetCurrentPosition() / kCountsPerDegree);
-  
 }
 
 void IntakeSubsystem::ResetWristEncoder() {
