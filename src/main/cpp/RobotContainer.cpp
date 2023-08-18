@@ -174,7 +174,6 @@ RobotContainer::RobotContainer() {
   // controller.A().ToggleOnTrue(&driveL);
   // controller.X().ToggleOnTrue(&driveL2);
   // controller.B().ToggleOnTrue(new GyroDock(1.5, &m_drive));
-
   partnerDpadUp.OnTrue(GetPositionCommand(3));
   partnerDpadLeft.OnTrue(GetPositionCommand(4));
   partnerDpadRight.OnTrue(GetPositionCommand(2));
@@ -213,8 +212,8 @@ RobotContainer::RobotContainer() {
             float ySpeed = DriveConstants::kDriveCurveExtent * pow(y, 3) + (1 - DriveConstants::kDriveCurveExtent) * y;
             float turn = 0.95 * pow(turnX, 3) + (1 - 0.95) * turnX;
             m_drive.Drive(
-              units::meters_per_second_t{xSpeed * -3.5},
-              units::meters_per_second_t{ySpeed * -3.5},
+              units::meters_per_second_t{xSpeed * -5.0},
+              units::meters_per_second_t{ySpeed * -5.0},
               
               units::degrees_per_second_t{turn * 226.0}, fieldCentric);
       },

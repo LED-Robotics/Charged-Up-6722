@@ -99,7 +99,8 @@
     "xstring": "cpp",
     "xtr1common": "cpp",
     "xutility": "cpp",
-    "*.mac": "cpp"
+    "*.mac": "cpp",
+    "matrixfunctions": "cpp"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }
