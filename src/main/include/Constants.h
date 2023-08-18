@@ -47,15 +47,15 @@ namespace DriveConstants {
     constexpr int kBackRightTalonPort = 10;
     constexpr int kFrontRightTalonPort = 11;
 
-    constexpr int kBLeftMagPos = 3120;
-    constexpr int kFLeftMagPos = 800;
-    constexpr int kBRightMagPos = 1549;
-    constexpr int kFRightMagPos = 454;
+    constexpr int kBLeftMagPos = -3491;
+    constexpr int kFLeftMagPos = 2117;
+    constexpr int kBRightMagPos = 8261;
+    constexpr int kFRightMagPos = -3397;
     
     // info for odometry
     constexpr int kEncoderResolution = 2048;
     constexpr double kWheelRadius = .0508;
-    constexpr double kDriveRatio = 1 / 6.55;
+    constexpr double kDriveRatio = 1 / 5.5;
     constexpr double kTurnRatio = 1 / 10.29;
     constexpr double kDriveEncoderDistancePerPulse = (2 * std::numbers::pi * kWheelRadius / (double)kEncoderResolution) * kDriveRatio;
     constexpr double kTurnEncoderDegreesPerPulse = (360.0 / (double)kEncoderResolution) * kTurnRatio;
@@ -69,7 +69,7 @@ namespace DriveConstants {
     // drivetrain controller constants
     constexpr double kDriveDeadzone = 0.05;
     constexpr double kDriveCurveExtent = 0.6;
-    constexpr auto kDriveTranslationLimit = 5.0_mps_sq;
+    constexpr auto kDriveTranslationLimit = 6.0_mps_sq;
 }  // namespace DriveConstants
 
 namespace ElevatorConstants {

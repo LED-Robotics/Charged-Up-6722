@@ -38,29 +38,21 @@ DriveSubsystem::DriveSubsystem()
       s_frontRight{&frontRight, &frontRightTheta},
 
       //Gryo
-      gyro{SerialPort::Port::kMXP},
+      gyro{0},
 
       //Odometry
-      odometry{kDriveKinematics, {gyro.GetRotation2d()}, {s_frontLeft.GetPosition(), s_frontRight.GetPosition(), s_backLeft.GetPosition(),
+      odometry{kDriveKinematics, {GetRotation()}, {s_frontLeft.GetPosition(), s_frontRight.GetPosition(), s_backLeft.GetPosition(),
       s_backRight.GetPosition()}, frc::Pose2d{{0.0_m, 0.0_m}, {180_deg}}},
       
       xLimiter{kDriveTranslationLimit},
       yLimiter{kDriveTranslationLimit} {
         ResetEncoders();
         ZeroSwervePosition();
-        // gyro.Reset();
-        // backLeft.SetInverted(true);
-        // frontLeft.SetInverted(true);
-        // backRight.SetInverted(true);
-        // frontRight.SetInverted(true);
 
         backLeftTheta.SetInverted(true);
         frontLeftTheta.SetInverted(true);
         backRightTheta.SetInverted(true);
         frontRightTheta.SetInverted(true);
-        // gyro.Calibrate();
-        // backRightTheta.SetSelectedSensorPosition(0);
-        // ConfigMotors();
 
         // ResetEncoders();
         // ResetOdometry(frc::Pose2d{{0.0_m, 0.0_m}, {180_deg}});
@@ -81,17 +73,17 @@ void DriveSubsystem::Periodic() {
 
 
 
-  odometry.Update(gyro.GetRotation2d(),
+  odometry.Update(GetRotation(),
                   {s_frontLeft.GetPosition(), s_frontRight.GetPosition(),
                   s_backLeft.GetPosition(), s_backRight.GetPosition()});
   // SmartDashboard::PutNumber("odomGyro", (double)odometry.GetPose().Rotation().Degrees());
-  SmartDashboard::PutNumber("navxGyro", (double)gyro.GetRotation2d().Degrees());
+  SmartDashboard::PutNumber("navxGyro", (double)GetRotation().Degrees());
   // SmartDashboard::PutNumber("turnRate", (double)GetTurnRate());
   auto pose = odometry.GetPose();
   SmartDashboard::PutNumber("poseX", (double)pose.X());
   SmartDashboard::PutNumber("poseY", (double)pose.Y());
   SmartDashboard::PutNumber("poseAngle", (double)pose.Rotation().Degrees());
-  SmartDashboard::PutNumber("gyroPitch", gyro.GetPitch());
+  SmartDashboard::PutNumber("gyroPitch", GetPitch());
   // SmartDashboard::PutNumber("frontLeftVel", (double)s_frontLeft.GetState().speed);
   // SmartDashboard::PutNumber("frontRightVel", (double)s_frontRight.GetState().speed);
 
@@ -120,14 +112,14 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
         xSpeed, ySpeed, rot, GetPose().Rotation())
       : frc::ChassisSpeeds{xSpeed, ySpeed, rot});
 
-  kDriveKinematics.DesaturateWheelSpeeds(&states, 3.5_mps);
+  kDriveKinematics.DesaturateWheelSpeeds(&states, 5.0_mps);
 
   SetModuleStates(states);
 }
 
 void DriveSubsystem::SetModuleStates(
   wpi::array<frc::SwerveModuleState, 4> desiredStates) {
-    kDriveKinematics.DesaturateWheelSpeeds(&desiredStates, 3.5_mps);
+    kDriveKinematics.DesaturateWheelSpeeds(&desiredStates, 5.0_mps);
     s_frontLeft.SetDesiredState(desiredStates[0]);
     s_frontRight.SetDesiredState(desiredStates[1]);
     s_backLeft.SetDesiredState(desiredStates[2]);
@@ -177,19 +169,21 @@ void DriveSubsystem::SetInverted(bool inverted) {
 }
 
 units::degree_t DriveSubsystem::GetAngle() const {
-  return units::degree_t{gyro.GetAngle()};
+  return units::degree_t{gyro.GetYaw()};
 }
 
 frc::Rotation2d DriveSubsystem::GetRotation() {
-  return gyro.GetRotation2d();
+  return GetAngle();
 }
 
 void DriveSubsystem::ZeroHeading() {
-  gyro.Reset();
+  gyro.SetYaw(0.0);
 }
 
 double DriveSubsystem::GetTurnRate() {
-  return -gyro.GetRate();
+  double data[3] = {0, 0, 0};
+  gyro.GetRawGyro(data);
+  return -data[2];
 }
 
 frc::Pose2d DriveSubsystem::GetPose() {
@@ -202,7 +196,7 @@ void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
   backRight.SetSelectedSensorPosition(0);
   frontRight.SetSelectedSensorPosition(0);
   odometry.ResetPosition(
-    gyro.GetRotation2d(),
+    GetRotation(),
     {s_frontLeft.GetPosition(), s_frontRight.GetPosition(),
     s_backLeft.GetPosition(), s_backRight.GetPosition()},
     pose);
@@ -245,7 +239,7 @@ void DriveSubsystem::ConfigMotors() {
 }
 
 double DriveSubsystem::GetPitch() {
-  return gyro.GetPitch();
+  return gyro.GetRoll();
 }
 
 void DriveSubsystem::SetPoseToHold(frc::Pose2d target) {

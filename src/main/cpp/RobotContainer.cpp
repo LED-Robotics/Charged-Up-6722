@@ -224,8 +224,8 @@ RobotContainer::RobotContainer() {
             // pass filtered inputs to Drive function
             // inputs will be between -1.0 to 1.0, multiply by intended speed range in mps/deg_per_s when passing
             m_drive.Drive(
-              units::meters_per_second_t{xSpeed * -3.5},
-              units::meters_per_second_t{ySpeed * -3.5},
+              units::meters_per_second_t{xSpeed * -5.0},
+              units::meters_per_second_t{ySpeed * -5.0},
               
               units::degrees_per_second_t{turn * 226.0}, fieldCentric);
       },

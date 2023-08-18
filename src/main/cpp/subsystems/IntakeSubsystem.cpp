@@ -12,8 +12,8 @@ using namespace IntakeConstants;
 using namespace frc;
 
 IntakeSubsystem::IntakeSubsystem(ArmSubsystem *reference)
-    : intakeMotor{kIntakePort},
-    wristMotor{kWristPort} {
+    : intakeMotor{kIntakePort, "canUknot"},
+    wristMotor{kWristPort, "canUknot"} {
       arm = reference;
       intakeMotor.SetInverted(true);
 }

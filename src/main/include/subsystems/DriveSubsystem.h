@@ -217,7 +217,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
 
   
   // The gyro sensor
-  AHRS gyro;
+  Pigeon2 gyro;
 
   // Odometry class for tracking robot pose
   frc::SwerveDriveOdometry<4> odometry;

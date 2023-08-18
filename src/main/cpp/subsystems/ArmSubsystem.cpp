@@ -13,9 +13,9 @@ using namespace ArmConstants;
 using namespace frc;
 
 ArmSubsystem::ArmSubsystem()
-    : left{kLeftMotorPort},
-    right{kRightMotorPort} {
-      left.SetInverted(true);
+    : left{kLeftMotorPort, "canUknot"},
+    right{kRightMotorPort, "canUknot"} {
+      right.SetInverted(true);
 }
 
 void ArmSubsystem::Periodic() {
