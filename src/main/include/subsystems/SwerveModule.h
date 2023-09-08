@@ -12,7 +12,7 @@
 #include <frc/controller/SimpleMotorFeedforward.h>
 #include <frc/kinematics/SwerveModulePosition.h>
 #include <frc/kinematics/SwerveModuleState.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
+#include <rev/CANSparkMax.h>
 #include <units/angular_velocity.h>
 #include <units/acceleration.h>
 #include <units/angle.h>
@@ -24,9 +24,12 @@
 
 #include "Constants.h"
 
+using namespace rev;
+
 class SwerveModule {
     public:
         SwerveModule(WPI_TalonFX *drivingMotor, WPI_TalonFX *turningMotor);
+        SwerveModule(WPI_TalonFX *drivingMotor, CANSparkMax *turningMotor);
         /**
          * Gets the distance of the drive encoder.
          *
@@ -89,7 +92,16 @@ class SwerveModule {
         void ResetEncoders();
 
     private:
+
+        double GetFalconTurnPosition() const; 
+        double GetNeoTurnPosition() const; 
+
+        void SetFalconTurnPower(double power); 
+        void SetNeoTurnPower(double power); 
+
         // motor references
+        bool usingFalcon = true;
         WPI_TalonFX *driveMotor;
-        WPI_TalonFX *turnMotor;
+        WPI_TalonFX *falconTurn;
+        CANSparkMax *neoTurn;
 };
