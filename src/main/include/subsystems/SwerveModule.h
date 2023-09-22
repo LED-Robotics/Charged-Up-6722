@@ -104,4 +104,5 @@ class SwerveModule {
         WPI_TalonFX *driveMotor;
         WPI_TalonFX *falconTurn;
         CANSparkMax *neoTurn;
+        SparkMaxPIDController *neoController;
 };

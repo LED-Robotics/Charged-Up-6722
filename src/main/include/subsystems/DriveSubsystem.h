@@ -14,6 +14,7 @@
 #include <frc/trajectory/constraint/SwerveDriveKinematicsConstraint.h>
 #include <frc/kinematics/ChassisSpeeds.h>
 #include <frc/motorcontrol/MotorControllerGroup.h>
+#include <rev/CANSparkMax.h>
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/SubsystemBase.h>
 #include <frc/filter/SlewRateLimiter.h>
@@ -25,6 +26,7 @@
 #include "SwerveModule.h"
 
 using namespace frc;
+using namespace rev;
 
 class DriveSubsystem : public frc2::SubsystemBase {
  public:

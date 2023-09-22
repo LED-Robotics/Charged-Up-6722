@@ -19,6 +19,8 @@ SwerveModule::SwerveModule(WPI_TalonFX *drivingMotor,
     usingFalcon = false;
     driveMotor = drivingMotor;
     neoTurn = turningMotor;
+    neoController = (SparkMaxPIDController*) malloc(sizeof(SparkMaxPIDController));
+    *neoController = neoTurn->GetPIDController();
 }
 
 double SwerveModule::GetFalconTurnPosition() const {
@@ -106,7 +108,7 @@ void SwerveModule::SetDesiredState(
     if(usingFalcon) {
         falconTurn->Set(TalonFXControlMode::Position, (double)state.angle.Degrees() / DriveConstants::kTurnEncoderDegreesPerPulse);
     } else {
-        
+        neoController->SetReference((double)state.angle.Degrees() / DriveConstants::kTurnEncoderDegreesPerPulse, CANSparkMax::ControlType::kPosition);
     }
 
     // TalonFX returns velocity per 100ms so the speed needs to be divided by 10
