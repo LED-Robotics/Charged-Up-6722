@@ -11,7 +11,32 @@
 SwerveModule::SwerveModule(WPI_TalonFX *drivingMotor,
                             WPI_TalonFX *turningMotor) {
     driveMotor = drivingMotor;
-    turnMotor = turningMotor;
+    falconTurn = turningMotor;
+}
+
+SwerveModule::SwerveModule(WPI_TalonFX *drivingMotor,
+                            rev::CANSparkMax *turningMotor) {
+    usingFalcon = false;
+    driveMotor = drivingMotor;
+    neoTurn = turningMotor;
+    neoController = (SparkMaxPIDController*) malloc(sizeof(SparkMaxPIDController));
+    *neoController = neoTurn->GetPIDController();
+}
+
+double SwerveModule::GetFalconTurnPosition() const {
+    return falconTurn->GetSelectedSensorPosition();
+}
+
+double SwerveModule::GetNeoTurnPosition() const {
+    return 0.0;
+}
+
+void SwerveModule::SetFalconTurnPower(double power) {
+    falconTurn->Set(power);
+}
+
+void SwerveModule::SetNeoTurnPower(double power) {
+    neoTurn->Set(power);
 }
 
 units::meter_t SwerveModule::GetDriveEncoderDistance() const {
@@ -19,7 +44,7 @@ units::meter_t SwerveModule::GetDriveEncoderDistance() const {
 }
 
 units::degree_t SwerveModule::GetTurnEncoderAngle() const {
-    return units::degree_t{turnMotor->GetSelectedSensorPosition() * DriveConstants::kTurnEncoderDegreesPerPulse};
+    return units::degree_t{(usingFalcon ? GetFalconTurnPosition() : GetNeoTurnPosition()) * DriveConstants::kTurnEncoderDegreesPerPulse};
 }
 
 units::meters_per_second_t SwerveModule::GetDriveEncoderRate() const {
@@ -80,7 +105,11 @@ void SwerveModule::SetDesiredState(
     // Optimize the reference state to avoid spinning further than 90 degrees*
     const auto state = Optimize(referenceState, {GetTurnEncoderAngle()});
     
-    turnMotor->Set(TalonFXControlMode::Position, (double)state.angle.Degrees() / DriveConstants::kTurnEncoderDegreesPerPulse);
+    if(usingFalcon) {
+        falconTurn->Set(TalonFXControlMode::Position, (double)state.angle.Degrees() / DriveConstants::kTurnEncoderDegreesPerPulse);
+    } else {
+        neoController->SetReference((double)state.angle.Degrees() / DriveConstants::kTurnEncoderDegreesPerPulse, CANSparkMax::ControlType::kPosition);
+    }
 
     // TalonFX returns velocity per 100ms so the speed needs to be divided by 10
     driveMotor->Set(TalonFXControlMode::Velocity, ((double)state.speed / 10.0) / DriveConstants::kDriveEncoderDistancePerPulse);    
@@ -92,10 +121,12 @@ void SwerveModule::SetDrivePower(double power) {
 }
 
 void SwerveModule::SetTurnPower(double power) {
-    turnMotor->Set(power);
+    if(usingFalcon) SetFalconTurnPower(power);
+    else SetNeoTurnPower(power);
+    // turnMotor->Set(power);
 }
 
 void SwerveModule::ResetEncoders() {
     driveMotor->SetSelectedSensorPosition(0);
-    turnMotor->SetSelectedSensorPosition(0);
+    if(usingFalcon) falconTurn->SetSelectedSensorPosition(0);
 }
