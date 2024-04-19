@@ -17,7 +17,7 @@
 #include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/ProfiledPIDSubsystem.h>
 #include <units/angle.h>
-#include <ctre\Phoenix.h>
+#include <ctre/Phoenix.h>
 
 #pragma once
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "Constants.h"
 #include <iostream>
-#include <frc2/command/CommandBase.h>
+#include <frc2/command/Command.h>
 #include <frc2/command/CommandHelper.h>
 #include <frc/Timer.h>
 
@@ -10,7 +10,7 @@
 /**
  * Command to dock and engage on the charge station.
  */
-class GyroDock : public frc2::CommandHelper<frc2::CommandBase, GyroDock> {
+class GyroDock : public frc2::CommandHelper<frc2::Command, GyroDock> {
  public:
   explicit GyroDock(double targetSpeed, DriveSubsystem* driveRef);
 

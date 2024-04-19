@@ -14,13 +14,10 @@
 #include <frc/trajectory/constraint/SwerveDriveKinematicsConstraint.h>
 #include <frc/kinematics/ChassisSpeeds.h>
 #include <frc/motorcontrol/MotorControllerGroup.h>
-#include <rev/CANSparkMax.h>
-#include <frc/motorcontrol/PWMSparkMax.h>
 #include <frc2/command/SubsystemBase.h>
 #include <frc/filter/SlewRateLimiter.h>
 #include <units/voltage.h>
 #include "ctre/Phoenix.h"
-#include "AHRS.h"
 
 #include "Constants.h"
 #include "SwerveModule.h"
@@ -186,9 +183,9 @@ class DriveSubsystem : public frc2::SubsystemBase {
 
   frc::Pose2d poseToHold{}; // var to contain target pose
   // PID controllers for position holding
-  frc2::PIDController xHoldController{2.5, 0.0, 0.0};
-  frc2::PIDController yHoldController{2.5, 0.0, 0.0};
-  frc2::PIDController thetaHoldController{-0.07, 0.0, 0.0};
+  frc::PIDController xHoldController{2.5, 0.0, 0.0};
+  frc::PIDController yHoldController{2.5, 0.0, 0.0};
+  frc::PIDController thetaHoldController{-0.07, 0.0, 0.0};
 
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.

@@ -1,7 +1,7 @@
 #pragma once
 #include "Constants.h"
 #include <iostream>
-#include <frc2/command/CommandBase.h>
+#include <frc2/command/Command.h>
 #include <frc2/command/CommandHelper.h>
 #include <frc/Timer.h>
 
@@ -12,7 +12,7 @@
 /**
  * A Command meant to follow and intake a cube using the Limelight
  */
-class FollowCube : public frc2::CommandHelper<frc2::CommandBase, FollowCube> {
+class FollowCube : public frc2::CommandHelper<frc2::Command, FollowCube> {
  public:
   explicit FollowCube(DriveSubsystem* driveRef, IntakeSubsystem* intakeRef, LimelightSubsystem* limeRef);
 
@@ -27,8 +27,8 @@ class FollowCube : public frc2::CommandHelper<frc2::CommandBase, FollowCube> {
  private:
     bool cubeCaught = false;
     bool done = false;
-    frc2::PIDController xController{2.5, 0.0, 0.0};
-    frc2::PIDController thetaController{-0.07, 0.0, 0.0};
+    frc::PIDController xController{2.5, 0.0, 0.0};
+    frc::PIDController thetaController{-0.07, 0.0, 0.0};
     DriveSubsystem *drive;
     IntakeSubsystem *intake;
     LimelightSubsystem *limelight;

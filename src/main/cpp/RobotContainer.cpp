@@ -9,7 +9,7 @@
 #include <iostream>
 #include <frc/controller/PIDController.h>
 #include <frc/shuffleboard/Shuffleboard.h>
-#include <frc/SmartDashboard/SmartDashboard.h>
+#include <frc/smartdashboard/SmartDashboard.h>
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
 #include <frc/trajectory/constraint/DifferentialDriveVoltageConstraint.h>

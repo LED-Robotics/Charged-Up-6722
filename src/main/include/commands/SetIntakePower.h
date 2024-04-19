@@ -1,7 +1,7 @@
 #pragma once
 #include "Constants.h"
 #include <iostream>
-#include <frc2/command/CommandBase.h>
+#include <frc2/command/Command.h>
 #include <frc2/command/CommandHelper.h>
 #include <frc/Timer.h>
 
@@ -10,7 +10,7 @@
 /**
  * Command to set IntakeSubsystem power.
  */
-class SetIntakePower : public frc2::CommandHelper<frc2::CommandBase, SetIntakePower> {
+class SetIntakePower : public frc2::CommandHelper<frc2::Command, SetIntakePower> {
  public:
   explicit SetIntakePower(double newPower, IntakeSubsystem* intakeRef);
 

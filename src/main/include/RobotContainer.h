@@ -19,7 +19,7 @@
 #include <frc2/command/ParallelRaceGroup.h>
 #include <frc2/command/RunCommand.h>
 #include "units/angle.h"
-#include <ctre\Phoenix.h>
+#include <ctre/Phoenix.h>
 
 #include "Constants.h"
 #include "commands/SetIntakePower.h"

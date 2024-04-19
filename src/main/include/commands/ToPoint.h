@@ -1,7 +1,7 @@
 #pragma once
 #include "Constants.h"
 #include <iostream>
-#include <frc2/command/CommandBase.h>
+#include <frc2/command/Command.h>
 #include <frc2/command/CommandHelper.h>
 #include <frc/Timer.h>
 
@@ -10,7 +10,7 @@
 /**
  * Command that moves the robot to a set Pose2d based on its odometry.
  */
-class ToPoint : public frc2::CommandHelper<frc2::CommandBase, ToPoint> {
+class ToPoint : public frc2::CommandHelper<frc2::Command, ToPoint> {
  public:
   explicit ToPoint(frc::Pose2d target, DriveSubsystem* driveRef);
 

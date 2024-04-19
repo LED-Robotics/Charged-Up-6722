@@ -1,7 +1,7 @@
 #pragma once
 #include "Constants.h"
 #include <iostream>
-#include <frc2/command/CommandBase.h>
+#include <frc2/command/Command.h>
 #include <frc2/command/CommandHelper.h>
 #include <frc/Timer.h>
 
@@ -10,7 +10,7 @@
 /**
  * Timed drive Command that relies on accurate kinematics to ensure correct distance.
  */
-class WaitDrive : public frc2::CommandHelper<frc2::CommandBase, WaitDrive> {
+class WaitDrive : public frc2::CommandHelper<frc2::Command, WaitDrive> {
  public:
   explicit WaitDrive(units::meter_t distance, units::velocity::meters_per_second_t speed, DriveSubsystem* driveRef);
 
