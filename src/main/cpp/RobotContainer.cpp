@@ -6,6 +6,7 @@
 
 #include <utility>
 
+
 #include <iostream>
 #include <frc/controller/PIDController.h>
 #include <frc/shuffleboard/Shuffleboard.h>
@@ -293,9 +294,9 @@ void RobotContainer::HandleIntake() {
     intakeHold = true;
     intake.SetPower(0.1);
   }
-  if(controller.GetLeftBumperPressed()) {
-    intake.SetPower(0.0);
-  }
+  // if(controller.GetLeftBumperPressed()) {
+  //   intake.SetPower(0.0);
+  // }
 }
 
 void RobotContainer::SetSlew(bool state) {

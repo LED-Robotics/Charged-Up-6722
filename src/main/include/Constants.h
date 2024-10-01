@@ -47,9 +47,9 @@ namespace DriveConstants {
     constexpr int kBackRightTalonPort = 10;
     constexpr int kFrontRightTalonPort = 11;
 
-    constexpr int kBLeftMagPos = -3491;
-    constexpr int kFLeftMagPos = 2117;
-    constexpr int kBRightMagPos = 8261;
+    constexpr int kBLeftMagPos = 664;
+    constexpr int kFLeftMagPos = 2119;
+    constexpr int kBRightMagPos = 4171;
     constexpr int kFRightMagPos = -3397;
     
     // info for odometry
@@ -121,10 +121,11 @@ namespace ArmConstants {
     // arm position constants
     constexpr double kStartAngle = 8.26;
     constexpr double kFloorPickupAngle = 18.5;
-    constexpr double kFloorStandingPickupAngle = 50.0;
+    constexpr double kFloorStandingPickupAngle = 65.0;
     constexpr double kMidDropoffAngle = 136.7;
     constexpr double kMidCubeAngle = 92.0;
     constexpr double kHighDropoffAngle = 136.7;
+
     constexpr double kHighCubeAngle = 135.0;
     constexpr double kDoubleStation = 136.7;
     constexpr double kAutonStart = 275.0;

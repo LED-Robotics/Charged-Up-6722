@@ -38,7 +38,7 @@ DriveSubsystem::DriveSubsystem()
       s_frontRight{&frontRight, &frontRightTheta},
 
       //Gryo
-      gyro{0},
+      gyro{0, "rio"},
 
       //Odometry
       odometry{kDriveKinematics, {GetRotation()}, {s_frontLeft.GetPosition(), s_frontRight.GetPosition(), s_backLeft.GetPosition(),
@@ -54,24 +54,33 @@ DriveSubsystem::DriveSubsystem()
         backRightTheta.SetInverted(true);
         frontRightTheta.SetInverted(true);
 
+        backLeft.SetInverted(false);
+        frontLeft.SetInverted(false);
+        backRight.SetInverted(false);
+        frontRight.SetInverted(false);
+        
+
         // ResetEncoders();
         // ResetOdometry(frc::Pose2d{{0.0_m, 0.0_m}, {180_deg}});
         // ResetOdometry(frc::Pose2d{{0.0_m, 0.0_m}, {90_deg}});
       }
 
 void DriveSubsystem::Periodic() {
-  // auto blPos = backLeftTalon.GetSensorCollection();
-  // auto flPos = frontLeftTalon.GetSensorCollection();
-  // auto brPos = backRightTalon.GetSensorCollection();
-  // auto frPos = frontRightTalon.GetSensorCollection();
+  auto blPos = backLeftTalon.GetSensorCollection();
+  auto flPos = frontLeftTalon.GetSensorCollection();
+  auto brPos = backRightTalon.GetSensorCollection();
+  auto frPos = frontRightTalon.GetSensorCollection();
   // Implementation of subsystem periodic method goes here.
-  // std::cout << "Back Left Absolute: " << blPos.GetPulseWidthPosition() << '\n';
   // std::cout << "Back Left Relative: " << backLeftTheta.GetSelectedSensorPosition() << '\n';
-  // std::cout << "Front Left: " << flPos.GetPulseWidthPosition() << '\n';
-  // std::cout << "Back Right: " << brPos.GetPulseWidthPosition() << '\n';
-  // std::cout << "Front Right: " << frPos.GetPulseWidthPosition() << '\n';
+  // std::cout << "Back Left" << blPos.GetPulseWidthPosition() << '\n';
+  // std::cout << "Front Left" << flPos.GetPulseWidthPosition() << '\n';
+  // std::cout << "Back Right" << brPos.GetPulseWidthPosition() << '\n';
+  // std::cout << "Front Right" << frPos.GetPulseWidthPosition() << '\n';
 
-
+  SmartDashboard::PutNumber("Front Left", flPos.GetPulseWidthPosition());
+  SmartDashboard::PutNumber("Back Left", blPos.GetPulseWidthPosition());
+  SmartDashboard::PutNumber("Front Right", frPos.GetPulseWidthPosition());
+  SmartDashboard::PutNumber("Back Right", brPos.GetPulseWidthPosition());
 
   odometry.Update(GetRotation(),
                   {s_frontLeft.GetPosition(), s_frontRight.GetPosition(),
@@ -169,7 +178,8 @@ void DriveSubsystem::SetInverted(bool inverted) {
 }
 
 units::degree_t DriveSubsystem::GetAngle() const {
-  return units::degree_t{gyro.GetYaw()};
+  // return units::degree_t{gyro.GetYaw()};
+  return units::degree_t{-gyro.GetAngle()};
 }
 
 frc::Rotation2d DriveSubsystem::GetRotation() {
@@ -177,13 +187,15 @@ frc::Rotation2d DriveSubsystem::GetRotation() {
 }
 
 void DriveSubsystem::ZeroHeading() {
-  gyro.SetYaw(0.0);
+  // gyro.SetYaw(0.0);
+  gyro.Reset();
 }
 
 double DriveSubsystem::GetTurnRate() {
-  double data[3] = {0, 0, 0};
-  gyro.GetRawGyro(data);
-  return -data[2];
+  // double data[3] = {0, 0, 0};
+  // gyro.GetRawGyro(data);
+  // return -data[2];
+  return -gyro.GetRate();
 }
 
 frc::Pose2d DriveSubsystem::GetPose() {
@@ -239,7 +251,8 @@ void DriveSubsystem::ConfigMotors() {
 }
 
 double DriveSubsystem::GetPitch() {
-  return gyro.GetRoll();
+  // return gyro.GetRoll();
+  return 0.0;
 }
 
 void DriveSubsystem::SetPoseToHold(frc::Pose2d target) {
