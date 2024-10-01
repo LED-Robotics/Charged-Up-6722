@@ -18,6 +18,7 @@
 #include <frc/filter/SlewRateLimiter.h>
 #include <units/voltage.h>
 #include "ctre/Phoenix.h"
+#include "ctre/phoenix6/Pigeon2.hpp"
 
 #include "Constants.h"
 #include "SwerveModule.h"
@@ -216,7 +217,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
 
   
   // The gyro sensor
-  Pigeon2 gyro;
+  ctre::phoenix6::hardware::Pigeon2 gyro;
 
   // Odometry class for tracking robot pose
   frc::SwerveDriveOdometry<4> odometry;
