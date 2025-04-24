@@ -10,16 +10,7 @@
 #include <frc2/command/CommandScheduler.h>
 
 void Robot::RobotInit() {
-  m_container.SetDriveBrakes(false);
-  // SmartDashboard::PutNumber("autoP", 0.1);
-  // SmartDashboard::PutNumber("armPos", 0.0);
-  // SmartDashboard::PutNumber("armPower", 0.0);
-  // SmartDashboard::PutNumber("wristPos", 4000);
-  // SmartDashboard::PutNumber("wristPower", 0.0);
-  // SmartDashboard::PutNumber("armAngle", 0.0);
-  // SmartDashboard::PutNumber("wristAngle", 0.0);
-  // SmartDashboard::PutNumber("elevatorPos", 0);
-  // SmartDashboard::PutBoolean("doAuton", true);
+
 }
 
 /**
@@ -40,7 +31,7 @@ void Robot::RobotPeriodic() {
  * robot is disabled.
  */
 void Robot::DisabledInit() {
-  m_container.SetDriveBrakes(false);
+
 }
 
 void Robot::DisabledPeriodic() {}
@@ -50,27 +41,13 @@ void Robot::DisabledPeriodic() {}
  * RobotContainer class.
  */
 void Robot::AutonomousInit() {
-  m_container.DisableTagTracking();   // auton uses odom relative to start, not based on AprilTags
-  m_autonomousCommand = m_container.GetAutonomousCommand();
-  if(m_autonomousCommand != nullptr) {
-    m_container.SetDriveBrakes(true);
-    m_container.SetSlew(false);
-    m_autonomousCommand->Schedule();
-  }
+
 }
 
 void Robot::AutonomousPeriodic() {}
 
 void Robot::TeleopInit() {
-  m_container.EnableTagTracking();  // station auto-align uses AprilTag tracking 
-  m_container.SetDriveBrakes(true);
-  m_container.SetSlew(true);
-  // This makes sure that the autonomous stops running when
-  // teleop starts running.
-  if (m_autonomousCommand != nullptr) {
-    m_autonomousCommand->Cancel();
-    m_autonomousCommand = nullptr;
-  }
+
 }
 
 /**
