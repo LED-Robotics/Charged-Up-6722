@@ -26,8 +26,6 @@ bool RobotContainer::IsBlue() {
 }
 // update SmartDashboard display of the currently selected station
 
-
-
 RobotContainer::RobotContainer() {
-
+  
 }
