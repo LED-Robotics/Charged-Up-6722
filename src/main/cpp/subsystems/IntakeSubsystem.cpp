@@ -49,7 +49,7 @@ double IntakeSubsystem::GetPower() {
   return power;
 }
 
-int IntakeSubsystem::GetState() {
+IntakeStates IntakeSubsystem::GetState() {
   return state;
 }
 

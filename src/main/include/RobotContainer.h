@@ -18,6 +18,11 @@
 #include <frc2/command/PIDCommand.h>
 #include <frc2/command/ParallelRaceGroup.h>
 #include <frc2/command/RunCommand.h>
+#include "subsystems/DriveSubsystem/DriveSubsystem.h"
+#include "subsystems/TelescopeSubsystem/TelescopeSubsystem.h"
+#include "subsystems/ArmSubsystem/ArmSubsystem.h"
+#include "subsystems/WristSubsystem/WristSubsystem.h"
+#include "subsystems/IntakeSubsystem/IntakeSubsystem.h"
 #include "units/angle.h"
 
 #include "GlobalConstants.h"
@@ -65,8 +70,24 @@ class RobotContainer {
   bool IsBlue();
 
  private:
+
+  // Global Flags
+  bool fieldCentric = true;
+
+  bool intakeHold = false;
+
   // The driver's controller
   frc2::CommandXboxController controller{OIConstants::kDriverControllerPort};
   // The partner controller
   frc2::CommandXboxController controller2{OIConstants::kCoDriverControllerPort};
+
+  DriveSubsystem drive{};
+
+  TelescopeSubsystem telescope{};
+
+  ArmSubsystem arm{};
+
+  WristSubsystem wrist{};
+
+  IntakeSubsystem intake{};
 };

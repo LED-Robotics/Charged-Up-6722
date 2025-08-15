@@ -35,8 +35,8 @@ void TelescopeSubsystem::Periodic() {
     left.Set(0.0);
     right.Set(0.0);
   } else if(state == TelescopeStates::kPowerMode) {
-    left.Set(power);
-    right.Set(power);
+    // left.Set(power);
+    // right.Set(power);
   } else if(state == TelescopeStates::kPositionMode) {
 
     microAdjust = units::length::meter_t{SmartDashboard::GetNumber("microAdjustTelescope", 0.0)};  // print to Shuffleboard
@@ -48,12 +48,12 @@ void TelescopeSubsystem::Periodic() {
     units::angle::turn_t posTarget{(position + microAdjust - kStartPosition).value() * kTurnsPerMeter};
     SmartDashboard::PutNumber("telescopeTargetTr", posTarget.value());
     
-    left.SetControl(positionController
-      .WithPosition(units::angle::turn_t{posTarget})
-      .WithEnableFOC(true));
-    right.SetControl(positionController
-      .WithPosition(units::angle::turn_t{posTarget})
-      .WithEnableFOC(true));
+    // left.SetControl(positionController
+    //   .WithPosition(units::angle::turn_t{posTarget})
+    //   .WithEnableFOC(true));
+    // right.SetControl(positionController
+    //   .WithPosition(units::angle::turn_t{posTarget})
+    //   .WithEnableFOC(true));
 
     // Test Motion Magic
     // left.SetControl(position

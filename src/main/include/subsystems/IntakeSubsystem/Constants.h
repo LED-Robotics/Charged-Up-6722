@@ -9,8 +9,7 @@ namespace IntakeConstants {
     // States
     enum IntakeStates {
       kOff,
-      kPowerMode,
-
+      kPowerMode
     };
 
     // Default power in power mode

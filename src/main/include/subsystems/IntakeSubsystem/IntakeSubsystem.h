@@ -17,6 +17,7 @@
 using namespace frc;
 using namespace ctre::phoenix6;
 using namespace rev::spark;
+using namespace IntakeConstants;
 
 class IntakeSubsystem : public frc2::SubsystemBase {
  public:
@@ -56,7 +57,7 @@ class IntakeSubsystem : public frc2::SubsystemBase {
    *
    * @return The current state of the intake
    */  
-  int GetState();
+  IntakeStates GetState();
 
   /**
    * Sets the current state of the intake.

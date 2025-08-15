@@ -18,7 +18,7 @@ using namespace frc;
 using namespace rev;
 using namespace pathplanner;
 
-DriveSubsystem::DriveSubsystem(int *targetRef)
+DriveSubsystem::DriveSubsystem()
       //Wheel motors
     : backLeft{kBackLeftPort, "canCan"},
       frontLeft{kFrontLeftPort, "canCan"},
@@ -58,7 +58,6 @@ DriveSubsystem::DriveSubsystem(int *targetRef)
       yDecel{kDriveDecelerationLimit},
       xTransSlewLimiter{kTransAdjustLimiter}, 
       yTransSlewLimiter{kTransAdjustLimiter} {
-        thetaTarget = targetRef;
 
         ConfigDriveMotors();
         ConfigThetaMotors();

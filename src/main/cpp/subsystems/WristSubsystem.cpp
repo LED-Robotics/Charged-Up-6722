@@ -16,7 +16,7 @@ WristSubsystem::WristSubsystem()
   : wrist{kWristPort},
     wristEncoder{kEncoderPort} {
       /*wrist.SetPosition(0.0_tr);*/
-      SmartDashboard::PutNumber("Wrist Angle", 0.0);
+      SmartDashboard::PutNumber("Wrist Angle", 90.0);
       SmartDashboard::PutNumber("microAdjustWrist", 0.0);  // print to Shuffleboard
       ConfigWrist();
 
@@ -32,7 +32,7 @@ void WristSubsystem::Periodic() {
   if(state == WristStates::kWristOff) {
     wrist.Set(0.0);
   } else if(state == WristStates::kWristPowerMode) {
-    wrist.Set(power);
+    // wrist.Set(power);
   } else if(state == WristStates::kWristAngleMode) {
     // feed forwards should be a changing constant that increases as the wrist moves further. It should be a static amount of power to overcome gravity.
 
@@ -43,9 +43,9 @@ void WristSubsystem::Periodic() {
     SmartDashboard::PutNumber("Angle Target", angle.value());
     units::angle::turn_t posTarget{(angle + microAdjust - kWristStartAngle).value() * kTurnsPerDegree};
     SmartDashboard::PutNumber("wrTurnTarget", posTarget.value());
-    wrist.SetControl(wristPosition
-      .WithPosition(units::angle::turn_t{posTarget})
-      .WithEnableFOC(true));
+    // wrist.SetControl(wristPosition
+    //   .WithPosition(units::angle::turn_t{posTarget})
+    //   .WithEnableFOC(true));
       /*.WithFeedForward(units::volt_t{feedForward}));*/
   }
 }
@@ -133,7 +133,8 @@ void WristSubsystem::ConfigWrist() {
   // wristConfig.MotionMagic.MotionMagicJerk = 200.0;
   
   // wristConfig.Feedback.FeedbackSensorSource = signals::FeedbackSensorSourceValue::RotorSensor;
-  wristConfig.Feedback.FeedbackSensorSource = signals::FeedbackSensorSourceValue::RotorSensor;
+  wristConfig.Feedback.FeedbackSensorSource = signals::FeedbackSensorSourceValue::SyncCANcoder;
+  wristConfig.Feedback.FeedbackRemoteSensorID = kEncoderPort;
   wristConfig.ClosedLoopGeneral.ContinuousWrap = false;
   wristConfig.Feedback.RotorToSensorRatio = kWristRotorToGearbox;
   wristConfig.Feedback.SensorToMechanismRatio = kWristGearboxToMechanism;
@@ -145,5 +146,14 @@ void WristSubsystem::ConfigWrist() {
   wristConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = kRampSeconds;
   wristConfig.Audio.AllowMusicDurDisable = true;
 
+  wristConfig.Feedback.FeedbackRemoteSensorID = kEncoderPort;
+  
   wrist.GetConfigurator().Apply(wristConfig);
+
+  configs::CANcoderConfiguration encoderConfig{};
+  encoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5_tr;
+  encoderConfig.MagnetSensor.SensorDirection = signals::SensorDirectionValue::CounterClockwise_Positive;
+  encoderConfig.MagnetSensor.MagnetOffset = kEncoderOffset;
+  
+  wristEncoder.GetConfigurator().Apply(encoderConfig);
 }

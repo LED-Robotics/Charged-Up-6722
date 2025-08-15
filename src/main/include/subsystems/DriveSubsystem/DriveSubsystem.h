@@ -34,7 +34,7 @@ using namespace DriveConstants;
 
 class DriveSubsystem : public frc2::SubsystemBase {
  public:
-  DriveSubsystem(int *targetRef);
+  DriveSubsystem();
 
     /**
    * Will be called periodically whenever the CommandScheduler runs.

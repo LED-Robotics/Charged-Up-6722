@@ -96,7 +96,7 @@ class TelescopeSubsystem : public frc2::SubsystemBase {
     
  private:
   // while the state is kOn the Telescope will run at the current power setting
-  int state = TelescopeConstants::TelescopeStates::kOff;
+  int state = TelescopeConstants::TelescopeStates::kPositionMode;
   double power = TelescopeConstants::kDefaultPower;
   units::length::meter_t position{TelescopeConstants::kStartPosition + 0.3_m};
   units::length::meter_t microAdjust{0.0_m};
