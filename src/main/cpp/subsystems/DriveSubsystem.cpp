@@ -386,14 +386,13 @@ void DriveSubsystem::ConfigDriveMotors() {
 
 void DriveSubsystem::ConfigThetaMotors() {
   configs::TalonFXConfiguration turnConfig{};
-  turnConfig.MotorOutput.Inverted = signals::InvertedValue::Clockwise_Positive;
+  turnConfig.MotorOutput.Inverted = signals::InvertedValue::CounterClockwise_Positive;
   turnConfig.Slot0.kP = kTurnP;
   turnConfig.Feedback.FeedbackSensorSource = signals::FeedbackSensorSourceValue::FusedCANcoder;
   turnConfig.Feedback.RotorToSensorRatio = kTurnPRatio;
   turnConfig.Feedback.SensorToMechanismRatio = 1.0;
   turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
   turnConfig.Audio.AllowMusicDurDisable = true;
-  turnConfig.MotorOutput.Inverted = true;
 
   turnConfig.Feedback.FeedbackRemoteSensorID = kBackLeftEncoderPort;
   backLeftTheta.GetConfigurator().Apply(turnConfig);

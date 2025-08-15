@@ -13,8 +13,7 @@ using namespace WristConstants;
 using namespace frc;
 
 WristSubsystem::WristSubsystem()
-  : wrist{kWristPort},
-    wristEncoder{kEncoderPort} {
+  : wrist{kWristPort} {
       /*wrist.SetPosition(0.0_tr);*/
       SmartDashboard::PutNumber("Wrist Angle", 90.0);
       SmartDashboard::PutNumber("microAdjustWrist", 0.0);  // print to Shuffleboard
@@ -154,6 +153,4 @@ void WristSubsystem::ConfigWrist() {
   encoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5_tr;
   encoderConfig.MagnetSensor.SensorDirection = signals::SensorDirectionValue::CounterClockwise_Positive;
   encoderConfig.MagnetSensor.MagnetOffset = kEncoderOffset;
-  
-  wristEncoder.GetConfigurator().Apply(encoderConfig);
 }

@@ -33,7 +33,7 @@ RobotContainer::RobotContainer() {
         // store control inputs for driving
         double x = -controller.GetLeftY();
         double y = -controller.GetLeftX();
-        double turnX = controller.GetRightX();
+        double turnX = -controller.GetRightX();
 
         // zero out axes if they fall within deadzon
         if (x > -DriveConstants::kDriveDeadzone &&

@@ -4,7 +4,7 @@
 
 namespace WristConstants {
     // ports
-    constexpr int kWristPort = 8;
+    constexpr int kWristPort = 17;
 
     constexpr int kEncoderPort = 12;
 

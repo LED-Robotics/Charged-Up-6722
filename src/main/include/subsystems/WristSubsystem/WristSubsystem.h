@@ -122,7 +122,5 @@ class WristSubsystem : public frc2::SubsystemBase {
   // The motor controllers
   hardware::TalonFX wrist;
 
-  hardware::CANcoder wristEncoder;
-
   controls::PositionVoltage wristPosition{0_tr};
 };

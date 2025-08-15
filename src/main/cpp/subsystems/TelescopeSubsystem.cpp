@@ -13,8 +13,8 @@ using namespace TelescopeConstants;
 using namespace frc;
 
 TelescopeSubsystem::TelescopeSubsystem()
-  : left{kLeftMotorPort},
-  right{kRightMotorPort}
+  : left{kLeftMotorPort, "canCan"},
+  right{kRightMotorPort, "canCan"}
   {
     SmartDashboard::PutNumber("Telescope Position", position.value());
     SmartDashboard::PutNumber("microAdjustTelescope", 0.0);  // print to Shuffleboard

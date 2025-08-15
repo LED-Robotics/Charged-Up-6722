@@ -34,10 +34,10 @@ namespace DriveConstants {
 
     constexpr int kWallSensorPort = 3;
     
-    constexpr units::angle::turn_t kBLeftMagPos = -0.427978515625_tr;
-    constexpr units::angle::turn_t kFLeftMagPos = 0.364501953125_tr;
-    constexpr units::angle::turn_t kBRightMagPos = -0.36279296875_tr;
-    constexpr units::angle::turn_t kFRightMagPos = -0.3642578125_tr;
+    constexpr units::angle::turn_t kBLeftMagPos = 0.404052734375_tr;
+    constexpr units::angle::turn_t kFLeftMagPos = -0.235595703125_tr;
+    constexpr units::angle::turn_t kBRightMagPos = 0.281982421875_tr;
+    constexpr units::angle::turn_t kFRightMagPos = 0.43359375_tr;
     
     // info for odometry
     constexpr int kEncoderResolution = 4096;
@@ -54,12 +54,14 @@ namespace DriveConstants {
     constexpr int kArbitrary = 0;
 
     // TalonFX config
-    constexpr double kDriveP = 0.2402345985174179;
-    constexpr double kDriveV = 0.1345313787460327;
-    constexpr units::time::second_t kDriveRamp = 0.0_s;
+    // constexpr double kDriveP = 0.2402345985174179;
+    // constexpr double kDriveV = 0.1345313787460327;
+    constexpr double kDriveP = 0.24;
+    constexpr double kDriveV = 0.0;
+    constexpr units::time::second_t kDriveRamp = 0.5_s;
     constexpr units::current::ampere_t kDriveCurrentLimit = 30.0_A;
-    constexpr double kTurnP = 80.0;
-    constexpr double kTurnPRatio = 10.279000282287598;
+    constexpr double kTurnP = 60.0;
+    constexpr double kTurnPRatio = 10.29;
 
     constexpr auto turnKp = 0.275;
 

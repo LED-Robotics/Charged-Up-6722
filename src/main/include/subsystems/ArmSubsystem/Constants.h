@@ -4,8 +4,8 @@
 
 namespace ArmConstants {
     // ports
-    constexpr int kLeftArmPort = 8;
-    constexpr int kRightArmPort = 9;
+    constexpr int kLeftArmPort = 14;
+    constexpr int kRightArmPort = 15;
 
     constexpr units::angle::turn_t kEncoderOffset =  -0.248779296875_tr;
 
