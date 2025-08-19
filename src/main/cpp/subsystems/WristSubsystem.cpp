@@ -15,7 +15,7 @@ using namespace frc;
 WristSubsystem::WristSubsystem()
   : wrist{kWristPort} {
       /*wrist.SetPosition(0.0_tr);*/
-      SmartDashboard::PutNumber("Wrist Angle", 90.0);
+      SmartDashboard::PutNumber("SetWristAngle", 90.0);
       SmartDashboard::PutNumber("microAdjustWrist", 0.0);  // print to Shuffleboard
       ConfigWrist();
 
@@ -26,25 +26,25 @@ WristSubsystem::WristSubsystem()
 void WristSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here
   // Wrist Control
-  SetTargetAngle(units::angle::degree_t{SmartDashboard::GetNumber("Wrist Angle", GetAngle().value())});
+  SetTargetAngle(units::angle::degree_t{SmartDashboard::GetNumber("SetWristAngle", GetAngle().value())});
   SmartDashboard::PutNumber("Wrist Actual", GetAngle().value());
   if(state == WristStates::kWristOff) {
     wrist.Set(0.0);
   } else if(state == WristStates::kWristPowerMode) {
-    // wrist.Set(power);
+    wrist.Set(power);
   } else if(state == WristStates::kWristAngleMode) {
     // feed forwards should be a changing constant that increases as the wrist moves further. It should be a static amount of power to overcome gravity.
 
     microAdjust = units::angle::degree_t{SmartDashboard::GetNumber("microAdjustWrist", 0.0)};  // print to Shuffleboard
-    SmartDashboard::PutNumber("wristWristTr", wrist.GetPosition().GetValue().value());  // print to Shuffleboard
-    SmartDashboard::PutNumber("angle", GetAngle().value());  // print to Shuffleboard
+    SmartDashboard::PutNumber("wristTr", wrist.GetPosition().GetValue().value());  // print to Shuffleboard
+    SmartDashboard::PutNumber("wristAngle", GetAngle().value());  // print to Shuffleboard
     double feedForward = fabs(sin(angle.value())) * kMaxFeedForward;
-    SmartDashboard::PutNumber("Angle Target", angle.value());
+    SmartDashboard::PutNumber("wristTarget", angle.value());
     units::angle::turn_t posTarget{(angle + microAdjust - kWristStartAngle).value() * kTurnsPerDegree};
-    SmartDashboard::PutNumber("wrTurnTarget", posTarget.value());
-    // wrist.SetControl(wristPosition
-    //   .WithPosition(units::angle::turn_t{posTarget})
-    //   .WithEnableFOC(true));
+    SmartDashboard::PutNumber("wristTrTarget", posTarget.value());
+    wrist.SetControl(wristPosition
+      .WithPosition(units::angle::turn_t{posTarget})
+      .WithEnableFOC(true));
       /*.WithFeedForward(units::volt_t{feedForward}));*/
   }
 }
@@ -121,7 +121,7 @@ void WristSubsystem::ConfigWrist() {
 
   wristConfig.Slot0.kP = kPWrist;
   wristConfig.Slot0.kD = kDWrist;
-  wristConfig.MotorOutput.Inverted = false;
+  wristConfig.MotorOutput.Inverted = signals::InvertedValue::Clockwise_Positive;
   // wristConfig.Slot0.kS = 0.28;
   // wristConfig.Slot0.kV = 8.5;
   // wristConfig.Slot0.kA = 3.0;
@@ -132,11 +132,6 @@ void WristSubsystem::ConfigWrist() {
   // wristConfig.MotionMagic.MotionMagicJerk = 200.0;
   
   // wristConfig.Feedback.FeedbackSensorSource = signals::FeedbackSensorSourceValue::RotorSensor;
-  wristConfig.Feedback.FeedbackSensorSource = signals::FeedbackSensorSourceValue::SyncCANcoder;
-  wristConfig.Feedback.FeedbackRemoteSensorID = kEncoderPort;
-  wristConfig.ClosedLoopGeneral.ContinuousWrap = false;
-  wristConfig.Feedback.RotorToSensorRatio = kWristRotorToGearbox;
-  wristConfig.Feedback.SensorToMechanismRatio = kWristGearboxToMechanism;
   wristConfig.MotorOutput.PeakReverseDutyCycle = -1.0;
   wristConfig.MotorOutput.PeakForwardDutyCycle = 1.0;
   // wristConfig.Feedback.SensorToMechanismRatio = 1.0;
@@ -145,12 +140,7 @@ void WristSubsystem::ConfigWrist() {
   wristConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = kRampSeconds;
   wristConfig.Audio.AllowMusicDurDisable = true;
 
-  wristConfig.Feedback.FeedbackRemoteSensorID = kEncoderPort;
   
   wrist.GetConfigurator().Apply(wristConfig);
 
-  configs::CANcoderConfiguration encoderConfig{};
-  encoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5_tr;
-  encoderConfig.MagnetSensor.SensorDirection = signals::SensorDirectionValue::CounterClockwise_Positive;
-  encoderConfig.MagnetSensor.MagnetOffset = kEncoderOffset;
 }

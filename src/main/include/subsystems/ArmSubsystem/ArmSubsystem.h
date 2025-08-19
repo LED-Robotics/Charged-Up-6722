@@ -113,7 +113,7 @@ class ArmSubsystem : public frc2::SubsystemBase {
   // While the state is kOn the arm will run on the angle mode.
   int state = ArmConstants::ArmStates::kArmAngleMode;
   double power = ArmConstants::kArmDefaultPower;
-  units::angle::degree_t angle{90_deg};
+  units::angle::degree_t angle{-90_deg};
   units::angle::degree_t microAdjust{0_deg};
 
   // Components (e.g. motor controllers and sensors) should generally be
