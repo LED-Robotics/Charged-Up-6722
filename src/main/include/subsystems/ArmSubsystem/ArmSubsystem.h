@@ -11,13 +11,19 @@
 #include <frc2/command/Commands.h>
 
 #include "Constants.h"
+#include "led_libraries/PositionalSubsystem.h"
+#include "led_libraries/TalonSmartMotor.h"
 
 using namespace frc;
 using namespace ctre::phoenix6;
 
-class ArmSubsystem : public frc2::SubsystemBase {
+class ArmSubsystem : public PositionalSubsystem {
  public:
   ArmSubsystem();
+
+  units::angle::degree_t ToDegrees(units::angle::turn_t turns);
+
+  units::angle::turn_t ToTurns(units::angle::degree_t degrees);
 
   /**
    * Will be called periodically whenever the CommandScheduler runs.
@@ -27,49 +33,18 @@ class ArmSubsystem : public frc2::SubsystemBase {
             /* arm FUNCTIONS */
 
   /**
-   * Turns the Intake state to kAngleMode.
-   */
-  void ArmOn();
-
-  /**
-   * Turns the Intake state to kOff.
-   */
-  void ArmOff();
-
-  /**
-   * Sets the power for the Arm to use when in kPowerMode.
-   *
-   * @param power the power for the arm to use
-   */
-  void SetArmPower(double newPower);
-  
-  /**
-   * Get the current power used by the Arm.
-   * 
-   * @return current arm power
-   */
-  double GetArmPower();
-
-  /**
    * Sets the target angle of the Arm.
    * 
    * @param newAngle new angle for the arm
    */
-  void SetTargetAngle(units::angle::degree_t newAngle);
+  void SetTargetDegrees(units::angle::degree_t newAngle, double feedForward = 0.0);
 
   /**
    * Returns the current estimated angle of the arm.
    * 
    * @return current arm angle
    */
-  units::angle::degree_t GetAngle();
-
-  /**
-   * Returns the position from the TalonFX motor controller.
-   *
-   * @return the TalonFX reported position
-   */
-  double GetArmPosition();
+  units::angle::degree_t GetAngleDegrees();
 
   /**
    * Returns whether the subsystem is at its intended target position.
@@ -77,20 +52,6 @@ class ArmSubsystem : public frc2::SubsystemBase {
    * @return If the arm is at it's target
    */
   bool IsAtTarget();
-
-  /**
-   * Sets the current state of the Arm.
-   * 
-   * @param newState the new state for the Arm.
-   */
-  void SetArmState(int newState);
-  
-  /**
-   * Returns the current state of the Arm.
-   *
-   * @return The current state of the Arm
-   */
-  int GetArmState();
 
   /**
    * Sets Arm brake mode.
@@ -110,18 +71,12 @@ class ArmSubsystem : public frc2::SubsystemBase {
   frc2::CommandPtr GetMoveCommand(units::angle::degree_t target);
     
  private:
-  // While the state is kOn the arm will run on the angle mode.
-  int state = ArmConstants::ArmStates::kArmAngleMode;
-  double power = ArmConstants::kArmDefaultPower;
-  units::angle::degree_t angle{-90_deg};
-  units::angle::degree_t microAdjust{0_deg};
-
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 
   // The motor controllers
-  hardware::TalonFX leftArm;
-  hardware::TalonFX rightArm;
-
-  controls::PositionVoltage armPosition{0_tr};
+  hardware::TalonFX left;
+  TalonSmartMotor leftController{&left};
+  hardware::TalonFX right;
+  TalonSmartMotor rightController{&right};
 };

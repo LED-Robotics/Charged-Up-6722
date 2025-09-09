@@ -9,48 +9,25 @@
 #include <ctre/phoenix6/CANcoder.hpp>
 #include <frc2/command/Command.h>
 #include <frc2/command/Commands.h>
+#include "led_libraries/PositionalSubsystem.h"
+#include "led_libraries/TalonSmartMotor.h"
 #include "Constants.h"
 
 using namespace frc;
 using namespace ctre::phoenix6;
 
-class TelescopeSubsystem : public frc2::SubsystemBase {
+class TelescopeSubsystem : public PositionalSubsystem {
  public:
   TelescopeSubsystem();
+
+  units::length::meter_t ToMeters(units::angle::turn_t turns);
+
+  units::angle::turn_t ToTurns(units::length::meter_t meters);
 
   /**
    * Will be called periodically whenever the CommandScheduler runs.
    */
   void Periodic() override;
-  
-  /**
-   * Turns the Telescope state to kOff.
-   */
-  void Off();
-  
-  /**
-   * Turns the Telescope state to kPowerMode.
-   */
-  void On();
-
-  /**
-   * Sets the power for the Telescope to use when in kPowerMode.
-   *
-   * @param power the power for the Telescope to use
-   */
-  void SetPower(double newPower);
-
-  /**
-   * Returns the current state of the Telescope.
-   *
-   * @return The current state of the Telescope
-   */
-  int GetState();
-
-  /**
-   * Sets the current state of the Telescope.
-   */
-  void SetState(int newState);
   
   /**
    * Returns the current position of the left Telescope's KrakenX60.
@@ -65,12 +42,12 @@ class TelescopeSubsystem : public frc2::SubsystemBase {
   /**
    * Returns the current estimated angle of the Telescope Subsystem.
    */
-  units::length::meter_t GetPosition();
+  units::length::meter_t GetPositionMeters();
 
   /**
    * Sets the target angle of the Telescope.
    */
-  void SetTargetPosition(units::length::meter_t newPosition);
+  void SetTargetMeters(units::length::meter_t newPosition);
 
   /**
    * Returns whether the subsystem is at its intended target position.
@@ -95,21 +72,12 @@ class TelescopeSubsystem : public frc2::SubsystemBase {
   frc2::CommandPtr GetMoveCommand(units::length::meter_t target);
     
  private:
-  // while the state is kOn the Telescope will run at the current power setting
-  int state = TelescopeConstants::TelescopeStates::kPositionMode;
-  double power = TelescopeConstants::kDefaultPower;
-  units::length::meter_t position{TelescopeConstants::kStartPosition + 0.3_m};
-  units::length::meter_t microAdjust{0.0_m};
-
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 
   // The motor controllers
   hardware::TalonFX left;
+  TalonSmartMotor leftController{&left};
   hardware::TalonFX right;
-
-  // hardware::CANcoder encoder;
-
-  controls::PositionVoltage positionController{0_tr};
-  // controls::MotionMagicVoltage positionController{0_tr};
+  TalonSmartMotor rightController{&right};
 };

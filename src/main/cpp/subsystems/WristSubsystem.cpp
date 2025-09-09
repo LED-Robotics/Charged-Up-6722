@@ -3,9 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/WristSubsystem/WristSubsystem.h"
+#include "units/angle.h"
 
 #include <frc/geometry/Rotation2d.h>
-#include <iostream>
 #include <frc/kinematics/DifferentialDriveWheelSpeeds.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
@@ -13,94 +13,65 @@ using namespace WristConstants;
 using namespace frc;
 
 WristSubsystem::WristSubsystem()
-  : wrist{kWristPort} {
-      /*wrist.SetPosition(0.0_tr);*/
-      SmartDashboard::PutNumber("SetWristAngle", 90.0);
-      SmartDashboard::PutNumber("microAdjustWrist", 0.0);  // print to Shuffleboard
+  : PositionalSubsystem{std::vector<SmartMotor*>{&wristController}},
+    wrist{kWristPort} {
       ConfigWrist();
+      SetTargetDegrees(kWristStartAngle);
 
-      SetTargetAngle(angle);
+      SmartDashboard::PutNumber("SetWristTarget", 90.0);
+      SmartDashboard::PutNumber("NudgeWrist", 0.0);  // print to Shuffleboard
+}
 
+
+units::angle::degree_t WristSubsystem::ToDegrees(units::angle::turn_t turns) {
+  return units::angle::degree_t{turns.value() / kTurnsPerDegree};
+}
+
+units::angle::turn_t WristSubsystem::ToTurns(units::angle::degree_t degrees) {
+  return units::angle::turn_t{degrees.value() * kTurnsPerDegree};
 }
 
 void WristSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here
   // Wrist Control
-  SetTargetAngle(units::angle::degree_t{SmartDashboard::GetNumber("SetWristAngle", GetAngle().value())});
-  SmartDashboard::PutNumber("Wrist Actual", GetAngle().value());
-  if(state == WristStates::kWristOff) {
-    wrist.Set(0.0);
-  } else if(state == WristStates::kWristPowerMode) {
-    wrist.Set(power);
-  } else if(state == WristStates::kWristAngleMode) {
+  SetNudge(ToTurns(units::angle::degree_t{SmartDashboard::GetNumber("NudgeWrist", 0.0)}));  // print to Shuffleboard
+
+  double feedForward = fabs(sin(ToDegrees(position).value())) * kMaxFeedForward;
+  SetTargetDegrees(units::angle::degree_t{SmartDashboard::GetNumber("SetWristTarget", GetAngleDegrees().value())}, feedForward);
     // feed forwards should be a changing constant that increases as the wrist moves further. It should be a static amount of power to overcome gravity.
+  SmartDashboard::PutNumber("WristActual", GetAngleDegrees().value());  // print to Shuffleboard
+  SmartDashboard::PutNumber("WristTr", GetPosition().value());  // print to Shuffleboard
+  SmartDashboard::PutNumber("WristTarget", ToDegrees(position).value());
+  SmartDashboard::PutNumber("WristTargetTr", position.value());
 
-    microAdjust = units::angle::degree_t{SmartDashboard::GetNumber("microAdjustWrist", 0.0)};  // print to Shuffleboard
-    SmartDashboard::PutNumber("wristTr", wrist.GetPosition().GetValue().value());  // print to Shuffleboard
-    SmartDashboard::PutNumber("wristAngle", GetAngle().value());  // print to Shuffleboard
-    double feedForward = fabs(sin(angle.value())) * kMaxFeedForward;
-    SmartDashboard::PutNumber("wristTarget", angle.value());
-    units::angle::turn_t posTarget{(angle + microAdjust - kWristStartAngle).value() * kTurnsPerDegree};
-    SmartDashboard::PutNumber("wristTrTarget", posTarget.value());
-    wrist.SetControl(wristPosition
-      .WithPosition(units::angle::turn_t{posTarget})
-      .WithEnableFOC(true));
-      /*.WithFeedForward(units::volt_t{feedForward}));*/
-  }
+  RunMotors();
 }
 
-void WristSubsystem::WristOn() {
-  state = WristStates::kWristAngleMode;
+void WristSubsystem::SetTargetDegrees(units::angle::degree_t newAngle, double feedForward) {
+  newAngle = newAngle + ToDegrees(nudge) - kWristStartAngle;
+  if(newAngle < kWristDegreeMin) newAngle = kWristDegreeMin;
+  if(newAngle > kWristDegreeMax) newAngle = kWristDegreeMax;
+  SetTargetPosition(ToTurns(newAngle), feedForward);
+  SmartDashboard::PutNumber("SetWristTarget", newAngle.value());
 }
 
-void WristSubsystem::WristOff() {
-  state = WristStates::kWristOff;
-}
-
-void WristSubsystem::SetWristPower(double newPower) {
-  power = newPower;
-}
-
-double WristSubsystem::GetWristPower() {
-  return power;
-}
-
-void WristSubsystem::SetTargetAngle(units::angle::degree_t newAngle) {
-  angle = newAngle;
-  if(angle < kWristDegreeMin) angle = kWristDegreeMin;
-  if(angle > kWristDegreeMax) angle = kWristDegreeMax;
-  SmartDashboard::PutNumber("Wrist Angle", angle.value());
-}
-
-units::angle::degree_t WristSubsystem::GetAngle() {
-  return units::angle::degree_t{(GetWristPosition() / kTurnsPerDegree)} + kWristStartAngle;
-}
-
-double WristSubsystem::GetWristPosition() {
-  return wrist.GetPosition().GetValueAsDouble();
+units::angle::degree_t WristSubsystem::GetAngleDegrees() {
+  return ToDegrees(GetPosition()) + kWristStartAngle;
 }
 
 bool WristSubsystem::IsAtTarget() {
-  auto target = angle + microAdjust;
-  auto angle = GetAngle();
+  auto target = ToDegrees(position + nudge);
+  auto angle = GetAngleDegrees();
   bool atTarget = angle > target - (kWristAngleDeadzone / 2) && angle < target + (kWristAngleDeadzone / 2);
   return atTarget;
-}
-
-void WristSubsystem::SetWristState(int newState) {
-  state = newState;
-}
-
-int WristSubsystem::GetWristState() {
-  return state;
 }
 
 frc2::CommandPtr WristSubsystem::GetMoveCommand(units::angle::degree_t target) {
   return frc2::cmd::Sequence(
       frc2::cmd::RunOnce([this, target]() {
-        SetTargetAngle(target);
+        SetTargetDegrees(target);
       }, {this}),
-      frc2::cmd::WaitUntil([this, target](){
+      frc2::cmd::WaitUntil([this](){
         return IsAtTarget();
       }));
   /*return frc2::cmd::RunOnce([this, target]() {*/
@@ -142,5 +113,4 @@ void WristSubsystem::ConfigWrist() {
 
   
   wrist.GetConfigurator().Apply(wristConfig);
-
 }

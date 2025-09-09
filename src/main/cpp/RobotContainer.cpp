@@ -4,8 +4,6 @@
 
 #include "RobotContainer.h"
 
-#include <utility>
-
 #include <frc/controller/PIDController.h>
 #include <frc/shuffleboard/Shuffleboard.h>
 #include <frc/smartdashboard/SmartDashboard.h>
@@ -17,7 +15,6 @@
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/SwerveControllerCommand.h>
 #include <frc2/command/button/JoystickButton.h>
-#include <iostream>
 
 // return current Alliance from either FMS or Driver Station
 bool RobotContainer::IsBlue() {

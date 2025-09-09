@@ -5,7 +5,6 @@
 #include "subsystems/TelescopeSubsystem/TelescopeSubsystem.h"
 
 #include <frc/geometry/Rotation2d.h>
-#include <iostream>
 #include <frc/kinematics/DifferentialDriveWheelSpeeds.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 
@@ -13,109 +12,60 @@ using namespace TelescopeConstants;
 using namespace frc;
 
 TelescopeSubsystem::TelescopeSubsystem()
-  : left{kLeftMotorPort, "canCan"},
+  : PositionalSubsystem{std::vector<SmartMotor*>{&leftController, &rightController}},
+  left{kLeftMotorPort, "canCan"},
   right{kRightMotorPort, "canCan"}
   {
-    SmartDashboard::PutNumber("Telescope Position", position.value());
-    SmartDashboard::PutNumber("microAdjustTelescope", 0.0);  // print to Shuffleboard
-    /*SmartDashboard::PutNumber("Telescope Power", 0.0);*/
     ConfigMotors();
-    SetTargetPosition(position);
+    SetTargetMeters(kStartPosition + 0.3_m);
 
+    SmartDashboard::PutNumber("SetTelescopeTarget", position.value());
+    SmartDashboard::PutNumber("NudgeTelescope", 0.0);  // print to Shuffleboard
 }
+
+
+units::length::meter_t TelescopeSubsystem::ToMeters(units::angle::turn_t turns) {
+  return units::length::meter_t{turns.value() / kTurnsPerMeter};
+}
+
+units::angle::turn_t TelescopeSubsystem::ToTurns(units::length::meter_t meters) {
+  return units::angle::turn_t{meters.value() * kTurnsPerMeter};
+}
+
 
 void TelescopeSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here
-  SetTargetPosition(units::length::meter_t{SmartDashboard::GetNumber("Telescope Position", position.value())});
-  /*SetPower(SmartDashboard::GetNumber("Telescope Power", power));*/
-  /*SmartDashboard::PutNumber("Telescope Voltage", left.GetMotorVoltage().GetValueAsDouble());*/
-  SmartDashboard::PutNumber("Left Actual Telescope", GetLeftPosition().value());
-  SmartDashboard::PutNumber("Right Actual Telescope", GetRightPosition().value());
-  if(state == kOff) {
-    left.Set(0.0);
-    right.Set(0.0);
-  } else if(state == TelescopeStates::kPowerMode) {
-    // left.Set(power);
-    // right.Set(power);
-  } else if(state == TelescopeStates::kPositionMode) {
+  SetNudge(ToTurns(units::length::meter_t{SmartDashboard::GetNumber("NudgeTelescope", 0.0)}));  // print to Shuffleboard
+  SetTargetMeters(units::length::meter_t{SmartDashboard::GetNumber("SetTelescopeTarget", ToMeters(position).value())});
 
-    microAdjust = units::length::meter_t{SmartDashboard::GetNumber("microAdjustTelescope", 0.0)};  // print to Shuffleboard
-    SmartDashboard::PutNumber("leftTelescopeTr", left.GetPosition().GetValue().value());
-    SmartDashboard::PutNumber("rightTelescopeTr", right.GetPosition().GetValue().value());
-    SmartDashboard::PutNumber("telescopePosition", ((GetLeftPosition().value()) + (GetRightPosition().value())) / 2);  // print to Shuffleboard
-    
-    SmartDashboard::PutNumber("Position Target", position.value());
-    units::angle::turn_t posTarget{(position + microAdjust - kStartPosition).value() * kTurnsPerMeter};
-    SmartDashboard::PutNumber("telescopeTargetTr", posTarget.value());
-    
-    // left.SetControl(positionController
-    //   .WithPosition(units::angle::turn_t{posTarget})
-    //   .WithEnableFOC(true));
-    // right.SetControl(positionController
-    //   .WithPosition(units::angle::turn_t{posTarget})
-    //   .WithEnableFOC(true));
+  SmartDashboard::PutNumber("TelescopeActual", ToMeters(GetPosition()).value());  // print to Shuffleboard
+  SmartDashboard::PutNumber("leftTelescopeTr", GetLeftPosition().value());
+  SmartDashboard::PutNumber("rightTelescopeTr", GetRightPosition().value());
+  SmartDashboard::PutNumber("TelescopeTarget", ToMeters(position).value());
+  SmartDashboard::PutNumber("TelescopeTargetTr", position.value());
 
-    // Test Motion Magic
-    // left.SetControl(position
-    //   .WithPosition(units::angle::turn_t{posTarget})
-    //   .WithEnableFOC(true));
-    // right.SetControl(position
-    //   .WithPosition(units::angle::turn_t{posTarget})
-    //   .WithEnableFOC(true));
-  }
+  
+  RunMotors();
 }
 
-void TelescopeSubsystem::Off() {
-  state = TelescopeStates::kOff;
+units::length::meter_t TelescopeSubsystem::GetPositionMeters() {
+  return ToMeters(GetPosition());
 }
 
-void TelescopeSubsystem::On() {
-  state = TelescopeStates::kPowerMode;
-}
-
-void TelescopeSubsystem::SetPower(double newPower) {
-  power = newPower;
-}
-
-void TelescopeSubsystem::SetState(int newState) {
-  state = newState;
-}
-
-int TelescopeSubsystem::GetState() {
-  return state;
-}
-
-units::length::meter_t TelescopeSubsystem::GetLeftPosition() {
-  auto base = units::length::meter_t{left.GetPosition().GetValueAsDouble() / kTurnsPerMeter};
-  return base + kStartPosition;
-}
-
-units::length::meter_t TelescopeSubsystem::GetRightPosition() {
-  auto base = units::length::meter_t{right.GetPosition().GetValueAsDouble() / kTurnsPerMeter};
-  return base + kStartPosition;
-}
-
-units::length::meter_t TelescopeSubsystem::GetPosition() {
-  auto left = GetLeftPosition();
-  auto right = GetRightPosition();
-  return (left + right) / 2;
-}
-
-void TelescopeSubsystem::SetTargetPosition(units::length::meter_t newPosition) {
-  position = newPosition;
-  if(position < kTelescopeMeterMin) position = kTelescopeMeterMin;
-  if(position > kTelescopeMeterMax) position = kTelescopeMeterMax;
-  SmartDashboard::PutNumber("Telescope Position", position.value());
+void TelescopeSubsystem::SetTargetMeters(units::length::meter_t newPosition) {
+  newPosition = newPosition + ToMeters(nudge) - kStartPosition;
+  if(newPosition < kTelescopeMeterMin) newPosition = kTelescopeMeterMin;
+  if(newPosition > kTelescopeMeterMax) newPosition = kTelescopeMeterMax;
+  SetTargetPosition(ToTurns(newPosition));
+  SmartDashboard::PutNumber("SetTelescopeTarget", newPosition.value());
 }
 
 bool TelescopeSubsystem::IsAtTarget() {
-  auto target = position + microAdjust;
-  auto leftPos = GetLeftPosition();
-  auto rightPos = GetRightPosition();
+  auto target = ToMeters(position + nudge);
+  auto pos = GetPositionMeters();
   
-  bool leftAtTarget = leftPos > target - (kPositionDeadzone / 2) && leftPos < target + (kPositionDeadzone / 2);
-  bool rightAtTarget = rightPos > target - (kPositionDeadzone / 2) && rightPos < target + (kPositionDeadzone / 2);
-  return leftAtTarget && rightAtTarget;
+  bool atTarget = pos > target - (kPositionDeadzone / 2) && pos < target + (kPositionDeadzone / 2);
+  return atTarget;
 }
 
 void TelescopeSubsystem::SetBrakeMode(bool state) {
@@ -163,14 +113,32 @@ void TelescopeSubsystem::ConfigMotors() {
   telescopeConfig.MotorOutput.Inverted = true;
 
   right.GetConfigurator().Apply(telescopeConfig);
+
+  // configs::CANcoderConfiguration encoderConfig{};
+  // encoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5_tr;
+  // encoderConfig.MagnetSensor.SensorDirection = signals::SensorDirectionValue::CounterClockwise_Positive;
+  // encoderConfig.MagnetSensor.MagnetOffset = kEncoderOffset;
+  // encoder.GetConfigurator().Apply(encoderConfig);
 }
 
 frc2::CommandPtr TelescopeSubsystem::GetMoveCommand(units::length::meter_t target) {
   return frc2::cmd::Sequence(
       frc2::cmd::RunOnce([this, target]() {
-        SetTargetPosition(target);
+        SetTargetMeters(target);
       }, {this}),
-      frc2::cmd::WaitUntil([this, target](){
+      frc2::cmd::WaitUntil([this](){
         return IsAtTarget();
       }));
 }
+
+// For debug
+units::length::meter_t TelescopeSubsystem::GetLeftPosition() {
+  auto base = units::length::meter_t{left.GetPosition().GetValueAsDouble() / kTurnsPerMeter};
+  return base + kStartPosition;
+}
+
+units::length::meter_t TelescopeSubsystem::GetRightPosition() {
+  auto base = units::length::meter_t{right.GetPosition().GetValueAsDouble() / kTurnsPerMeter};
+  return base + kStartPosition;
+}
+

@@ -11,13 +11,19 @@
 #include <frc2/command/Commands.h>
 
 #include "Constants.h"
+#include "led_libraries/PositionalSubsystem.h"
+#include "led_libraries/TalonSmartMotor.h"
 
 using namespace frc;
 using namespace ctre::phoenix6;
 
-class WristSubsystem : public frc2::SubsystemBase {
+class WristSubsystem : public PositionalSubsystem {
  public:
   WristSubsystem();
+
+  units::angle::degree_t ToDegrees(units::angle::turn_t turns);
+
+  units::angle::turn_t ToTurns(units::angle::degree_t degrees);
 
   /**
    * Will be called periodically whenever the CommandScheduler runs.
@@ -27,49 +33,18 @@ class WristSubsystem : public frc2::SubsystemBase {
             /* wrist FUNCTIONS */
 
   /**
-   * Turns the Intake state to kAngleMode.
-   */
-  void WristOn();
-
-  /**
-   * Turns the Intake state to kOff.
-   */
-  void WristOff();
-
-  /**
-   * Sets the power for the Wrist to use when in kPowerMode.
-   *
-   * @param power the power for the wrist to use
-   */
-  void SetWristPower(double newPower);
-  
-  /**
-   * Get the current power used by the Wrist.
-   * 
-   * @return current wrist power
-   */
-  double GetWristPower();
-
-  /**
    * Sets the target angle of the Wrist.
    * 
    * @param newAngle new angle for the wrist
    */
-  void SetTargetAngle(units::angle::degree_t newAngle);
+  void SetTargetDegrees(units::angle::degree_t newAngle, double feedForward = 0.0);
 
   /**
    * Returns the current estimated angle of the wrist.
    * 
    * @return current wrist angle
    */
-  units::angle::degree_t GetAngle();
-
-  /**
-   * Returns the position from the TalonFX motor controller.
-   *
-   * @return the TalonFX reported position
-   */
-  double GetWristPosition();
+  units::angle::degree_t GetAngleDegrees();
 
   /**
    * Returns whether the subsystem is at its intended target position.
@@ -77,20 +52,6 @@ class WristSubsystem : public frc2::SubsystemBase {
    * @return If the wrist is at it's target
    */
   bool IsAtTarget();
-
-  /**
-   * Sets the current state of the Wrist.
-   * 
-   * @param newState the new state for the Wrist.
-   */
-  void SetWristState(int newState);
-  
-  /**
-   * Returns the current state of the Wrist.
-   *
-   * @return The current state of the Wrist
-   */
-  int GetWristState();
 
   /**
    * Sets Wrist brake mode.
@@ -110,17 +71,10 @@ class WristSubsystem : public frc2::SubsystemBase {
   frc2::CommandPtr GetMoveCommand(units::angle::degree_t target);
     
  private:
-  // While the state is kOn the wrist will run on the angle mode.
-  int state = WristConstants::WristStates::kWristAngleMode;
-  double power = WristConstants::kWristDefaultPower;
-  units::angle::degree_t angle{90_deg};
-  units::angle::degree_t microAdjust{0_deg};
-
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 
   // The motor controllers
   hardware::TalonFX wrist;
-
-  controls::PositionVoltage wristPosition{0_tr};
+  TalonSmartMotor wristController{&wrist};
 };

@@ -3,117 +3,90 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/ArmSubsystem/ArmSubsystem.h"
+#include "units/angle.h"
 
 #include <frc/geometry/Rotation2d.h>
 #include <frc/kinematics/DifferentialDriveWheelSpeeds.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <iostream>
 
 using namespace ArmConstants;
 using namespace frc;
 
-ArmSubsystem::ArmSubsystem() : leftArm{kLeftArmPort}, rightArm{kRightArmPort} {
-  /*arm.SetPosition(0.0_tr);*/
-  SmartDashboard::PutNumber("SetArmAngle", angle.value());
-  SmartDashboard::PutNumber("microAdjustArm", 0.0); // print to Shuffleboard
-  ConfigArm();
+ArmSubsystem::ArmSubsystem()
+  : PositionalSubsystem{std::vector<SmartMotor*>{&leftController, &rightController}},
+    left{kLeftArmPort},
+    right{kRightArmPort} {
+      ConfigArm();
+      SetTargetDegrees(kArmStartAngle);
 
-  SetTargetAngle(angle);
+      SmartDashboard::PutNumber("SetArmTarget", 90.0);
+      SmartDashboard::PutNumber("NudgeArm", 0.0);  // print to Shuffleboard
+}
+
+
+units::angle::degree_t ArmSubsystem::ToDegrees(units::angle::turn_t turns) {
+  return units::angle::degree_t{turns.value() / kTurnsPerDegree};
+}
+
+units::angle::turn_t ArmSubsystem::ToTurns(units::angle::degree_t degrees) {
+  return units::angle::turn_t{degrees.value() * kTurnsPerDegree};
 }
 
 void ArmSubsystem::Periodic() {
   // Implementation of subsystem periodic method goes here
   // Arm Control
-  SetTargetAngle(units::angle::degree_t{
-      SmartDashboard::GetNumber("SetArmAngle", GetAngle().value())});
-  SmartDashboard::PutNumber("Arm Actual", GetAngle().value());
-  if (state == ArmStates::kArmOff) {
-    leftArm.Set(0.0);
-    rightArm.Set(0.0);
-  } else if (state == ArmStates::kArmPowerMode) {
-    leftArm.Set(power);
-    rightArm.Set(power);
-  } else if (state == ArmStates::kArmAngleMode) {
-    // feed forwards should be a changing constant that increases as the arm
-    // moves further. It should be a static amount of power to overcome gravity.
+  SetNudge(ToTurns(units::angle::degree_t{SmartDashboard::GetNumber("NudgeArm", 0.0)}));  // print to Shuffleboard
 
-    microAdjust = units::angle::degree_t{SmartDashboard::GetNumber(
-        "microAdjustArm", 0.0)}; // print to Shuffleboard
-    SmartDashboard::PutNumber(
-        "armTr",
-        GetArmPosition()); // print to Shuffleboard
-    SmartDashboard::PutNumber("armAngle",
-                              GetAngle().value()); // print to Shuffleboard
-    double feedForward = fabs(sin(angle.value())) * kMaxFeedForward;
-    SmartDashboard::PutNumber("armTarget", angle.value());
-    units::angle::turn_t posTarget{
-        (angle + microAdjust - kArmStartAngle).value() * kTurnsPerDegree};
-    SmartDashboard::PutNumber("armTrTarget", posTarget.value());
-    leftArm.SetControl(armPosition.WithPosition(units::angle::turn_t{posTarget})
-                           .WithEnableFOC(true));
-    rightArm.SetControl(
-        armPosition.WithPosition(units::angle::turn_t{posTarget})
-            .WithEnableFOC(true));
-    /*.WithFeedForward(units::volt_t{feedForward}));*/
-  }
+  double feedForward = fabs(sin(ToDegrees(position).value())) * kMaxFeedForward;
+  SetTargetDegrees(units::angle::degree_t{SmartDashboard::GetNumber("SetArmTarget", GetAngleDegrees().value())}, feedForward);
+    // feed forwards should be a changing constant that increases as the arm moves further. It should be a static amount of power to overcome gravity.
+  SmartDashboard::PutNumber("ArmActual", GetAngleDegrees().value());  // print to Shuffleboard
+  SmartDashboard::PutNumber("ArmTr", GetPosition().value());  // print to Shuffleboard
+  SmartDashboard::PutNumber("ArmTarget", ToDegrees(position).value());
+  SmartDashboard::PutNumber("ArmTargetTr", position.value());
+
+  RunMotors();
 }
 
-void ArmSubsystem::ArmOn() { state = ArmStates::kArmAngleMode; }
-
-void ArmSubsystem::ArmOff() { state = ArmStates::kArmOff; }
-
-void ArmSubsystem::SetArmPower(double newPower) { power = newPower; }
-
-double ArmSubsystem::GetArmPower() { return power; }
-
-void ArmSubsystem::SetTargetAngle(units::angle::degree_t newAngle) {
-  angle = newAngle;
-  if (angle < kArmDegreeMin)
-    angle = kArmDegreeMin;
-  if (angle > kArmDegreeMax)
-    angle = kArmDegreeMax;
-  SmartDashboard::PutNumber("Arm Angle", angle.value());
+void ArmSubsystem::SetTargetDegrees(units::angle::degree_t newAngle, double feedForward) {
+  newAngle = newAngle + ToDegrees(nudge) - kArmStartAngle;
+  if(newAngle < kArmDegreeMin) newAngle = kArmDegreeMin;
+  if(newAngle > kArmDegreeMax) newAngle = kArmDegreeMax;
+  SetTargetPosition(ToTurns(newAngle), feedForward);
+  SmartDashboard::PutNumber("SetArmTarget", newAngle.value());
 }
 
-units::angle::degree_t ArmSubsystem::GetAngle() {
-  return units::angle::degree_t{(GetArmPosition() / kTurnsPerDegree)} +
-         kArmStartAngle;
-}
-
-double ArmSubsystem::GetArmPosition() {
-  return (leftArm.GetPosition().GetValueAsDouble() + rightArm.GetPosition().GetValueAsDouble()) / 2.0;
+units::angle::degree_t ArmSubsystem::GetAngleDegrees() {
+  return ToDegrees(GetPosition()) + kArmStartAngle;
 }
 
 bool ArmSubsystem::IsAtTarget() {
-  auto target = angle + microAdjust;
-  auto angle = GetAngle();
-  bool atTarget = angle > target - (kArmAngleDeadzone / 2) &&
-                  angle < target + (kArmAngleDeadzone / 2);
+  auto target = ToDegrees(position + nudge);
+  auto angle = GetAngleDegrees();
+  bool atTarget = angle > target - (kArmAngleDeadzone / 2) && angle < target + (kArmAngleDeadzone / 2);
   return atTarget;
 }
 
-void ArmSubsystem::SetArmState(int newState) { state = newState; }
-
-int ArmSubsystem::GetArmState() { return state; }
-
 frc2::CommandPtr ArmSubsystem::GetMoveCommand(units::angle::degree_t target) {
   return frc2::cmd::Sequence(
-      frc2::cmd::RunOnce([this, target]() { SetTargetAngle(target); }, {this}),
-      frc2::cmd::WaitUntil([this, target]() { return IsAtTarget(); }));
+      frc2::cmd::RunOnce([this, target]() {
+        SetTargetDegrees(target);
+      }, {this}),
+      frc2::cmd::WaitUntil([this](){
+        return IsAtTarget();
+      }));
   /*return frc2::cmd::RunOnce([this, target]() {*/
   /*      SetTargetAngle(target);*/
   /*    }, {this});*/
 }
 void ArmSubsystem::SetArmBrakeMode(bool state) {
   signals::NeutralModeValue mode;
-  if (state)
-    mode = signals::NeutralModeValue::Brake;
-  else
-    mode = signals::NeutralModeValue::Coast;
+  if(state) mode = signals::NeutralModeValue::Brake;
+  else mode = signals::NeutralModeValue::Coast;
   configs::MotorOutputConfigs updated;
   updated.WithNeutralMode(mode);
-  leftArm.GetConfigurator().Apply(updated, 50_ms);
-  rightArm.GetConfigurator().Apply(updated, 50_ms);
+  left.GetConfigurator().Apply(updated, 50_ms);
+  right.GetConfigurator().Apply(updated, 50_ms);
 }
 
 void ArmSubsystem::ConfigArm() {
@@ -144,7 +117,7 @@ void ArmSubsystem::ConfigArm() {
 
   // armConfig.Feedback.FeedbackRemoteSensorID = kEncoderPort;
 
-  leftArm.GetConfigurator().Apply(armConfig);
+  left.GetConfigurator().Apply(armConfig);
   armConfig.MotorOutput.Inverted = signals::InvertedValue::Clockwise_Positive;
-  rightArm.GetConfigurator().Apply(armConfig);
+  right.GetConfigurator().Apply(armConfig);
 }
