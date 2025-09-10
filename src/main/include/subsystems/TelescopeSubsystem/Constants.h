@@ -11,7 +11,7 @@ namespace TelescopeConstants {
 
     constexpr units::angle::turn_t kEncoderOffset = 0.498291015625_tr;
 
-    constexpr units::time::second_t kRampSeconds = 0.5_s;
+    constexpr units::time::second_t kRampSeconds = 0.0_s;
 
     // states
     enum TelescopeStates {
@@ -28,14 +28,14 @@ namespace TelescopeConstants {
     // constexpr units::length::meter_t kStartPosition{0.13335_m};
     // arm min/max positions
     constexpr units::length::meter_t kTelescopeMeterMin{kStartPosition};   // encoder Turns at the Telescope's minimum usable position
-    constexpr units::length::meter_t kTelescopeMeterMax{0.5_m}; // meters the Telescope is capable of moving 
+    constexpr units::length::meter_t kTelescopeMeterMax{1.1_m}; // meters the Telescope is capable of moving 
     // for arm feed forward trig
     constexpr double kTurnsPerMeter = 2.46056189903846; // Recalc
     // position deadzone
     constexpr units::length::meter_t kPositionDeadzone{10.0_cm};
     constexpr units::current::ampere_t kCurrentLimit = 30.0_A;
     // TalonFX config
-    constexpr double kP = 0.0;
+    constexpr double kP = 40.0;
     constexpr double kD = 0.0;
     /*constexpr double kD = 0.0;*/
     constexpr double kG = 0.0;

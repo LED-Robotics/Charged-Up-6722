@@ -18,8 +18,9 @@ ArmSubsystem::ArmSubsystem()
     right{kRightArmPort} {
       ConfigArm();
       SetTargetDegrees(kArmStartAngle);
+      SetState(kPositionMode);
 
-      SmartDashboard::PutNumber("SetArmTarget", 90.0);
+      SmartDashboard::PutNumber("SetArmTarget", ToDegrees(position).value());
       SmartDashboard::PutNumber("NudgeArm", 0.0);  // print to Shuffleboard
 }
 
@@ -37,8 +38,9 @@ void ArmSubsystem::Periodic() {
   // Arm Control
   SetNudge(ToTurns(units::angle::degree_t{SmartDashboard::GetNumber("NudgeArm", 0.0)}));  // print to Shuffleboard
 
-  double feedForward = fabs(sin(ToDegrees(position).value())) * kMaxFeedForward;
-  SetTargetDegrees(units::angle::degree_t{SmartDashboard::GetNumber("SetArmTarget", GetAngleDegrees().value())}, feedForward);
+  // double feedForward = fabs(sin(ToDegrees(position).value())) * kMaxFeedForward;
+  double feedForward = 0.0;
+  SetTargetDegrees(units::angle::degree_t{SmartDashboard::GetNumber("SetArmTarget", ToDegrees(position).value())}, feedForward);
     // feed forwards should be a changing constant that increases as the arm moves further. It should be a static amount of power to overcome gravity.
   SmartDashboard::PutNumber("ArmActual", GetAngleDegrees().value());  // print to Shuffleboard
   SmartDashboard::PutNumber("ArmTr", GetPosition().value());  // print to Shuffleboard
@@ -49,7 +51,6 @@ void ArmSubsystem::Periodic() {
 }
 
 void ArmSubsystem::SetTargetDegrees(units::angle::degree_t newAngle, double feedForward) {
-  newAngle = newAngle + ToDegrees(nudge) - kArmStartAngle;
   if(newAngle < kArmDegreeMin) newAngle = kArmDegreeMin;
   if(newAngle > kArmDegreeMax) newAngle = kArmDegreeMax;
   SetTargetPosition(ToTurns(newAngle), feedForward);
@@ -107,8 +108,9 @@ void ArmSubsystem::ConfigArm() {
   // armConfig.Feedback.FeedbackSensorSource =
   // signals::FeedbackSensorSourceValue::RotorSensor;
   // armConfig.Feedback.FeedbackRemoteSensorID = kEncoderPort;
-  armConfig.MotorOutput.PeakReverseDutyCycle = -0.4;
-  armConfig.MotorOutput.PeakForwardDutyCycle = 1.0;
+  armConfig.MotorOutput.PeakReverseDutyCycle = -0.0;
+  armConfig.MotorOutput.PeakForwardDutyCycle = 0.05;
+  armConfig.MotorOutput.NeutralMode = signals::NeutralModeValue::Brake;
   // armConfig.Feedback.SensorToMechanismRatio = 1.0;
   armConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
   armConfig.CurrentLimits.SupplyCurrentLimit = kCurrentLimit;

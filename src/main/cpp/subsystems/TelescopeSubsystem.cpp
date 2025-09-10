@@ -17,7 +17,8 @@ TelescopeSubsystem::TelescopeSubsystem()
   right{kRightMotorPort, "canCan"}
   {
     ConfigMotors();
-    SetTargetMeters(kStartPosition + 0.3_m);
+    SetTargetMeters(kStartPosition);
+    SetState(kPositionMode);
 
     SmartDashboard::PutNumber("SetTelescopeTarget", position.value());
     SmartDashboard::PutNumber("NudgeTelescope", 0.0);  // print to Shuffleboard
@@ -53,7 +54,6 @@ units::length::meter_t TelescopeSubsystem::GetPositionMeters() {
 }
 
 void TelescopeSubsystem::SetTargetMeters(units::length::meter_t newPosition) {
-  newPosition = newPosition + ToMeters(nudge) - kStartPosition;
   if(newPosition < kTelescopeMeterMin) newPosition = kTelescopeMeterMin;
   if(newPosition > kTelescopeMeterMax) newPosition = kTelescopeMeterMax;
   SetTargetPosition(ToTurns(newPosition));

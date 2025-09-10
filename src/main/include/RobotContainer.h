@@ -39,6 +39,12 @@ class RobotContainer {
  public:
   RobotContainer();
 
+  struct KinematicsPose {
+    units::length::meter_t telescopePose;
+    units::angle::degree_t armAngle;
+    units::angle::degree_t wristAngle;
+  };
+
   frc2::Command* GetAutonomousCommand();
   /**
    * Enable odometry updates from AprilTag tracking.
@@ -81,6 +87,16 @@ class RobotContainer {
   // The partner controller
   frc2::CommandXboxController controller2{OIConstants::kCoDriverControllerPort};
 
+  frc2::Trigger mainDpadUp{controller.POV(0)};
+  frc2::Trigger mainDpadDown{controller.POV(180)};
+  frc2::Trigger mainDpadLeft{controller.POV(270)};
+  frc2::Trigger mainDpadRight{controller.POV(90)};
+
+  frc2::Trigger mainDpadUp2{controller2.POV(0)};
+  frc2::Trigger mainDpadDown2{controller2.POV(180)};
+  frc2::Trigger mainDpadLeft2{controller2.POV(270)};
+  frc2::Trigger mainDpadRight2{controller2.POV(90)};
+
   DriveSubsystem drive{};
 
   TelescopeSubsystem telescope{};
@@ -90,4 +106,14 @@ class RobotContainer {
   WristSubsystem wrist{};
 
   IntakeSubsystem intake{};
+
+  KinematicsPose startingPose{0.0_m, 20_deg, -31.0_deg};
+  KinematicsPose floorPose{0.0_m, 31.5_deg, -144.0_deg};
+  KinematicsPose middlePose{0.0_m, 129.8_deg, -270.0_deg};
+  KinematicsPose topPose{1.1_m, 129.8_deg, -255.16_deg};
+
+  /**
+   * Return the command pointer that sets all subsystem kinematics.
+   */
+  frc2::CommandPtr SetAllKinematics(KinematicsPose pose);
 };

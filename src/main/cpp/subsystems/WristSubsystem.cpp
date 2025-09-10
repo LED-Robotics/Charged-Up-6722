@@ -17,8 +17,9 @@ WristSubsystem::WristSubsystem()
     wrist{kWristPort} {
       ConfigWrist();
       SetTargetDegrees(kWristStartAngle);
+      SetState(kPositionMode);
 
-      SmartDashboard::PutNumber("SetWristTarget", 90.0);
+      SmartDashboard::PutNumber("SetWristTarget", ToDegrees(position).value());
       SmartDashboard::PutNumber("NudgeWrist", 0.0);  // print to Shuffleboard
 }
 
@@ -36,8 +37,9 @@ void WristSubsystem::Periodic() {
   // Wrist Control
   SetNudge(ToTurns(units::angle::degree_t{SmartDashboard::GetNumber("NudgeWrist", 0.0)}));  // print to Shuffleboard
 
-  double feedForward = fabs(sin(ToDegrees(position).value())) * kMaxFeedForward;
-  SetTargetDegrees(units::angle::degree_t{SmartDashboard::GetNumber("SetWristTarget", GetAngleDegrees().value())}, feedForward);
+  // double feedForward = fabs(sin(ToDegrees(position).value())) * kMaxFeedForward;
+  double feedForward = 0.0;
+  SetTargetDegrees(units::angle::degree_t{SmartDashboard::GetNumber("SetWristTarget", ToDegrees(position).value())}, feedForward);
     // feed forwards should be a changing constant that increases as the wrist moves further. It should be a static amount of power to overcome gravity.
   SmartDashboard::PutNumber("WristActual", GetAngleDegrees().value());  // print to Shuffleboard
   SmartDashboard::PutNumber("WristTr", GetPosition().value());  // print to Shuffleboard
@@ -48,7 +50,6 @@ void WristSubsystem::Periodic() {
 }
 
 void WristSubsystem::SetTargetDegrees(units::angle::degree_t newAngle, double feedForward) {
-  newAngle = newAngle + ToDegrees(nudge) - kWristStartAngle;
   if(newAngle < kWristDegreeMin) newAngle = kWristDegreeMin;
   if(newAngle > kWristDegreeMax) newAngle = kWristDegreeMax;
   SetTargetPosition(ToTurns(newAngle), feedForward);
@@ -103,8 +104,9 @@ void WristSubsystem::ConfigWrist() {
   // wristConfig.MotionMagic.MotionMagicJerk = 200.0;
   
   // wristConfig.Feedback.FeedbackSensorSource = signals::FeedbackSensorSourceValue::RotorSensor;
-  wristConfig.MotorOutput.PeakReverseDutyCycle = -1.0;
-  wristConfig.MotorOutput.PeakForwardDutyCycle = 1.0;
+  wristConfig.MotorOutput.PeakReverseDutyCycle = -0.0;
+  wristConfig.MotorOutput.PeakForwardDutyCycle = 0.02;
+  wristConfig.MotorOutput.NeutralMode = signals::NeutralModeValue::Brake;
   // wristConfig.Feedback.SensorToMechanismRatio = 1.0;
   wristConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
   wristConfig.CurrentLimits.SupplyCurrentLimit = kCurrentLimit;

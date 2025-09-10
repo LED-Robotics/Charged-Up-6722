@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "RobotContainer.h"
+#include "frc2/command/Commands.h"
 
 #include <frc/controller/PIDController.h>
 #include <frc/shuffleboard/Shuffleboard.h>
@@ -23,7 +24,31 @@ bool RobotContainer::IsBlue() {
 }
 // update SmartDashboard display of the currently selected station
 
+frc2::CommandPtr RobotContainer::SetAllKinematics(RobotContainer::KinematicsPose pose) {
+  // Fill with command(s)
+  std::vector<frc2::CommandPtr> commands;
+  // Set subsystems to final targets
+  commands.push_back(
+    frc2::cmd::Parallel(
+      arm.GetMoveCommand(pose.armAngle),
+      wrist.GetMoveCommand(pose.wristAngle)
+  ));
+
+  if(telescope.GetPositionMeters() >= pose.telescopePose) {
+    commands.insert(commands.begin(), telescope.GetMoveCommand(pose.telescopePose));
+  } else {
+    commands.push_back(telescope.GetMoveCommand(pose.telescopePose));
+  }
+
+  // Return command vector
+  return frc2::cmd::Sequence(std::move(commands));
+}
 RobotContainer::RobotContainer() {
+
+  controller.Start().OnTrue(SetAllKinematics(startingPose));
+  mainDpadDown.OnTrue(SetAllKinematics(floorPose));
+  mainDpadRight.OnTrue(SetAllKinematics(middlePose));
+  mainDpadUp.OnTrue(SetAllKinematics(topPose));
 
   drive.SetDefaultCommand(frc2::cmd::Run(
       [this] {
