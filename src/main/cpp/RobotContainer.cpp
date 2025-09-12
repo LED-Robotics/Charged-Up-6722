@@ -47,6 +47,7 @@ RobotContainer::RobotContainer() {
 
   controller.Start().OnTrue(SetAllKinematics(startingPose));
   mainDpadDown.OnTrue(SetAllKinematics(floorPose));
+  mainDpadLeft.OnTrue(SetAllKinematics(floorStandingPose));
   mainDpadRight.OnTrue(SetAllKinematics(middlePose));
   mainDpadUp.OnTrue(SetAllKinematics(topPose));
 

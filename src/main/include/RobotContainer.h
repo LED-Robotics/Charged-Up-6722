@@ -109,8 +109,9 @@ class RobotContainer {
 
   KinematicsPose startingPose{0.0_m, 20_deg, -31.0_deg};
   KinematicsPose floorPose{0.0_m, 31.5_deg, -144.0_deg};
-  KinematicsPose middlePose{0.0_m, 129.8_deg, -270.0_deg};
-  KinematicsPose topPose{1.1_m, 129.8_deg, -255.16_deg};
+  KinematicsPose floorStandingPose{0.0_m, 31.5_deg, -112.0_deg};
+  KinematicsPose middlePose{0.0_m, 142.8_deg, -270.0_deg};
+  KinematicsPose topPose{1.1_m, 135.8_deg, -255.16_deg};
 
   /**
    * Return the command pointer that sets all subsystem kinematics.

@@ -13,7 +13,7 @@ using namespace frc;
 
 IntakeSubsystem::IntakeSubsystem() 
     : intake{kIntakePort} {
-
+      ConfigMotors();
     }
 
 
@@ -71,7 +71,7 @@ void IntakeSubsystem::ConfigMotors() {
   configs::TalonFXConfiguration intakeConfig{};
 
   // coralConfig.Slot0.kP = kP;
-  intakeConfig.MotorOutput.Inverted = true;
+  intakeConfig.MotorOutput.Inverted = signals::InvertedValue::Clockwise_Positive;
   // coralConfig.Slot0.kS = 0.28;
   // coralConfig.Slot0.kV = 8.5;
   // coralConfig.Slot0.kA = 3.0;
@@ -94,7 +94,6 @@ void IntakeSubsystem::ConfigMotors() {
   // coralConfig.Feedback.FeedbackRemoteSensorID = kEncoderPort;
   
   intake.GetConfigurator().Apply(intakeConfig);
-  intakeConfig.MotorOutput.Inverted = false;
 
 }
 
