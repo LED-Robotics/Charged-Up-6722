@@ -2,7 +2,7 @@
 
 namespace IntakeConstants {
     // Ports
-    constexpr int kIntakePort = 16;
+    constexpr int kIntakePort = 19;
 
     constexpr double kHoldingPower = -0.05;
 

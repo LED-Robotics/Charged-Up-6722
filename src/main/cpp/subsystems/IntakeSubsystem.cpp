@@ -12,7 +12,7 @@ using namespace IntakeConstants;
 using namespace frc;
 
 IntakeSubsystem::IntakeSubsystem() 
-    : intake{kIntakePort} {
+    : intake{kIntakePort, rev::spark::SparkLowLevel::MotorType::kBrushless} {
       ConfigMotors();
     }
 
@@ -68,32 +68,32 @@ void IntakeSubsystem::SetBrakeMode(bool state) {
 }
 
 void IntakeSubsystem::ConfigMotors() {
-  configs::TalonFXConfiguration intakeConfig{};
+//   configs::TalonFXConfiguration intakeConfig{};
 
-  // coralConfig.Slot0.kP = kP;
-  intakeConfig.MotorOutput.Inverted = signals::InvertedValue::Clockwise_Positive;
-  // coralConfig.Slot0.kS = 0.28;
-  // coralConfig.Slot0.kV = 8.5;
-  // coralConfig.Slot0.kA = 3.0;
-  // coralConfig.Slot0.kP = 8.0;
+//   // coralConfig.Slot0.kP = kP;
+//   intakeConfig.MotorOutput.Inverted = signals::InvertedValue::Clockwise_Positive;
+//   // coralConfig.Slot0.kS = 0.28;
+//   // coralConfig.Slot0.kV = 8.5;
+//   // coralConfig.Slot0.kA = 3.0;
+//   // coralConfig.Slot0.kP = 8.0;
 
-  // coralConfig.MotionMagic.MotionMagicCruiseVelocity = 6.0;
-  // coralConfig.MotionMagic.MotionMagicAcceleration = 2.0;
-  // coralConfig.MotionMagic.MotionMagicJerk = 200.0;
+//   // coralConfig.MotionMagic.MotionMagicCruiseVelocity = 6.0;
+//   // coralConfig.MotionMagic.MotionMagicAcceleration = 2.0;
+//   // coralConfig.MotionMagic.MotionMagicJerk = 200.0;
   
-  // coralConfig.Feedback.FeedbackSensorSource = signals::FeedbackSensorSourceValue::RotorSensor;
-  // coralConfig.Feedback.FeedbackSensorSource = signals::FeedbackSensorSourceValue::FusedCANcoder;
-  // coralConfig.Feedback.RotorToSensorRatio = kRotorToGearbox;
-  // coralConfig.Feedback.SensorToMechanismRatio = kRotorToGearbox * kGearboxToMechanism;
-  // coralConfig.MotorOutput.PeakReverseDutyCycle = -1.0;
-  // coralConfig.MotorOutput.PeakForwardDutyCycle = 1.0;
-  // coralConfig.Feedback.SensorToMechanismRatio = 1.0;
-  // coralConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = kRampSeconds;
-  // coralConfig.Audio.AllowMusicDurDisable = true;
+//   // coralConfig.Feedback.FeedbackSensorSource = signals::FeedbackSensorSourceValue::RotorSensor;
+//   // coralConfig.Feedback.FeedbackSensorSource = signals::FeedbackSensorSourceValue::FusedCANcoder;
+//   // coralConfig.Feedback.RotorToSensorRatio = kRotorToGearbox;
+//   // coralConfig.Feedback.SensorToMechanismRatio = kRotorToGearbox * kGearboxToMechanism;
+//   // coralConfig.MotorOutput.PeakReverseDutyCycle = -1.0;
+//   // coralConfig.MotorOutput.PeakForwardDutyCycle = 1.0;
+//   // coralConfig.Feedback.SensorToMechanismRatio = 1.0;
+//   // coralConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = kRampSeconds;
+//   // coralConfig.Audio.AllowMusicDurDisable = true;
 
-  // coralConfig.Feedback.FeedbackRemoteSensorID = kEncoderPort;
+//   // coralConfig.Feedback.FeedbackRemoteSensorID = kEncoderPort;
   
-  intake.GetConfigurator().Apply(intakeConfig);
+//   intake.GetConfigurator().Apply(intakeConfig);
 
 }
 

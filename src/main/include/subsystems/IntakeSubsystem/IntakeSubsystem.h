@@ -89,6 +89,6 @@ class IntakeSubsystem : public frc2::SubsystemBase {
   /*hardware::TalonFX left;*/
   /*hardware::TalonFX right;*/
 
-  hardware::TalonFX intake;
+  rev::spark::SparkMax intake;
 
 };
