@@ -75,6 +75,5 @@ class WristSubsystem : public PositionalSubsystem {
   // declared private and exposed only through public methods.
 
   // The motor controllers
-  hardware::TalonFX wrist;
-  TalonSmartMotor wristController{&wrist};
+  TalonSmartMotor wrist;
 };

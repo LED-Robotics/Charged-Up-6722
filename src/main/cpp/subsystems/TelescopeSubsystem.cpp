@@ -12,9 +12,9 @@ using namespace TelescopeConstants;
 using namespace frc;
 
 TelescopeSubsystem::TelescopeSubsystem()
-  : PositionalSubsystem{std::vector<SmartMotor*>{&leftController, &rightController}},
-  left{kLeftMotorPort, "canCan"},
-  right{kRightMotorPort, "canCan"}
+  : PositionalSubsystem{std::vector<SmartMotor*>{&left, &right}},
+  left{kLeftMotorPort, true, "canCan"},
+  right{kRightMotorPort, true, "canCan"}
   {
     ConfigMotors();
     SetTargetMeters(kStartPosition);
@@ -75,8 +75,8 @@ void TelescopeSubsystem::SetBrakeMode(bool state) {
   configs::MotorOutputConfigs updated;
   updated.WithNeutralMode(mode);
 
-  left.GetConfigurator().Apply(updated, 50_ms);
-  right.GetConfigurator().Apply(updated, 50_ms);
+  left.motor.GetConfigurator().Apply(updated, 50_ms);
+  right.motor.GetConfigurator().Apply(updated, 50_ms);
 }
 
 void TelescopeSubsystem::ConfigMotors() {
@@ -107,12 +107,12 @@ void TelescopeSubsystem::ConfigMotors() {
   telescopeConfig.MotorOutput.Inverted = false;
   // telescopeConfig.Feedback.FeedbackRemoteSensorID = kEncoderPort;
   
-  left.GetConfigurator().Apply(telescopeConfig);
+  left.motor.GetConfigurator().Apply(telescopeConfig);
   // telescopeConfig.DifferentialSensors.DifferentialSensorSource = signals::DifferentialSensorSourceValue::RemoteTalonFX_Diff;
   // telescopeConfig.DifferentialSensors.DifferentialTalonFXSensorID = kLeftMotorPort;
   telescopeConfig.MotorOutput.Inverted = true;
 
-  right.GetConfigurator().Apply(telescopeConfig);
+  right.motor.GetConfigurator().Apply(telescopeConfig);
 
   // configs::CANcoderConfiguration encoderConfig{};
   // encoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5_tr;
@@ -133,12 +133,12 @@ frc2::CommandPtr TelescopeSubsystem::GetMoveCommand(units::length::meter_t targe
 
 // For debug
 units::length::meter_t TelescopeSubsystem::GetLeftPosition() {
-  auto base = units::length::meter_t{left.GetPosition().GetValueAsDouble() / kTurnsPerMeter};
+  auto base = units::length::meter_t{left.motor.GetPosition().GetValueAsDouble() / kTurnsPerMeter};
   return base + kStartPosition;
 }
 
 units::length::meter_t TelescopeSubsystem::GetRightPosition() {
-  auto base = units::length::meter_t{right.GetPosition().GetValueAsDouble() / kTurnsPerMeter};
+  auto base = units::length::meter_t{right.motor.GetPosition().GetValueAsDouble() / kTurnsPerMeter};
   return base + kStartPosition;
 }
 

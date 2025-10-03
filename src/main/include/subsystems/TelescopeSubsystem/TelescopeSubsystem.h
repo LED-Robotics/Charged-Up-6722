@@ -76,8 +76,6 @@ class TelescopeSubsystem : public PositionalSubsystem {
   // declared private and exposed only through public methods.
 
   // The motor controllers
-  hardware::TalonFX left;
-  TalonSmartMotor leftController{&left};
-  hardware::TalonFX right;
-  TalonSmartMotor rightController{&right};
+  TalonSmartMotor left;
+  TalonSmartMotor right;
 };

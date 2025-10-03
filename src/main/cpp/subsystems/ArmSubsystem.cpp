@@ -13,7 +13,7 @@ using namespace ArmConstants;
 using namespace frc;
 
 ArmSubsystem::ArmSubsystem()
-  : PositionalSubsystem{std::vector<SmartMotor*>{&leftController, &rightController}},
+  : PositionalSubsystem{std::vector<SmartMotor*>{&left, &right}},
     left{kLeftArmPort},
     right{kRightArmPort} {
       ConfigArm();
@@ -86,8 +86,8 @@ void ArmSubsystem::SetArmBrakeMode(bool state) {
   else mode = signals::NeutralModeValue::Coast;
   configs::MotorOutputConfigs updated;
   updated.WithNeutralMode(mode);
-  left.GetConfigurator().Apply(updated, 50_ms);
-  right.GetConfigurator().Apply(updated, 50_ms);
+  left.motor.GetConfigurator().Apply(updated, 50_ms);
+  right.motor.GetConfigurator().Apply(updated, 50_ms);
 }
 
 void ArmSubsystem::ConfigArm() {
@@ -119,7 +119,7 @@ void ArmSubsystem::ConfigArm() {
 
   // armConfig.Feedback.FeedbackRemoteSensorID = kEncoderPort;
 
-  left.GetConfigurator().Apply(armConfig);
+  left.motor.GetConfigurator().Apply(armConfig);
   armConfig.MotorOutput.Inverted = signals::InvertedValue::Clockwise_Positive;
-  right.GetConfigurator().Apply(armConfig);
+  right.motor.GetConfigurator().Apply(armConfig);
 }

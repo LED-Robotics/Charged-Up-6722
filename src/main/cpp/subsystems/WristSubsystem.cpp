@@ -13,7 +13,7 @@ using namespace WristConstants;
 using namespace frc;
 
 WristSubsystem::WristSubsystem()
-  : PositionalSubsystem{std::vector<SmartMotor*>{&wristController}},
+  : PositionalSubsystem{std::vector<SmartMotor*>{&wrist}},
     wrist{kWristPort} {
       ConfigWrist();
       SetTargetDegrees(kWristStartAngle);
@@ -85,7 +85,7 @@ void WristSubsystem::SetWristBrakeMode(bool state) {
   else mode = signals::NeutralModeValue::Coast;
   configs::MotorOutputConfigs updated;
   updated.WithNeutralMode(mode);
-  wrist.GetConfigurator().Apply(updated, 50_ms);
+  wrist.motor.GetConfigurator().Apply(updated, 50_ms);
 }
 
 void WristSubsystem::ConfigWrist() {
@@ -114,5 +114,5 @@ void WristSubsystem::ConfigWrist() {
   wristConfig.Audio.AllowMusicDurDisable = true;
 
   
-  wrist.GetConfigurator().Apply(wristConfig);
+  wrist.motor.GetConfigurator().Apply(wristConfig);
 }

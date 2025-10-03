@@ -1,18 +1,13 @@
-#pragma once
-
-#include <ctre/phoenix6/TalonFX.hpp>
+#include "rev/SparkMax.h"
 #include "SmartMotor.h"
 
-using namespace ctre::phoenix6;
+using namespace rev::spark;
 
-class TalonSmartMotor : public SmartMotor {
+class SparkMaxSmartMotor : public SmartMotor {
   public:
-    hardware::TalonFX motor;
-    controls::PositionVoltage positionController{0_tr};
-    controls::VelocityVoltage velocityController{0_tps};
-    bool focEnabled;
+    SparkMax motor;
     
-    TalonSmartMotor(int port, bool foc = true, std::string canBus = "rio");
+    SparkMaxSmartMotor(int port, SparkLowLevel::MotorType type);
 
     units::angle::turn_t GetPosition() override;
     units::angular_velocity::turns_per_second_t GetVelocity() override;
