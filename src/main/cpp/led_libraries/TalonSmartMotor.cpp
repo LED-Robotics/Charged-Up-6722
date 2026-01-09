@@ -23,6 +23,12 @@ void TalonSmartMotor::SetPosition(units::angle::turn_t turns) {
       .WithEnableFOC(focEnabled));
 }
 
+void TalonSmartMotor::SetPositionProfiled(units::angle::turn_t turns) {
+  motor.SetControl(profiledController
+      .WithPosition(turns)
+      .WithEnableFOC(focEnabled));
+}
+
 void TalonSmartMotor::SetVelocity(units::angular_velocity::turns_per_second_t tps) {
   motor.SetControl(velocityController
       .WithVelocity(tps)

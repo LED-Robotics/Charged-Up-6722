@@ -9,7 +9,10 @@
 #include <ctre/phoenix6/CANcoder.hpp>
 #include <frc2/command/Command.h>
 #include <frc2/command/Commands.h>
+#include "frc/trajectory/TrapezoidProfile.h"
 #include "led_libraries/SmartMotor.h"
+#include "units/angular_acceleration.h"
+#include "units/angular_velocity.h"
 
 using namespace frc;
 using namespace ctre::phoenix6;
@@ -18,7 +21,7 @@ class PositionalSubsystem : public frc2::SubsystemBase {
  public:
   PositionalSubsystem(std::vector<SmartMotor*> motors);
 
-  enum States { kOff, kPowerMode, kPositionMode };
+  enum States { kOff, kPowerMode, kPositionMode, kProfileMode };
   /**
    * Sends control signals to motors
    * This function MUST be called in Periodic of the derived class
@@ -71,6 +74,11 @@ class PositionalSubsystem : public frc2::SubsystemBase {
    * Sets the feed forward of the subsystem.
    */
   void SetFeedForward(double power);
+  
+  /**
+   * Sets the motion profile of the subsystem.
+   */
+  void SetMotionProfile(frc::TrapezoidProfile<units::turn_t> profile);
 
  protected:
   // while the state is kOn the motors will run at the current power setting

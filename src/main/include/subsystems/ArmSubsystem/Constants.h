@@ -1,3 +1,6 @@
+#include "units/angular_acceleration.h"
+#include "units/angular_jerk.h"
+#include "units/angular_velocity.h"
 #include <units/angle.h>
 #include <units/time.h>
 #include <units/current.h>
@@ -32,8 +35,26 @@ namespace ArmConstants {
     // feed forward at max gravity i.e. 90 degrees off the floor
     constexpr double kMaxFeedForward = 0.352;
     // TalonFX config
-    constexpr double kPArm = 0.9;
-    constexpr double kDArm = 0.1;
+//
+    // PositionVoltage Constants 
+    // constexpr double kPArm = 0.9;
+    // constexpr double kDArm = 0.1;
+    // constexpr double kVArm = 0.0;
+    // constexpr double kAArm = 0.0;
+//
+    // PositionVoltage Constants 
+    // MotionMagicVoltage Constants 
+
+    constexpr double kPArm = 0.5;
+    constexpr double kDArm = 0.0;
+    constexpr double kVArm = 0.01921694722905;
+    constexpr double kAArm = 0.14491150442477;
+
+    constexpr units::angular_velocity::turns_per_second_t kMotionMagicCruiseVelocity = 70_tps; // Target cruise velocity of 80 rps
+    constexpr units::angular_acceleration::turns_per_second_squared_t kMotionMagicAcceleration = 1000_tr_per_s_sq; // Target acceleration of 160 rps/s (0.5 seconds)
+
+    // MotionMagicVoltage Constants 
+
     constexpr double kArmRotorToGearbox = 136.0 / 5.0; //Will change
     constexpr double kArmGearboxToMechanism = 68.0 / 18.0; //Will change
     // constexpr double kTurnsPerDegree = (kArmRotorToGearbox * kArmGearboxToMechanism) / 360.0;

@@ -21,6 +21,10 @@ void SparkFlexSmartMotor::SetPosition(units::angle::turn_t turns) {
   motor.GetClosedLoopController().SetReference(turns.value(), SparkBase::ControlType::kPosition);
 }
 
+void SparkFlexSmartMotor::SetPositionProfiled(units::angle::turn_t turns) {
+  motor.GetClosedLoopController().SetReference(turns.value(), SparkBase::ControlType::kPosition);
+}
+
 void SparkFlexSmartMotor::SetVelocity(units::angular_velocity::turns_per_second_t tps) {
   motor.GetClosedLoopController().SetReference(tps.value(), SparkBase::ControlType::kVelocity);
 }

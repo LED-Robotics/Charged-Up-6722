@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 #include "subsystems/ArmSubsystem/ArmSubsystem.h"
+#include "led_libraries/PositionalSubsystem.h"
 #include "units/angle.h"
 
 #include <frc/geometry/Rotation2d.h>
@@ -18,7 +19,7 @@ ArmSubsystem::ArmSubsystem()
     right{kRightArmPort} {
       ConfigArm();
       SetTargetDegrees(kArmStartAngle);
-      SetState(kPositionMode);
+      SetState(kProfileMode);
 
       SmartDashboard::PutNumber("SetArmTarget", ToDegrees(position).value());
       SmartDashboard::PutNumber("NudgeArm", 0.0);  // print to Shuffleboard
@@ -95,21 +96,20 @@ void ArmSubsystem::ConfigArm() {
 
   armConfig.Slot0.kP = kPArm;
   armConfig.Slot0.kD = kDArm;
+  armConfig.Slot0.kV = kVArm;
+  armConfig.Slot0.kA = kAArm;
   armConfig.MotorOutput.Inverted = signals::InvertedValue::CounterClockwise_Positive;
   // armConfig.Slot0.kS = 0.28;
-  // armConfig.Slot0.kV = 8.5;
-  // armConfig.Slot0.kA = 3.0;
   // armConfig.Slot0.kP = 8.0;
 
-  // armConfig.MotionMagic.MotionMagicCruiseVelocity = 6.0;
-  // armConfig.MotionMagic.MotionMagicAcceleration = 2.0;
-  // armConfig.MotionMagic.MotionMagicJerk = 200.0;
+  armConfig.MotionMagic.MotionMagicCruiseVelocity = kMotionMagicCruiseVelocity;
+  armConfig.MotionMagic.MotionMagicAcceleration = kMotionMagicAcceleration;
 
   // armConfig.Feedback.FeedbackSensorSource =
   // signals::FeedbackSensorSourceValue::RotorSensor;
   // armConfig.Feedback.FeedbackRemoteSensorID = kEncoderPort;
-  armConfig.MotorOutput.PeakReverseDutyCycle = -0.0;
-  armConfig.MotorOutput.PeakForwardDutyCycle = 0.05;
+  armConfig.MotorOutput.PeakReverseDutyCycle = -1.0;
+  armConfig.MotorOutput.PeakForwardDutyCycle = 1.0;
   armConfig.MotorOutput.NeutralMode = signals::NeutralModeValue::Brake;
   // armConfig.Feedback.SensorToMechanismRatio = 1.0;
   armConfig.CurrentLimits.SupplyCurrentLimitEnable = true;

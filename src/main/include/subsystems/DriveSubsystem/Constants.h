@@ -56,8 +56,8 @@ namespace DriveConstants {
     // TalonFX config
     // constexpr double kDriveP = 0.2402345985174179;
     // constexpr double kDriveV = 0.1345313787460327;
-    constexpr double kDriveP = 0.24;
-    constexpr double kDriveV = 0.0;
+    constexpr double kDriveP = 0.243;
+    constexpr double kDriveV = 0.12878367346938;
     constexpr units::time::second_t kDriveRamp = 0.5_s;
     constexpr units::current::ampere_t kDriveCurrentLimit = 30.0_A;
     constexpr double kTurnP = 60.0;

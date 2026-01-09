@@ -19,6 +19,10 @@ void PositionalSubsystem::RunMotors() {
     for(auto &motor : motors) {
       motor->SetPosition(position + nudge);
     }
+  } else if(state == States::kProfileMode) {
+    for(auto &motor : motors) {
+      motor->SetPositionProfiled(position + nudge);
+    }
   }
 }
 

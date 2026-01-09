@@ -2,6 +2,8 @@
 
 #include <ctre/phoenix6/TalonFX.hpp>
 #include "SmartMotor.h"
+#include "ctre/phoenix6/controls/MotionMagicVoltage.hpp"
+#include "frc/trajectory/TrapezoidProfile.h"
 
 using namespace ctre::phoenix6;
 
@@ -9,6 +11,7 @@ class TalonSmartMotor : public SmartMotor {
   public:
     hardware::TalonFX motor;
     controls::PositionVoltage positionController{0_tr};
+    controls::MotionMagicVoltage profiledController{0_tr};
     controls::VelocityVoltage velocityController{0_tps};
     bool focEnabled;
     
@@ -18,6 +21,7 @@ class TalonSmartMotor : public SmartMotor {
     units::angular_velocity::turns_per_second_t GetVelocity() override;
     double GetPower() override;
     void SetPosition(units::angle::turn_t turns) override;
+    void SetPositionProfiled(units::angle::turn_t turns) override;
     void SetVelocity(units::angular_velocity::turns_per_second_t tps) override;
     void SetPower(double power) override;
     void Stop() override;
