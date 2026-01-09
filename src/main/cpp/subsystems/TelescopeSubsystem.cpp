@@ -13,8 +13,9 @@ using namespace frc;
 
 TelescopeSubsystem::TelescopeSubsystem()
   : PositionalSubsystem{std::vector<SmartMotor*>{&left, &right}},
-  left{kLeftMotorPort, true, "canCan"},
-  right{kRightMotorPort, true, "canCan"}
+  canivore{"canCan"},
+  left{kLeftMotorPort, true, canivore},
+  right{kRightMotorPort, true, canivore}
   {
     ConfigMotors();
     SetTargetMeters(kStartPosition);

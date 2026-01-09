@@ -2,8 +2,6 @@
 
 #include <units/angle.h>
 #include <units/angular_velocity.h>
-#include <units/angular_acceleration.h>
-#include "frc/trajectory/TrapezoidProfile.h"
 
 class SmartMotor {
   public:

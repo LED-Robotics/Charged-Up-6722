@@ -1,6 +1,6 @@
-#include "led_libraries/TalonSmartMotor.h"
+#include "led_libraries/SmartMotor/TalonSmartMotor.h"
 
-TalonSmartMotor::TalonSmartMotor(int port, bool foc, std::string canBus) 
+TalonSmartMotor::TalonSmartMotor(int port, bool foc, CANBus canBus) 
   : motor{port, canBus} {
   focEnabled = foc;
 }

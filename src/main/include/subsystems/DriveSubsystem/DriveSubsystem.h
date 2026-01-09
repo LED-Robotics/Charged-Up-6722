@@ -21,11 +21,13 @@
 #include <ctre/phoenix6/Pigeon2.hpp>
 #include <ctre/phoenix6/CANcoder.hpp>
 #include <frc/AnalogInput.h>
+#include <frc2/command/Commands.h>
 
 #include <frc/DriverStation.h>
 
 #include "GlobalConstants.h"
 #include "SwerveModule.h"
+#include "ctre/phoenix6/CANBus.hpp"
 
 using namespace frc;
 using namespace ctre::phoenix6;
@@ -289,6 +291,8 @@ class DriveSubsystem : public frc2::SubsystemBase {
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
 
+  CANBus canivore;
+
   // The motor controllers
   //Wheel motors
   hardware::TalonFX backLeft;
@@ -337,4 +341,5 @@ class DriveSubsystem : public frc2::SubsystemBase {
   units::length::meter_t distFromTarget{0.0_m};
   double wallDistance = 0.0;
   Field2d fieldWidget;
+
 };

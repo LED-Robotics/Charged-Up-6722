@@ -9,8 +9,9 @@
 #include <ctre/phoenix6/CANcoder.hpp>
 #include <frc2/command/Command.h>
 #include <frc2/command/Commands.h>
-#include "led_libraries/PositionalSubsystem.h"
-#include "led_libraries/TalonSmartMotor.h"
+#include "ctre/phoenix6/CANBus.hpp"
+#include "led_libraries/Subsystems/PositionalSubsystem.h"
+#include "led_libraries/SmartMotor/TalonSmartMotor.h"
 #include "Constants.h"
 
 using namespace frc;
@@ -74,6 +75,8 @@ class TelescopeSubsystem : public PositionalSubsystem {
  private:
   // Components (e.g. motor controllers and sensors) should generally be
   // declared private and exposed only through public methods.
+
+  CANBus canivore;
 
   // The motor controllers
   TalonSmartMotor left;
